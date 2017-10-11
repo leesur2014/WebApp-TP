@@ -11,3 +11,4 @@ Mustache.js | JS template engine
 Redis | NoSQL database, pub/sub channels
 WebSocket | push notifications, canvas sync
 JQuery | Async requests
+Sequelize | ORM for Node.js
