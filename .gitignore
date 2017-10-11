@@ -1,3 +1,10 @@
+# ignore config files
+npm
+src/npm
+.idea
+*.xml
+*.iml
+
 # Class-specific section #
 
 
