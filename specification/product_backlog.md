@@ -2,37 +2,36 @@
 
 ### Login/logout via Facebook
 
-    A user could login through Facebook's verification page. 
-    Whenever a user accesses our home page, an alert 
-    window "continue with Facebook" would redirect them to login 
-    with their Facebook account.
-    After a user is logged in, he/she would see a game center 
-    page which displays all public game rooms. In this page, 
-    Similarly, the user could logout during any time and be 
-    redirected back to the home page.
-    
+1. A user can log in through Facebook via OAuth2.
+2. Whenever a user accesses our home page, a button
+"continue with Facebook" would redirect them to login
+with their Facebook accounts.
+3. After a user logs in, he/she will see a game center
+page which displays all public game rooms.
+4. A user may log out at any time. But if a user quits during a game,
+his/her points will be deducted.
+
 ### Game Center
-    
-    a) a user could join a publicly listed game room (as a 
-        player or observer).
-    b) a user could join a private room by entering invite code
-        (as a player or observer).
-    c) a user could create room (could be public/private), if the
-    room is private, this user would get a room inviting passcode.
-    
+
+1. The game center displays a list of public game rooms.
+1. A user may join any publicly listed game room by clinking on it.
+2. A user may join a private room by entering a code.
+3. A user could create room. If he chooses to create a private room, this user will get a room invitation code.
+
 ### Drawing Room
-    
-    
-    After all players click "ready", the game starts. Any player
-    who hasn't "ready"ed for 20 seconds after all other players are 
-    "ready" could be deducted some points and be made an observer.
-    
-    There could be 2 types of users in a drawing room.
-    a) player: each player take turns to be a "drawer" who could see a keyword
-    and draw any shape on the board. The first 2 players who guessed 
-    right keyword are winners (for some points). If nobody guessed
-    right, the drawer could be deducted some points.
-    
-    b) observer: an observer could only watch the game and give
-    remarks.
-    
+
+1. A room consists of one to six players.
+2. The minimal unit of a game is a round.
+3. A game round starts when the following condition is satisfied:
+  1. There are more than two players in the room
+  2. All players are ready
+4. At the beginning of a round, the server designates a player as the painter and other players as guessers.
+The server presents the painter a word. Then the painter draws on the board. The painter should complete
+his/her drawing within a predefined time. Meanwhile, the guessers may type their guesses into a input box.
+The server will notify a guesser if his/her guess is correct or not.
+4. A game round ends in two cases.
+  1. more than half of the guesser have come up with the correct answer
+  2. a predefined time out occurs
+  3. the painter quits the game
+5. When the round ends. All guessers who submitted the correct answer will get some points.
+If nobody guessed right, the painter's points will be deducted.
