@@ -51,4 +51,4 @@ If nobody guessed right, the painter's points will be deducted.
 | Views: Log in/ Log out (via Facebook) | Xuhui Wang |
 | Scoreboard | Peipei Li|
 | Game Center | Hancheng Zhong |
-| Drawing Room Logic (with highest cohesion) | Hancheng Zhong, Xuhui Wang|
+| Drawing Room Logic (with highest cohesion) | Hancheng Zhong, Xuhui Wang, Peipei Li|
