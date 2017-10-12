@@ -115,12 +115,11 @@ const User = sequelize.define('user', {
   },
 });
 
-
-Room.hasOne(Round);
-Room.hasMany(User);
-Round.hasMany(User, {as: 'guesser'});
-Round.hasOne(User, {as: 'painter'});
-Round.hasOne(Dict, {as: 'word'});
+Round.belongsTo(Dict, {as: 'word'});
+Round.belongsTo(Room);
+User.belongsTo(Room);
+User.belongsTo(Round);
+User.hasOne(Round, {as: 'painter'});
 
 Dict.sync({force: true}).then(function () {
   User.sync({force: true}).then(function () {
