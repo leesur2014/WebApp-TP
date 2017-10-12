@@ -14,7 +14,7 @@ his/her points will be deducted.
 ### Game Center
 
 1. The game center displays a list of public game rooms.
-1. A user may join any publicly listed game room by clinking on it.
+1. A user may join any publicly listed game room by clicking on it.
 2. A user may join a private room by entering a code.
 3. A user could create room. If he chooses to create a private room, this user will get a room invitation code.
 
@@ -35,3 +35,20 @@ The server will notify a guesser if his/her guess is correct or not.
   3. the painter quits the game
 5. When the round ends. All guessers who submitted the correct answer will get some points.
 If nobody guessed right, the painter's points will be deducted.
+
+
+### Scoreboard
+
+1. The users with highest overall scores are displayed
+2. A 'Best guesser' list (users with highest 'guessing' scores)
+3. A 'Best Painter' list (users with highest 'painting' scores)
+
+
+## Primary Responsibilities assignment
+
+| Modules | Responsible team members|
+|---|---|
+| Views: Log in/ Log out (via Facebook) | Xuhui Wang |
+| Scoreboard | Peipei Li|
+| Game Center | Hancheng Zhong |
+| Drawing Room Logic (with highest cohesion) | Hancheng Zhong, Xuhui Wang, Peipei Li|
