@@ -37,9 +37,9 @@ The server presents the painter a word. Then the painter draws on the board. The
 his/her drawing within a predefined time `T_draw`. Meanwhile, the guessers may type their guesses into a input box.
 The server will notify a guesser if his/her guess is correct or not.
 7. A game round ends if any of these conditions are true:
-    1. more than half of the guesser have come up with the correct answer
-    2. a predefined time out `T_round` occurs
-    3. the painter quits the game
+    * more than half of the guesser have come up with the correct answer
+    * a predefined time out `T_round` occurs
+    * the painter quits the game
 8. When a round ends. All guessers who submitted the correct answer receive `GF(x)` points.
 The painter will receive `PF(x)` points. Variable `x` is the # of guessers with correct answers.
 Both `GF(x)` and `PF(x)` are configurable.
