@@ -1,6 +1,6 @@
 ## List of functionalities and Description of actions
 
-### Login/logout via Facebook
+### Log in/out
 
 1. There is a "Log in with Facebook" button on the login page.
 Users can log in with their Facebook accounts via OAuth2.
