@@ -10,7 +10,7 @@ Features
 1. Users can log in with their Facebook accounts.
 2. A User will be prompted for a nickname the first time he/she logs in.
 3. Users will be redirected to the game center page after logging in.
-4. The game center displays a list of public game rooms.
+4. The game center displays a list of public game rooms. For each request, only render part of the game center, render more content if users scroll all the way down to the bottom of the page.
 5. Users may create public/private rooms. For private rooms, an invitation code
 is generated for that room by the server.
 6. A user may join any public game room by clicking on it in the game center page.
@@ -35,6 +35,8 @@ All | Test database queries | 2 | Hancheng
 1,2,3 | Implement OAuth2 callback view | 3 | Xuhui
 1 | Test OAuth2 functionality | 2 | Xuhui
 4 | Design HTML/CSS for the game center view | 4 | Peipei
+4 | Read React.js API docs | 4 | Peipei
+4 | Implement game center partial rendering | 6 | Peipei
 5,6,7 | Define JSON endpoints for retrieving game room list, creating/joining/leaving game rooms | 1 | Hancheng
 4 | Write JS code to retrieve game room list incrementally and update HTML | 2 | Peipei
 4 | Write backend code to handle game room list requests | 2 | Hancheng
