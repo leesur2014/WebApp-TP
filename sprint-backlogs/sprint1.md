@@ -29,6 +29,8 @@ All | Analysis authentication requirements for each URL | 1 | Hancheng
 All | Read docs of node-postgres | 2 | Hancheng
 All | Re/Define database structures | 2 | Hancheng
 All | Test database queries | 2 | Hancheng
+All | Comprehensive code review on database queries | 5 | Xuhui
+All | Deployment on cloud | 4 | Xuhui
 1 | Read Facebook OAuth2 API docs | 3 | Xuhui
 1 | Read passport.js docs | 2 | Xuhui
 1 | Create OAuth2 client ID and key on FB | 1 | Xuhui
