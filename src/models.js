@@ -66,7 +66,10 @@ user.leaveRoom = function (user_id) {
 
 };
 
+user.createRoom = function (user_id, isPrivate)
+{
 
+}
 
 
 room._getById = function (tx, room_id) {
@@ -104,21 +107,21 @@ room._create = function (tx, isPrivate) {
       charset: 'numeric'
     });
   }
-  return tx.one('INSERT INTO rooms (passcode) VALUES ($1) RETURNING id', [passcode]);
+  return tx.one('INSERT INTO rooms (passcode) VALUES ($1) RETURNING *', [passcode]);
 };
 
 room.getPublicRoomsWithUsers = function () {
   return db.any('SELECT rooms.id AS room_id, rooms.created_at, ' +
     'users.id AS user_id, users.nickname ' +
     'FROM rooms JOIN users ON users.room_id = rooms.id ' +
-    'WHERE rooms.passcode IS NULL AND rooms.deleted_at IS NULL' +
+    'WHERE rooms.passcode IS NULL AND rooms.deleted_at IS NULL ' +
     'ORDER BY rooms.id');
 }
 
 room.getPublicRooms = function () {
-  return db.any('SELECT rooms.id, rooms.created_at, count(user.id)' +
+  return db.any('SELECT rooms.id, rooms.created_at, count(users.id)' +
     'FROM rooms JOIN users ON users.room_id = rooms.id ' +
-    'WHERE rooms.passcode IS NULL AND rooms.deleted_at IS NULL' +
+    'WHERE rooms.passcode IS NULL AND rooms.deleted_at IS NULL ' +
     'GROUP BY rooms.id ORDER BY rooms.id');
 }
 
@@ -130,6 +133,7 @@ room._startNewRound = function (tx, room_id) {
   // create a row for each of the rest players in round_user table
   // clear every player's ready bit
   // create one row in rounds table
+  // return that row
 }
 
 round._end = function (tx, round_id) {
