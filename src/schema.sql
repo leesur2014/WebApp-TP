@@ -9,6 +9,7 @@ CREATE TABLE "users" (
 	"score_penalty" integer NOT NULL DEFAULT '0',
 	"room_id" integer NULL,
 	"ready" boolean NOT NULL default 'FALSE',
+	"online" boolean NOT NULL default 'FALSE',
 	"joined_at" TIMESTAMP NOT NULL default current_timestamp,
 	PRIMARY KEY ("id")
 ) WITH (
