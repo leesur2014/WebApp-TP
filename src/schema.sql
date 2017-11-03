@@ -9,6 +9,7 @@ CREATE TABLE "users" (
 	"score_penalty" integer NOT NULL DEFAULT '0',
 	"room_id" integer NULL,
 	"ready" boolean NOT NULL default 'FALSE',
+	"joined_at" TIMESTAMP NOT NULL default current_timestamp,
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -19,7 +20,7 @@ CREATE TABLE "users" (
 CREATE TABLE "rooms" (
 	"id" serial NOT NULL,
 	"passcode" character(10) NULL,
-	"created_at" TIMESTAMP NOT NULL,
+	"created_at" TIMESTAMP NOT NULL default current_timestamp,
 	"deleted_at" TIMESTAMP NULL,
 	PRIMARY KEY ("id")
 ) WITH (
@@ -32,7 +33,7 @@ CREATE TABLE "rounds" (
 	"id" serial NOT NULL,
 	"painter_id" integer NOT NULL,
 	"room_id" integer NOT NULL,
-	"started_at" TIMESTAMP NOT NULL,
+	"started_at" TIMESTAMP NOT NULL default current_timestamp,
 	"ended_at" TIMESTAMP NULL,
 	"answer" varchar(64) NOT NULL,
 	PRIMARY KEY ("id")
@@ -45,6 +46,7 @@ CREATE TABLE "round_user" (
 	"user_id" integer NOT NULL,
 	"round_id" integer NOT NULL,
 	"submission" varchar(64) NULL,
+	"submitted_at" timestamp NULL,
 	"score" integer NULL,
 	UNIQUE ("user_id", "round_id"),
 	PRIMARY KEY ("id")
@@ -55,7 +57,7 @@ CREATE TABLE "round_user" (
 CREATE TABLE "canvas" (
 	"id" serial NOT NULL,
 	"round_id" integer NOT NULL,
-	"timestamp" TIMESTAMP NOT NULL,
+	"timestamp" TIMESTAMP NOT NULL default current_timestamp,
 	"image" bytea NOT NULL,
 	PRIMARY KEY ("id")
 ) WITH (
