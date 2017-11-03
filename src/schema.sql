@@ -1,4 +1,4 @@
-CREATE TABLE "user" (
+CREATE TABLE "users" (
 	"id" serial NOT NULL,
 	"fb_id" varchar(255) NOT NULL UNIQUE,
 	"access_token" char(255) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE "user" (
 	"score_guess" integer NOT NULL DEFAULT '0',
 	"score_penalty" integer NOT NULL DEFAULT '0',
 	"room_id" integer NULL,
-	"ready" boolean NOT NULL default 'TRUE',
+	"ready" boolean NOT NULL default 'FALSE',
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -16,7 +16,7 @@ CREATE TABLE "user" (
 
 
 
-CREATE TABLE "room" (
+CREATE TABLE "rooms" (
 	"id" serial NOT NULL,
 	"passcode" character(10) NULL,
 	"created_at" TIMESTAMP NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE "room" (
 
 
 
-CREATE TABLE "round" (
+CREATE TABLE "rounds" (
 	"id" serial NOT NULL,
 	"painter_id" integer NOT NULL,
 	"room_id" integer NOT NULL,
@@ -40,9 +40,7 @@ CREATE TABLE "round" (
   OIDS=FALSE
 );
 
-
-
-CREATE TABLE "guesser" (
+CREATE TABLE "round_user" (
 	"id" serial NOT NULL,
 	"user_id" integer NOT NULL,
 	"round_id" integer NOT NULL,
@@ -54,8 +52,6 @@ CREATE TABLE "guesser" (
   OIDS=FALSE
 );
 
-
-
 CREATE TABLE "canvas" (
 	"id" serial NOT NULL,
 	"round_id" integer NOT NULL,
@@ -66,8 +62,6 @@ CREATE TABLE "canvas" (
   OIDS=FALSE
 );
 
-
-
 CREATE TABLE "dictionary" (
 	"word" varchar(64) NOT NULL,
 	PRIMARY KEY ("word")
@@ -77,13 +71,13 @@ CREATE TABLE "dictionary" (
 
 
 
-ALTER TABLE "user" ADD CONSTRAINT "user_fk0" FOREIGN KEY ("room_id") REFERENCES "room"("id");
+ALTER TABLE "users" ADD CONSTRAINT "user_fk0" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
 
 
-ALTER TABLE "round" ADD CONSTRAINT "round_fk0" FOREIGN KEY ("painter_id") REFERENCES "user"("id");
-ALTER TABLE "round" ADD CONSTRAINT "round_fk1" FOREIGN KEY ("room_id") REFERENCES "room"("id");
+ALTER TABLE "rounds" ADD CONSTRAINT "round_fk0" FOREIGN KEY ("painter_id") REFERENCES "users"("id");
+ALTER TABLE "rounds" ADD CONSTRAINT "round_fk1" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
 
-ALTER TABLE "guesser" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") REFERENCES "user"("id");
-ALTER TABLE "guesser" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "round"("id");
+ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
+ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
 
-ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "round"("id");
+ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
