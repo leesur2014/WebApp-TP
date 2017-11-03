@@ -2,7 +2,7 @@ CREATE TABLE "user" (
 	"id" serial NOT NULL,
 	"fb_id" varchar(255) NOT NULL UNIQUE,
 	"access_token" char(255) NOT NULL,
-	"nickname" varchar(64) NOT NULL UNIQUE,
+	"nickname" varchar(64) NOT NULL,
 	"token_expire_at" TIMESTAMP NULL,
 	"score_draw" integer NOT NULL DEFAULT '0',
 	"score_guess" integer NOT NULL DEFAULT '0',
