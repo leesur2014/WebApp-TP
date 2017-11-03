@@ -7,10 +7,11 @@ CREATE TABLE "users" (
 	"score_draw" integer NOT NULL DEFAULT '0',
 	"score_guess" integer NOT NULL DEFAULT '0',
 	"score_penalty" integer NOT NULL DEFAULT '0',
-	"room_id" integer NULL,
-	"ready" boolean NOT NULL default 'FALSE',
 	"online" boolean NOT NULL default 'FALSE',
 	"joined_at" TIMESTAMP NOT NULL default current_timestamp,
+	"room_id" integer NULL,
+	"ready" boolean NOT NULL default 'FALSE',
+	"observer" boolean NOT NULL default 'FALSE',
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
