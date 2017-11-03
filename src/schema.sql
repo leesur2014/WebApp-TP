@@ -49,7 +49,7 @@ CREATE TABLE "guesser" (
 	"submission" varchar(64) NULL,
 	"score" integer NULL,
 	UNIQUE ("user_id", "round_id"),
-	PRIMARY KEY ("id"),
+	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
