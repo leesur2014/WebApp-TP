@@ -43,14 +43,12 @@ CREATE TABLE "rounds" (
 );
 
 CREATE TABLE "round_user" (
-	"id" serial NOT NULL,
 	"user_id" integer NOT NULL,
 	"round_id" integer NOT NULL,
 	"submission" varchar(64) NULL,
 	"submitted_at" timestamp NULL,
 	"score" integer NULL,
-	UNIQUE ("user_id", "round_id"),
-	PRIMARY KEY ("id")
+	PRIMARY KEY ("user_id", "round_id")
 ) WITH (
   OIDS=FALSE
 );
