@@ -74,7 +74,15 @@ CREATE TABLE "dictionary" (
   OIDS=FALSE
 );
 
+CREATE TABLE "painter_score_map" (
+	"correct_guessers" INTEGER,
+	"score" INTEGER NOT NULL,
+	PRIMARY KEY ("correct_guessers")
+) WITH (
+  OIDS=FALSE
+);
 
+INSERT INTO "painter_score_map" (correct_guessers, score) VALUES (0, 0), (1, 3), (2, 3), (3, 2), (4, 1), (5, 1);
 
 ALTER TABLE "users" ADD CONSTRAINT "user_fk0" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
 
