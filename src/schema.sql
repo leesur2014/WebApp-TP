@@ -1,14 +1,16 @@
 CREATE TABLE "users" (
 	"id" serial NOT NULL,
 	"fb_id" varchar(255) NOT NULL UNIQUE,
-	"access_token" char(255) NOT NULL,
+	"fb_access_token" char(255) NULL,
+	"fb_token_expire_at" TIMESTAMP NULL,
+	"access_token" char(128) NULL,
 	"nickname" varchar(64) NOT NULL,
-	"token_expire_at" TIMESTAMP NULL,
 	"score_draw" integer NOT NULL DEFAULT '0',
 	"score_guess" integer NOT NULL DEFAULT '0',
 	"score_penalty" integer NOT NULL DEFAULT '0',
-	"online" boolean NOT NULL default 'FALSE',
 	"joined_at" TIMESTAMP NOT NULL default current_timestamp,
+
+	"online" boolean NOT NULL default 'FALSE',
 	"room_id" integer NULL,
 	"ready" boolean NOT NULL default 'FALSE',
 	"observer" boolean NOT NULL default 'FALSE',
@@ -34,6 +36,7 @@ CREATE TABLE "rooms" (
 CREATE TABLE "rounds" (
 	"id" serial NOT NULL,
 	"painter_id" integer NOT NULL,
+	"painter_score" integer NULL,
 	"room_id" integer NOT NULL,
 	"started_at" TIMESTAMP NOT NULL default current_timestamp,
 	"ended_at" TIMESTAMP NULL,
@@ -83,3 +86,14 @@ ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") RE
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
 
 ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
+
+
+CREATE VIEW public_rooms AS SELECT rooms.id, rooms.created_at, count(users.id)
+FROM rooms JOIN users ON users.room_id = rooms.id
+WHERE rooms.passcode IS NULL AND rooms.deleted_at IS NULL
+GROUP BY rooms.id ORDER BY rooms.id;
+
+CREATE VIEW top_guessers AS SELECT id, nickname, score_guess FROM users ORDER BY score_guess FETCH FIRST 50 ROWS ONLY;
+CREATE VIEW top_painter AS SELECT id, nickname, score_draw FROM users ORDER BY score_draw FETCH FIRST 50 ROWS ONLY;
+CREATE VIEW top_users AS SELECT id, nickname, (score_guess + score_draw - score_penalty) AS score
+FROM users ORDER BY score FETCH FIRST 50 ROWS ONLY;
