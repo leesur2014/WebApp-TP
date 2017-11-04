@@ -27,6 +27,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION __user_inc_penalty (_user_id INT, _val INT) RETURNS void AS $$
+BEGIN
+  UPDATE users SET score_penalty = score_penalty + _val WHERE id = _user_id;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'user % does not exist', _user_id;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION room_create(_user_id INT, _passcode VARCHAR DEFAULT NULL) RETURNS rooms AS $$
@@ -266,19 +274,27 @@ BEGIN
   END IF;
 
   IF user_can_exit_room(_user.id) THEN
-    UPDATE users SET room_id = NULL WHERE id = _user.id;
-  ELSE IF _force THEN
+    NULL;
+  ELSIF _force THEN
+    PERFORM __user_inc_penalty(_user_id, _penalty);
     SELECT * INTO STRICT _round FROM room_get_current_round(_user.room_id);
     IF _round.painter_id = _user.id THEN
       -- the exiting user is the painter
-      PERFORM round_end()
+      PERFORM round_end(_round.id, TRUE);
     ELSE
       -- the exiting user is a guesser
-
-    UPDATE users SET room_id = NULL WHERE id = _user.id;
+      DELETE FROM round_user WHERE round_id = _round.id AND user_id = _user.id;
+      IF NOT EXISTS (SELECT * FROM round_user WHERE round_id = _round.id) THEN
+        -- end the round if there are no guessers
+        PERFORM round_end(_round.id, TRUE);
+      END IF;
+    END IF;
   ELSE
-    RAISE EXCEPTION 'cannot exit room % normally', _user.room_id
+    RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
   END IF;
+
+  -- remove user from current room
+  UPDATE users SET room_id = NULL WHERE id = _user.id;
 
   IF room_count_users(_user.room_id) = 0 THEN
     PERFORM __room_delete(_user.room_id);
