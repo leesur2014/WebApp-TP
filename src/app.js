@@ -1,5 +1,4 @@
 'use strict';
-
 var express = require('express');
 var redis = require('redis');
 var path = require('path');

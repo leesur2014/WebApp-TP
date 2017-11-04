@@ -28,5 +28,10 @@
   "description": "Please complete all your project development in this directory and  its subdirectories (which you may create as neeeded).",
   "main": "app.js",
   "author": "Xuhui Wang",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1"
+  }
 }
