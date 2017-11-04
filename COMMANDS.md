@@ -14,3 +14,12 @@
 alerting and analytics tool for developers
 
     `npm install nodemon`
+    
+* connect to the psql database
+
+    `  psql "sslmode=verify-full sslrootcert=server-ca.pem \
+           sslcert=client-cert.pem sslkey=client-key.pem \
+           hostaddr=104.196.2.236 \
+           host=named-idiom-184419:you-draw-i-guess \
+           port=5432 \
+           user=postgres dbname=postgres"`
