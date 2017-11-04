@@ -23,7 +23,7 @@ CREATE TABLE "users" (
 
 CREATE TABLE "rooms" (
 	"id" serial NOT NULL,
-	"passcode" character(10) NULL,
+	"passcode" character(10) NOT NULL DEFAULT '',
 	"created_at" TIMESTAMP NOT NULL default current_timestamp,
 	"deleted_at" TIMESTAMP NULL,
 	PRIMARY KEY ("id")
@@ -36,7 +36,7 @@ CREATE TABLE "rooms" (
 CREATE TABLE "rounds" (
 	"id" serial NOT NULL,
 	"painter_id" integer NOT NULL,
-	"painter_score" integer NULL,
+	"painter_score" integer NOT NULL DEFAULT 0,
 	"room_id" integer NOT NULL,
 	"started_at" TIMESTAMP NOT NULL default current_timestamp,
 	"ended_at" TIMESTAMP NULL,
@@ -51,7 +51,7 @@ CREATE TABLE "round_user" (
 	"round_id" integer NOT NULL,
 	"submission" varchar(64) NULL,
 	"submitted_at" timestamp NULL,
-	"score" integer NULL,
+	"score" integer NOT NULL DEFAULT 0,
 	PRIMARY KEY ("user_id", "round_id")
 ) WITH (
   OIDS=FALSE
@@ -75,14 +75,13 @@ CREATE TABLE "dictionary" (
 );
 
 CREATE TABLE "painter_score_map" (
-	"correct_guessers" INTEGER,
-	"score" INTEGER NOT NULL,
-	PRIMARY KEY ("correct_guessers")
+	"correct_guesses" INTEGER PRIMARY KEY,
+	"score" INTEGER NOT NULL
 ) WITH (
   OIDS=FALSE
 );
 
-INSERT INTO "painter_score_map" (correct_guessers, score) VALUES (0, 0), (1, 3), (2, 3), (3, 2), (4, 1), (5, 1);
+INSERT INTO "painter_score_map" VALUES (0, 0), (1, 3), (2, 3), (3, 2), (4, 1), (5, 1);
 
 ALTER TABLE "users" ADD CONSTRAINT "user_fk0" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
 
