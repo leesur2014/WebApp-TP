@@ -1,5 +1,5 @@
 {
-  "name": "application-name",
+  "name": "you_draw_i_guess",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -24,5 +24,9 @@
     "redis": "^2.8.0",
     "static-favicon": "~1.0.0",
     "validator": "^9.1.1"
-  }
+  },
+  "description": "Please complete all your project development in this directory and  its subdirectories (which you may create as neeeded).",
+  "main": "app.js",
+  "author": "Xuhui Wang",
+  "license": "ISC"
 }
