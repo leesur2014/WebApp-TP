@@ -170,7 +170,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- round_end() should be called by the application when it is time to end a round
-CREATE OR REPLACE FUNCTION round_end(_round_id INT) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION round_end(_round_id INT, _aborted BOOLEAN DEFAULT FALSE) RETURNS VOID AS $$
 DECLARE
   _round RECORD;
   _row RECORD;
@@ -181,23 +181,26 @@ BEGIN
   IF _round.ended_at IS NOT NULL THEN
     RAISE EXCEPTION 'round % is alreayd eneded', _round_id;
   END IF;
-  -- get the # of correct_guesses
-  SELECT count(*) INTO _correct_guesses FROM round_user WHERE round_user.submission = _round.answer;
-  RAISE INFO '% players got the correct answer', _correct_guesses;
-  -- TODO: calculate each guesser's score and save in their round_user row;
+  -- mark this round as ended
+  UPDATE rounds SET ended_at = current_timestamp WHERE id = _round_id;
 
-  -- caculate the painter's score thourgh painter_score_map
-  -- also mark this round as ended
-  UPDATE rounds SET ended_at = current_timestamp,
-    painter_score = map_correct_guesses_to_painter_score(_correct_guesses)
-    WHERE id = _round_id;
-  -- increment the painter's score in users table
-  UPDATE users SET score_draw = score_draw + map_correct_guesses_to_painter_score(_correct_guesses)
-    WHERE id = _round.painter_id;
-  -- increment each guesser's score
-  FOR _row IN SELECT * FROM round_user WHERE round_id = _round_id LOOP
-    UPDATE users SET score_guess = score_guess + _row.score WHERE id = _row.user_id;
-  END LOOP;
+  IF NOT _aborted THEN
+    -- get the # of correct_guesses
+    SELECT count(*) INTO _correct_guesses FROM round_user WHERE round_user.submission = _round.answer;
+    RAISE INFO '% players got the correct answer', _correct_guesses;
+    -- TODO: calculate each guesser's score and save in their round_user row;
+
+    -- caculate the painter's score thourgh painter_score_map
+    UPDATE rounds SET painter_score = map_correct_guesses_to_painter_score(_correct_guesses)
+      WHERE id = _round_id;
+    -- increment the painter's score in users table
+    UPDATE users SET score_draw = score_draw + map_correct_guesses_to_painter_score(_correct_guesses)
+      WHERE id = _round.painter_id;
+    -- increment each guesser's score
+    FOR _row IN SELECT * FROM round_user WHERE round_id = _round_id LOOP
+      UPDATE users SET score_guess = score_guess + _row.score WHERE id = _row.user_id;
+    END LOOP;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -265,7 +268,12 @@ BEGIN
   IF user_can_exit_room(_user.id) THEN
     UPDATE users SET room_id = NULL WHERE id = _user.id;
   ELSE IF _force THEN
-    -- TODO
+    SELECT * INTO STRICT _round FROM room_get_current_round(_user.room_id);
+    IF _round.painter_id = _user.id THEN
+      -- the exiting user is the painter
+      PERFORM round_end()
+    ELSE
+      -- the exiting user is a guesser
 
     UPDATE users SET room_id = NULL WHERE id = _user.id;
   ELSE
