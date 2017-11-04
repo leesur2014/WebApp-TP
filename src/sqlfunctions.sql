@@ -233,8 +233,43 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_set_ready (_user_id INT) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_set_ready_status (_user_id INT, _ready BOOLEAN) RETURNS VOID AS $$
+DECLARE
+  _user RECORD;
+BEGIN
+  SELECT * INTO _user FROM user_get_by_id(_user_id);
+  IF _user.room_id IS NULL THEN
+    RAISE EXCEPTION 'failed since user % is not in a room', _user_id;
+  END IF;
+  IF _user.observer THEN
+    RAISE EXCEPTION 'failed since user % is an observer', _user_id;
+  END IF;
+  IF EXISTS (SELECT * FROM room_get_current_round(_user.room_id)) THEN
+    RAISE EXCEPTION 'failed since a round is active';
+  END IF;
+  UPDATE users SET ready = _ready WHERE id = _user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION user_submit_answer (_user_id INT, _answer VARCHAR) RETURNS BOOLEAN AS $$
+DECLARE
+  _round RECORD;
 BEGIN
   PERFORM user_get_by_id(_user_id);
-  UPDATE users SET ready = TRUE WHERE id = _user_id;
+
+  SELECT * INTO STRICT _round FROM rounds WHERE id = (
+    SELECT id FROM rounds JOIN round_user ON round_id = id
+    WHERE ended_at IS NULL AND user_id = _user_id
+  );
+
+  -- TODO: decide whether a user is allow to guess multiple times
+  UPDATE round_user SET submission = _answer, submitted_at = current_timestamp
+    WHERE round_id = _round.id AND user_id = _user_id;
+
+  IF _answer = _round.answer THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
 END;
+$$ LANGUAGE plpgsql;
