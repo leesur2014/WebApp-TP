@@ -12,6 +12,17 @@ var users = require('./routes/users');
 var app = express();
 var expressWs = require('express-ws')(app);
 
+// define PORT
+const PORT = 3000;
+
+app.get('/', (req, res) =>
+    res.send(`Node running! ${PORT}`)
+);
+
+app.listen(PORT, () =>
+    console.log(`your servering is running on port ${PORT}`)
+);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -59,3 +70,4 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+

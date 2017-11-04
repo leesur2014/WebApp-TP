@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "nodejs ./bin/www"
+    "start": "nodemon ./app.js --exec babel-node -e js"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
@@ -16,6 +16,7 @@
     "express-session": "^1.15.6",
     "express-ws": "^3.0.0",
     "morgan": "~1.0.0",
+    "nodemon": "^1.12.1",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "pg-monitor": "^0.8.3",
@@ -25,7 +26,7 @@
     "static-favicon": "~1.0.0",
     "validator": "^9.1.1"
   },
-  "description": "Please complete all your project development in this directory and  its subdirectories (which you may create as neeeded).",
+  "description": "you draw, I guess",
   "main": "app.js",
   "author": "Xuhui Wang",
   "license": "ISC",
