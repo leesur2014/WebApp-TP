@@ -1,12 +1,15 @@
+import express from 'express';
+import routes from './routes/index';
 'use strict';
-var express = require('express');
+
+//var express = require('express');
 var redis = require('redis');
 var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var api = require('./routes/api');
-var routes = require('./routes/index');
+//var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
@@ -15,37 +18,40 @@ var expressWs = require('express-ws')(app);
 // define PORT
 const PORT = 3000;
 
-app.get('/', (req, res) =>
-    res.send(`Node running! ${PORT}`)
-);
+routes(app);
+//app.get('/', (req, res) =>
+//    res.send(`Node running! ${PORT}`)
+//);
+//
+//app.listen(PORT, () =>
+//    console.log(`your servering is running on port ${PORT}`)
+//);
 
-app.listen(PORT, () =>
-    console.log(`your servering is running on port ${PORT}`)
-);
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+//app.set('views', path.join(__dirname, 'views'));
+//app.set('view engine', 'ejs');
+//
+//app.use(logger('dev'));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded());
+//app.use(cookieParser());
+//app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', routes);
-app.use('/users', users);
-app.use('/api', api);
+//app.use('/', routes);
+//app.use('/users', users);
+//app.use('/api', api);
 
 /// catch 404 and forwarding to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
+//app.use(function(req, res, next) {
+//    var err = new Error('Not Found');
+//    err.status = 404;
+//    next(err);
+//});
 
 /// error handlers
 
+/*
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
@@ -67,7 +73,7 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
+*/
 
 module.exports = app;
 
