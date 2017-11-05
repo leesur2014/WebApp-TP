@@ -1,5 +1,3 @@
-//import express from 'express';
-//import routes from './routes/index';
 'use strict';
 
 var express = require('express');
@@ -15,9 +13,32 @@ var users = require('./routes/users');
 
 var app = express();
 var expressWs = require('express-ws')(app);
+var configAuth = require('./config/auth');
+
+/* Facebook authentication middleware */
+var passport = require('passport')
+  , FacebookStrategy = require('passport-facebook').Strategy;
+
+passport.use(new FacebookStrategy({
+    clientID: configAuth.facebookAuth.clientID,
+    clientSecret: configAuth.facebookAuth.clientSecret,
+    callbackURL: configAuth.facebookAuth.callbackURL
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOrCreate({'facebook.id': profile.id}, function(err, user) {
+      if (err) { return done(err); }
+      done(null, user);
+    });
+  }
+));
+
+/*
+ *  connect to controllers
+ */
+var redirect = require('./controllers/redirect');
 
 // define PORT
-const PORT = 3000;
+const PORT = 8000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -65,9 +86,17 @@ app.set('view engine', 'ejs');
 //    });
 //});
 
-app.get('/', function(req, res) {
-    res.render('login', {});
+app.get('/', passport.authenticate('facebook', {successRedirect: '/game',
+failureRedirect: '/login'}));
+
+app.get('/login', function(req, res) {
+    redirect.directLogin(req, res);
 });
+
+app.get('/game', function(req, res) {
+    redirect.directGameCenter(req, res);
+});
+
 
 app.listen(PORT, () =>
     console.log(`your servering is running on port ${PORT}`)
