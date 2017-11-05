@@ -11,6 +11,8 @@ URL | Description
 
 Method | URL | Description
 ---|----|-------------
+GET | `/api/me` | Get current user's info
+POST | `/api/me` | change my nickname
 GET | `/api/lounge` | Get a list of public rooms
 GET | `/api/room` | Get detailed info about current room
 GET | `/api/user/{user_id}` | Get info about a user
@@ -38,6 +40,60 @@ For brevity, all timestamps are omitted in examples.
 
 
 ## Examples
+
+### Get my info
+
+```
+GET /api/me
+```
+
+```json
+{
+    "id": 4,
+    "fb_id": "482587648807570",
+    "nickname": "adsasdsad",
+    "score_draw": 0,
+    "score_guess": 0,
+    "score_penalty": 0,
+    "joined_at": "2017-11-06T03:07:27.708Z",
+    "online": false,
+    "room_id": 15,
+    "ready": false,
+    "observer": false
+}
+```
+
+
+### change my nickname
+
+field | optional | Description
+-----|-----------|--------------
+nickname | No | new nickname
+
+```
+POST /api/me
+
+nickname=whatever
+```
+
+```json
+{
+    "code": 0,
+    "data": {
+        "id": 4,
+        "fb_id": "482587648807570",
+        "nickname": "whatever",
+        "score_draw": 0,
+        "score_guess": 0,
+        "score_penalty": 0,
+        "joined_at": "2017-11-06T03:07:27.708Z",
+        "online": false,
+        "room_id": 15,
+        "ready": false,
+        "observer": false
+    }
+}
+```
 
 ### Get the list of public rooms
 
@@ -108,6 +164,12 @@ When there is a round in this room
             {
                 "id": 1,
                 "nickname": "xxxx",
+                "observer": false,
+                "ready": false
+            },
+            {
+                "id": 4,
+                "nickname": "whatever",
                 "observer": false,
                 "ready": false
             }
