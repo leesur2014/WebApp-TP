@@ -11,11 +11,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION user_get_or_create (_fb_id VARCHAR, _nickname VARCHAR) RETURNS users AS $$
+DECLARE
+  _user users%ROWTYPE;
+BEGIN
+  SELECT * INTO _user FROM users WHERE id = _user_id;
+  IF NOT FOUND THEN
+    INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
+  END IF;
+  RETURN _user;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE
   _user users%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _user FROM users WHERE id = _user_id;
+  BEGIN
+    SELECT * INTO STRICT _user FROM users WHERE id = _user_id;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'user % not found', _user_id;
+      WHEN TOO_MANY_ROWS THEN
+          RAISE EXCEPTION 'user % not unique', _user_id;
+  END;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
@@ -24,7 +44,14 @@ CREATE OR REPLACE FUNCTION room_get_by_id (_room_id INT) RETURNS rooms AS $$
 DECLARE
   _row rooms%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _row FROM rooms WHERE id = _room_id;
+  BEGIN
+    SELECT * INTO STRICT _row FROM rooms WHERE id = _room_id;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'room % not found', _room_id;
+      WHEN TOO_MANY_ROWS THEN
+          RAISE EXCEPTION 'room % not unique', _room_id;
+  END;
   RETURN _row;
 END;
 $$ LANGUAGE plpgsql;
@@ -33,7 +60,14 @@ CREATE OR REPLACE FUNCTION round_get_by_id (_round_id INT) RETURNS rounds AS $$
 DECLARE
   _row rounds%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _row FROM rounds WHERE id = _round_id;
+  BEGIN
+    SELECT * INTO STRICT _row FROM rounds WHERE id = _round_id;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'round % not found', _round_id;
+      WHEN TOO_MANY_ROWS THEN
+          RAISE EXCEPTION 'round % not unique', _round_id;
+  END;
   RETURN _row;
 END;
 $$ LANGUAGE plpgsql;
