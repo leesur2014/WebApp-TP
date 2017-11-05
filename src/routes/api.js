@@ -21,6 +21,7 @@ router.get('/me', function(req, res) {
 router.get('/user/:id(\\d+)', function(req, res) {
   User.getById(req.params.id)
   .then(function (user) {
+    user.fb_id = undefined;
     res.send(user);
   })
   .catch(function (err)
