@@ -24,12 +24,13 @@ All POST requests body is an URLencoded string.
 
 All endpoints require login. Or a HTTP 401 response is returned.
 
-All endpoints return a JSON object on HTTP 200 responses. If the code attribute of the object is 0, the request is successful. Otherwise the request failed. In the failure case, the error attribute is a string containing the reason. For example,
+All endpoints return a JSON object on HTTP 200 responses. If the `code` is 0, the request is successful. Otherwise the request failed. In the failure case, the error attribute is a string containing the reason. All JSON responses contains `timestamp`. For example,
 
 ```json
 {
   "code": -1,
-  "error": "lalalala"
+  "error": "lalalala",
+  "timestamp": "2017-10-05T14:48:00.000Z"
 }
 ```
 
