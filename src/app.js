@@ -24,10 +24,10 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded());
 app.use(session({
     store: new RedisStore({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: process.env.REDIS_PORT || 6379
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
     }),
-    secret: process.env.SESSION_SECRET || 'sessionsecret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));
