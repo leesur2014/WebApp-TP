@@ -72,7 +72,7 @@ BEGIN
   -- create a new room
 	INSERT INTO rooms (passcode) VALUES (_passcode) RETURNING * INTO _room;
   -- add this user into this room as a non-observer
-	PERFORM user_enter_room(_user.id, _room.id, passcode);
+	PERFORM user_enter_room(_user.id, _room.id, _passcode);
 	RETURN _room;
 END;
 $$ LANGUAGE plpgsql;
@@ -121,7 +121,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION room_get_players (_room_id INT) RETURNS SETOF users AS $$
 BEGIN
-  RETURN QUERY SELECT id, nickname FROM users WHERE room_id = _room_id AND observer = FALSE;
+  RETURN QUERY SELECT * FROM users WHERE room_id = _room_id AND observer = FALSE;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -277,7 +277,7 @@ BEGIN
     -- if user if an observer, he/she can exits any time as he/she wants
     RETURN TRUE;
   ELSE
-    IF EXISTS (SELECT * FROM room_get_current_round(_user.room_id)) THEN
+    IF EXISTS (SELECT id FROM room_get_current_round(_user.room_id)) THEN
       RETURN FALSE;
     END IF;
   END IF;
