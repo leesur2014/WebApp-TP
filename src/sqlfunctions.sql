@@ -1,4 +1,15 @@
--- functions started with two underscores should not be called by the application
+-- NOTE functions started with two underscores should not be called by the application
+
+CREATE OR REPLACE FUNCTION dictionary_get_random_word() RETURNS VARCHAR AS $$
+DECLARE
+  _word VARCHAR;
+  _rows INT;
+BEGIN
+  SELECT count(*) INTO _rows FROM dictionary;
+  SELECT word INTO _word FROM dictionary OFFSET floor(random() * _rows) LIMIT 1;
+  RETURN _word;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE
@@ -33,6 +44,17 @@ BEGIN
   IF NOT FOUND THEN
     RAISE EXCEPTION 'user % does not exist', _user_id;
   END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION user_get_current_round(_user_id INT) RETURNS SETOF rounds AS $$
+DECLARE
+  _round rounds%ROWTYPE;
+  _user RECORD;
+BEGIN
+  SELECT * INTO _user FROM user_get_by_id(_user_id);
+  RETURN QUERY SELECT * FROM rounds WHERE room_id = _user.room_id AND ended_at IS NULL;
+  RETURN;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -73,6 +95,7 @@ DECLARE
   _round rounds%ROWTYPE;
 BEGIN
   RETURN QUERY SELECT * FROM rounds WHERE room_id = _room_id AND ended_at IS NULL;
+  RETURN;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -138,7 +161,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- round_end() should be called by the application when it wishes to start a new round in a room
+-- room_start_new_round should be called by the application when it wishes to start a new round in a room
 -- may throw exception if requirements are not met
 CREATE OR REPLACE FUNCTION room_start_new_round(_room_id INT, word varchar) RETURNS rounds AS $$
 DECLARE
@@ -265,27 +288,28 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT, _force BOOLEAN DEFAULT FALSE, _penalty INTEGER DEFAULT 5) RETURNS void AS $$
 DECLARE
 	_user users%ROWTYPE;
-  _round RECORD;
+  _round rounds%ROWTYPE;
 BEGIN
-  SELECT * INTO _user FROM user_get_by_id(_user_id);
+  SELECT * INTO STRICT _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
-    -- do nothing
-    RETURN;
+    RAISE EXCEPTION 'user % is not in a room', _user_id;
   END IF;
 
   IF user_can_exit_room(_user.id) THEN
     NULL;
   ELSIF _force THEN
     PERFORM __user_inc_penalty(_user_id, _penalty);
-    SELECT * INTO STRICT _round FROM room_get_current_round(_user.room_id);
+    SELECT * INTO STRICT _round FROM user_get_current_round(_user.id);
     IF _round.painter_id = _user.id THEN
       -- the exiting user is the painter
+      RAISE INFO 'round % ended due to painter % exit', _round.id, _user.id;
       PERFORM round_end(_round.id, TRUE);
     ELSE
       -- the exiting user is a guesser
       DELETE FROM round_user WHERE round_id = _round.id AND user_id = _user.id;
       IF NOT EXISTS (SELECT * FROM round_user WHERE round_id = _round.id) THEN
         -- end the round if there are no guessers
+        RAISE INFO 'round % ended due to no guessers', _round.id;
         PERFORM round_end(_round.id, TRUE);
       END IF;
     END IF;
@@ -308,13 +332,13 @@ DECLARE
 BEGIN
   SELECT * INTO _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
-    RAISE EXCEPTION 'failed since user % is not in a room', _user_id;
+    RAISE EXCEPTION 'user % is not in a room', _user_id;
   END IF;
   IF _user.observer THEN
-    RAISE EXCEPTION 'failed since user % is an observer', _user_id;
+    RAISE EXCEPTION 'user % is an observer', _user_id;
   END IF;
-  IF EXISTS (SELECT * FROM room_get_current_round(_user.room_id)) THEN
-    RAISE EXCEPTION 'failed since a round is active';
+  IF EXISTS (SELECT * FROM user_get_current_round(_user_id)) THEN
+    RAISE EXCEPTION 'user % is in an active round', _user_id;
   END IF;
   UPDATE users SET ready = _ready WHERE id = _user_id;
 END;
@@ -324,21 +348,38 @@ CREATE OR REPLACE FUNCTION user_submit_answer (_user_id INT, _answer VARCHAR) RE
 DECLARE
   _round RECORD;
 BEGIN
-  PERFORM user_get_by_id(_user_id);
 
-  SELECT * INTO STRICT _round FROM rounds WHERE id = (
-    SELECT id FROM rounds JOIN round_user ON round_id = id
-    WHERE ended_at IS NULL AND user_id = _user_id
-  );
+  SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
 
   -- TODO: decide whether a user is allow to guess multiple times
-  UPDATE round_user SET submission = _answer, submitted_at = current_timestamp
+  UPDATE round_user SET submission = _answer, submitted_at = now_utc()
     WHERE round_id = _round.id AND user_id = _user_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'no round_user entry found for user % at round %', _user_id, _round.id;
+  END IF;
 
   IF _answer = _round.answer THEN
     RETURN TRUE;
   ELSE
     RETURN FALSE;
   END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION user_submit_image (_user_id INT, _image BYTEA) RETURNS VOID AS $$
+DECLARE
+  _round RECORD;
+BEGIN
+
+  SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
+
+  IF _round.painter_id = _user_id THEN
+    INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
+  ELSE
+    RAISE EXCEPTION 'user % is not the painter in round %', _user_id, _round.id;
+  END IF;
+
 END;
 $$ LANGUAGE plpgsql;

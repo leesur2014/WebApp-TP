@@ -1,17 +1,25 @@
 'use strict';
 
 var express = require('express');
-var redis = require('redis');
 var path = require('path');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+<<<<<<< HEAD
 var fs = require('fs');
+=======
+
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+
+var passport = require('passport');
+
+>>>>>>> 2bfc5bb92834d14224490d2b1f9da6647b888ae1
 var api = require('./routes/api');
 //var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+<<<<<<< HEAD
 var expressWs = require('express-ws')(app);
 var configAuth = require('./config/auth');
 
@@ -62,6 +70,36 @@ app.set('view engine', 'ejs');
 //});
 
 // error handlers
+=======
+app.use(logger('dev'));
+
+app.use(session({
+    store: new RedisStore({
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(bodyParser.urlencoded());
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/', routes);
+app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use('/users', users);
+app.use('/api', api);
+
+/// catch 404 and forwarding to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+>>>>>>> 2bfc5bb92834d14224490d2b1f9da6647b888ae1
 
 
 // development error handler
