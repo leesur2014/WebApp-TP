@@ -330,13 +330,13 @@ DECLARE
 BEGIN
   SELECT * INTO _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
-    RAISE EXCEPTION 'failed since user % is not in a room', _user_id;
+    RAISE EXCEPTION 'user % is not in a room', _user_id;
   END IF;
   IF _user.observer THEN
-    RAISE EXCEPTION 'failed since user % is an observer', _user_id;
+    RAISE EXCEPTION 'user % is an observer', _user_id;
   END IF;
-  IF EXISTS (SELECT * FROM room_get_current_round(_user.room_id)) THEN
-    RAISE EXCEPTION 'failed since a round is active';
+  IF EXISTS (SELECT * FROM user_get_current_round(_user_id) THEN
+    RAISE EXCEPTION 'user % is in an active round', _user_id;
   END IF;
   UPDATE users SET ready = _ready WHERE id = _user_id;
 END;
