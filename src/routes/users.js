@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
+var User = require('../models/user.js');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -10,10 +10,15 @@ passport.use(new FacebookStrategy({
     callbackURL: process.env.FB_CALLBACK_URL
   },
   function(accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-      console.log(profile);
-      return done(null, profile);
-    });
+    User.getOrCreate(profile.id, profile.displayName)
+      .then(function (user) {
+        // console.log(user);
+        return done(null, user);
+      })
+      .catch(function(err) {
+        // console.log(err);
+        done(err);
+      });
   }
 ));
 
@@ -22,11 +27,14 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log("deserialize " + id);
-  done(null, {hello: "world"})
-  // User.findById(id, function(err, user) {
-  //   done(err, user);
-  // });
+  User.getById(id)
+    .then(function (user) {
+      done(null, user);
+    })
+    .catch(function(err) {
+      // control reaches here if a logged in user is deleted from the DB
+      done(null, null);
+    });
 });
 
 router.get('/login', passport.authenticate('facebook'));
@@ -36,8 +44,9 @@ router.get('/callback',
                                       failureRedirect: '/user/login' }));
 
 
-router.get('/logout', function(req, res) {
-  res.send('respond with a resource');
+router.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
 });
 
 module.exports = router;
