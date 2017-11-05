@@ -288,9 +288,9 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT, _force BOOLEAN DEFAULT FALSE, _penalty INTEGER DEFAULT 5) RETURNS void AS $$
 DECLARE
 	_user users%ROWTYPE;
-  _round RECORD;
+  _round rounds%ROWTYPE;
 BEGIN
-  SELECT * INTO _user FROM user_get_by_id(_user_id);
+  SELECT * INTO STRICT _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
     RAISE EXCEPTION 'user % is not in a room', _user_id;
   END IF;
@@ -299,15 +299,17 @@ BEGIN
     NULL;
   ELSIF _force THEN
     PERFORM __user_inc_penalty(_user_id, _penalty);
-    SELECT * INTO STRICT _round FROM room_get_current_round(_user.room_id);
+    SELECT * INTO STRICT _round FROM user_get_current_round(_user.id);
     IF _round.painter_id = _user.id THEN
       -- the exiting user is the painter
+      RAISE INFO 'round % ended due to painter % exit', _round.id, _user.id;
       PERFORM round_end(_round.id, TRUE);
     ELSE
       -- the exiting user is a guesser
       DELETE FROM round_user WHERE round_id = _round.id AND user_id = _user.id;
       IF NOT EXISTS (SELECT * FROM round_user WHERE round_id = _round.id) THEN
         -- end the round if there are no guessers
+        RAISE INFO 'round % ended due to no guessers', _round.id;
         PERFORM round_end(_round.id, TRUE);
       END IF;
     END IF;
@@ -335,7 +337,7 @@ BEGIN
   IF _user.observer THEN
     RAISE EXCEPTION 'user % is an observer', _user_id;
   END IF;
-  IF EXISTS (SELECT * FROM user_get_current_round(_user_id) THEN
+  IF EXISTS (SELECT * FROM user_get_current_round(_user_id)) THEN
     RAISE EXCEPTION 'user % is in an active round', _user_id;
   END IF;
   UPDATE users SET ready = _ready WHERE id = _user_id;
