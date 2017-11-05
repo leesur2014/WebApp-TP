@@ -59,7 +59,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION room_create(_user_id INT, _passcode VARCHAR DEFAULT NULL) RETURNS rooms AS $$
+CREATE OR REPLACE FUNCTION user_create_room(_user_id INT, _passcode VARCHAR DEFAULT '') RETURNS rooms AS $$
 DECLARE
   _room rooms%ROWTYPE;
   _user RECORD;
@@ -80,7 +80,7 @@ $$ LANGUAGE plpgsql;
 -- This function is automatically called when the last user leaves the room
 CREATE OR REPLACE FUNCTION __room_delete(_room_id INT) RETURNS VOID AS $$
 BEGIN
-	IF NOT EXISTS (SELECT * FROM users WHERE room_id = _room_id) THEN
+	IF NOT EXISTS (SELECT id FROM users WHERE room_id = _room_id) THEN
     RAISE INFO 'room % is marked deleted', _room_id;
 		UPDATE rooms SET deleted_at = current_timestamp WHERE id = _room_id;
 	ELSE
@@ -121,7 +121,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION room_get_players (_room_id INT) RETURNS SETOF users AS $$
 BEGIN
-  RETURN QUERY SELECT * FROM users WHERE room_id = _room_id AND observer = FALSE;
+  RETURN QUERY SELECT id, nickname FROM users WHERE room_id = _room_id AND observer = FALSE;
 END;
 $$ LANGUAGE plpgsql;
 
