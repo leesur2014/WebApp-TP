@@ -13,6 +13,7 @@ Method | URL | Description
 ---|----|-------------
 GET | `/api/rooms` | Get a list of public rooms
 GET | `/api/room/{room_id}` | Get the member and round info about a room
+GET | `/api/user/{user_id}` | Get basic info about a user
 POST | `/api/enter` | Join a room
 POST | `/api/exit` | Quit a room
 POST | `/api/ready` | Set/clear the user's ready bit
@@ -239,7 +240,7 @@ failure response
 URL | Description
 ----|--------------
 `/ws/room/{room_id}` | Get notifications about events in the room
-
+`/ws/lounge` | Get notifications about all public rooms (planned)
 
 A client should connect to `/ws/room/{room_id}` after the user enters the room. The connection
 is disconnected when a user leaves a room. The server sends events as JSON objects to the client.
@@ -251,8 +252,67 @@ event type | desc
 -----------|---------
 `user_enter` | a user entered this room
 `user_exit` | a user left this room
+`user_guess` | a user submitted a guess
 `round_start` | a round started
 `round_end` | a round ended
 `image` | painter's drawing
 
-Examples
+## Examples
+
+```json
+{
+  "event": "user_enter",
+  "data": {
+    "user_id": 120,
+  }
+}
+```
+
+```json
+{
+  "event": "user_exit",
+  "data": {
+    "user_id": 120,
+  }
+}
+```
+
+
+```json
+{
+  "event": "round_start",
+  "data": {
+    "round_id": 110,
+  }
+}
+```
+
+```json
+{
+  "event": "round_end",
+  "data": {
+    "round_id": 110,
+  }
+}
+```
+
+
+```json
+{
+  "event": "image",
+  "data": {
+    "round_id": 110,
+  }
+}
+```
+
+
+```json
+{
+  "event": "user_guess",
+  "data": {
+    "user_id": 120,
+    "correct": false
+  }
+}
+```
