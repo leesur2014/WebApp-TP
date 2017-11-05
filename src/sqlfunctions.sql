@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION user_get_or_create (_fb_id VARCHAR, _nickname VARCHAR
 DECLARE
   _user users%ROWTYPE;
 BEGIN
-  SELECT * INTO _user FROM users WHERE id = _user_id;
+  SELECT * INTO _user FROM users WHERE fb_id = _fb_id;
   IF NOT FOUND THEN
     INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
   END IF;
