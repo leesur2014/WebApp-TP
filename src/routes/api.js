@@ -5,6 +5,9 @@ var User = require('../models/user');
 var Room = require('../models/room');
 var randomstring = require("randomstring");
 
+const { check, validationResult } = require('express-validator/check');
+const { matchedData, sanitize } = require('express-validator/filter');
+
 function send_error(res, err, code = -1)
 {
   res.send({
