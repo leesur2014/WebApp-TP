@@ -2,8 +2,8 @@ var db = require('./db');
 
 Room = {};
 
-Room.getById = async function (id) {
-  return await db.one("SELECT * FROM rooms WHERE id = $1", [id]);
+Room.getById = function (id) {
+  return db.proc("room_get_by_id", [id]);
 }
 
 

@@ -4,21 +4,17 @@ class User {
 
   static async getById(user_id) {
     let user = {};
-    user = await db.one("SELECT * FROM users WHERE id = $1", [user_id]);
+    user = await db.proc("user_get_by_id", [user_id]);
     Object.setPrototypeOf(user, User.prototype);
     return user;
   }
 
-  static async getOrCreate(fb_id, displayName) {
-    let user;
-    try {
-      user = await db.one("SELECT * FROM users WHERE fb_id = $1", [fb_id]);
-    } catch(e) {
-      // possible race here
-      user = await db.one("INSERT INTO users (fb_id, nickname) VALUES ($1, $2) RETURNING *", [fb_id, displayName]);
-    }
-    Object.setPrototypeOf(user, User.prototype);
-    return user;
+  static getOrCreate(fb_id, displayName) {
+    return db.proc("user_get_or_create", [fb_id, displayName])
+      .then(function (user) {
+        Object.setPrototypeOf(user, User.prototype);
+        return user;
+      });
   }
 
 
