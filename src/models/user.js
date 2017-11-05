@@ -29,8 +29,8 @@ class User {
     }
 
 
-    enterRoom(room_id, passcode) {
-      return db.proc('user_enter_room', [this.id, passcode || ''])
+    enterRoom(room_id, passcode, observer) {
+      return db.proc('user_enter_room', [this.id, room_id, passcode || '', observer || false])
       // TODO push to redis channel
     }
 
@@ -54,7 +54,7 @@ class User {
       return db.proc('user_submit_image', [this.id, image]);
       // TODO push to redis channel
     }
-    
+
 }
 
 
