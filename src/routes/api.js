@@ -4,13 +4,14 @@ var db = require('../models/db');
 var User = require('../models/user');
 var Room = require('../models/room');
 var randomstring = require("randomstring");
+var validator = require('validator');
 
 
 function send_error(res, err, code = -1)
 {
   res.send({
     code: code,
-    error: err.message
+    error: err.message || err
   });
 }
 
@@ -27,6 +28,23 @@ router.use('/', function (req, res, next) {
 
 router.get('/me', function(req, res) {
   res.send(req.user);
+})
+
+router.post('/me', function(req, res) {
+  console.log(req.params);
+  if (req.body.nickname)
+  {
+    req.user.setNickname(validator.escape(req.body.nickname))
+      .then(function (user) {
+        res.send({
+          code: 0,
+          data: user
+        });
+      });
+  }
+  else {
+    send_error(res, "nickname required");
+  }
 })
 
 router.get('/user/:id(\\d+)', function(req, res) {
