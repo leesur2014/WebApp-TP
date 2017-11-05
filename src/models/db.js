@@ -6,11 +6,11 @@ var options = {
 };
 
 const config = {
-  host: 'localhost',
-  port: 5432,
-  database: 'draw',
-  user: 'jzhong',
-  password: 'testtest',
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  database: process.env.PG_DATABASE,
+  user: process.env.PG_USERNAME,
+  password: process.env.PG_PASSWORD,
   poolSize: 10
 }
 
