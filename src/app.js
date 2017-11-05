@@ -37,8 +37,9 @@ app.use(bodyParser.urlencoded());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/', routes);
 app.use('/static', express.static(path.join(__dirname, 'public')));
+
+app.use('/', routes);
 app.use('/users', users);
 app.use('/api', api);
 
