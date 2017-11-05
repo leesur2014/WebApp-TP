@@ -1,9 +1,8 @@
-## views
+# views
 
 URL | Description
 ----|-------------
 `/` | game center, login required
-`/room/:id` | game room, accessible only if current user is in the room, redirect to game center otherwise
 `/users/login` | login page
 `/users/logout` | logout
 `/users/callback` | Facebook OAuth2 callback
@@ -36,16 +35,8 @@ All endpoints return a JSON object on HTTP 200 responses. If the `code` is 0, th
 
 For brevity, all timestamps are omitted in examples.
 
-# Websoket API
 
-
-URL | Description
-----|--------------
-`/ws/room/{room_id}` | Get the status of the game process
-
-
-
-# Examples
+## Examples
 
 ### Get the list of public rooms
 
@@ -240,3 +231,28 @@ failure response
   "error": "user 1 is not the painter in round 10"
 }
 ```
+
+
+# Websoket API
+
+
+URL | Description
+----|--------------
+`/ws/room/{room_id}` | Get notifications about events in the room
+
+
+A client should connect to `/ws/room/{room_id}` after the user enters the room. The connection
+is disconnected when a user leaves a room. The server sends events as JSON objects to the client.
+
+The JSON object contains an `event` member and an optional `data` member. The `event` member is
+a string containing the type of the event.
+
+event type | desc    
+-----------|---------
+`user_enter` | a user entered this room
+`user_exit` | a user left this room
+`round_start` | a round started
+`round_end` | a round ended
+`image` | painter's drawing
+
+Examples
