@@ -20,8 +20,8 @@ var expressWs = require('express-ws')(app);
 const PORT = 3000;
 
 // view engine setup
-//app.set('views', path.join(__dirname, 'views'));
-//app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 //
 //app.use(logger('dev'));
 //app.use(bodyParser.json());
@@ -71,17 +71,18 @@ const PORT = 3000;
 //);
 
 app.get('/', function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    fs.readFile('./views/login.html', null, function(error, data) {
-        if (error) {
-            res.writeHead(404);
-            res.write('File not found');
-        } else {
-            res.write(data);
-        }
-
-        res.end();
-    });
+    res.render('login');
+//    res.writeHead(200, {'Content-Type': 'text/html'});
+//    fs.readFile('./views/login.pug', null, function(error, data) {
+//        if (error) {
+//            res.writeHead(404);
+//            res.write('File not found');
+//        } else {
+//            res.write(data);
+//        }
+//
+//        res.end();
+//    });
 //    res.sendFile(path.join(__dirname + 'views/login.html'));
 });
 
