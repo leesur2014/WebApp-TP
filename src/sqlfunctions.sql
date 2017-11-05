@@ -149,7 +149,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- round_end() should be called by the application when it wishes to start a new round in a room
+-- room_start_new_round should be called by the application when it wishes to start a new round in a room
 -- may throw exception if requirements are not met
 CREATE OR REPLACE FUNCTION room_start_new_round(_room_id INT, word varchar) RETURNS rounds AS $$
 DECLARE
