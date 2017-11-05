@@ -95,10 +95,9 @@ ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") R
 ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
 
 
-CREATE VIEW public_rooms AS SELECT rooms.id, rooms.created_at, count(users.id)
-FROM rooms JOIN users ON users.room_id = rooms.id
-WHERE rooms.passcode IS NULL AND rooms.deleted_at IS NULL
-GROUP BY rooms.id ORDER BY rooms.id;
+CREATE VIEW public_rooms AS SELECT id, created_at, room_count_users(id) AS user_count,
+room_count_players(id) AS player_count, (SELECT id FROM room_get_current_round(id)) AS round_id
+FROM rooms WHERE passcode = '' AND deleted_at IS NULL ORDER BY id;
 
 CREATE VIEW top_guessers AS SELECT id, nickname, score_guess FROM users ORDER BY score_guess FETCH FIRST 50 ROWS ONLY;
 CREATE VIEW top_painter AS SELECT id, nickname, score_draw FROM users ORDER BY score_draw FETCH FIRST 50 ROWS ONLY;
