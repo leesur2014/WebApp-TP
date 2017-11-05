@@ -2,7 +2,6 @@ var db = require('./db');
 
 class User {
 
-
   static async getById(user_id) {
     let user = {};
     user = await db.one("SELECT * FROM users WHERE id = $1", [user_id]);
@@ -23,37 +22,37 @@ class User {
   }
 
 
-    createRoom(passcode) {
-      return db.proc('user_create_room', [this.id, passcode || ''])
-      // TODO push to redis channel
-    }
+  createRoom(passcode = '') {
+    return db.proc('user_create_room', [this.id, passcode])
+    // TODO push to redis channel
+  }
 
 
-    enterRoom(room_id, passcode, observer) {
-      return db.proc('user_enter_room', [this.id, room_id, passcode || '', observer || false])
-      // TODO push to redis channel
-    }
+  enterRoom(room_id, passcode = '', observer = false) {
+    return db.proc('user_enter_room', [this.id, room_id, passcode, observer])
+    // TODO push to redis channel
+  }
 
 
-    exitRoom(force) {
-      return db.proc('user_exit_room', [this.id, force]);
-      // TODO push to redis channel
-    }
+  exitRoom(force = false) {
+    return db.proc('user_exit_room', [this.id, force]);
+    // TODO push to redis channel
+  }
 
-    setReady(state) {
-      return db.proc('user_set_ready_status', [this.id, state]);
-      // TODO push to redis channel
-    }
+  setReady(state) {
+    return db.proc('user_set_ready_status', [this.id, state]);
+    // TODO push to redis channel
+  }
 
-    submit(guess) {
-      return db.proc('user_submit_answer', [this.id, guess]);
-      // TODO push to redis channel
-    }
+  submit(guess) {
+    return db.proc('user_submit_answer', [this.id, guess]);
+    // TODO push to redis channel
+  }
 
-    draw(image) {
-      return db.proc('user_submit_image', [this.id, image]);
-      // TODO push to redis channel
-    }
+  draw(image) {
+    return db.proc('user_submit_image', [this.id, image]);
+    // TODO push to redis channel
+  }
 
 }
 
