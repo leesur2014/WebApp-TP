@@ -5,8 +5,6 @@ var User = require('../models/user');
 var Room = require('../models/room');
 var randomstring = require("randomstring");
 
-const { check, validationResult } = require('express-validator/check');
-const { matchedData, sanitize } = require('express-validator/filter');
 
 function send_error(res, err, code = -1)
 {
@@ -39,7 +37,7 @@ router.get('/user/:id(\\d+)', function(req, res) {
   })
   .catch(function (err)
   {
-    send_error(req, err);
+    send_error(res, err);
   });
 });
 
@@ -67,7 +65,7 @@ router.get('/room', function(req, res) {
       })
       .catch(function (err)
       {
-        send_error(req, err, code);
+        send_error(res, err);
       });
   }
   else {
@@ -78,13 +76,45 @@ router.get('/room', function(req, res) {
   }
 });
 
-
-
 router.post('/room', function(req, res) {
+  // console.log(req.user);
+  req.user.createRoom(req.body.passcode || '')
+    .then(function (room) {
+      res.send({
+        code: 0,
+        data: room
+      });
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
+});
 
+router.post('/enter', function(req, res) {
+  // TODO input validation
+  req.user.enterRoom(req.body.room_id, req.body.passcode || '', req.body.observer || false)
+    .then(function (room) {
+      res.send({
+        code: 0,
+        data: room
+      });
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
+})
 
-
-
+router.post('/exit', function(req, res) {
+  // console.log(req.user);
+  req.user.exitRoom(req.body.force || false)
+    .then(function (room) {
+      res.send({
+        code: 0
+      });
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
 });
 
 
