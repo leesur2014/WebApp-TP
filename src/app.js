@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 
+var passport = require('passport');
+
 var api = require('./routes/api');
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -18,10 +20,8 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// app.use(favicon());
 app.use(logger('dev'));
-// app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+
 app.use(session({
     store: new RedisStore({
       host: process.env.REDIS_HOST,
@@ -32,8 +32,13 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded());
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', routes);
+app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/users', users);
 app.use('/api', api);
 
