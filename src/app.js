@@ -17,16 +17,15 @@ var users = require('./routes/users');
 
 var app = express();
 var expressWs = require('express-ws')(app);
-var configAuth = require('./config/auth');
 
 /* Facebook authentication middleware */
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
 
 passport.use(new FacebookStrategy({
-    clientID: configAuth.facebookAuth.clientID,
-    clientSecret: configAuth.facebookAuth.clientSecret,
-    callbackURL: configAuth.facebookAuth.callbackURL
+    clientID: process.env.FB_APP_ID,
+    clientSecret: process.env.FB_APP_SECRET,
+    callbackURL: process.env.FB_CALLBACK_URL
   },
   function(accessToken, refreshToken, profile, done) {
     User.findOrCreate({'facebook.id': profile.id}, function(err, user) {
@@ -47,17 +46,12 @@ const PORT = 8000;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-//
-//app.use(logger('dev'));
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded());
-//app.use(cookieParser());
-//app.use(express.static(path.join(__dirname, 'public')));
 
-
-// error handlers
-=======
 app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+//app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
     store: new RedisStore({
@@ -110,14 +104,18 @@ app.use(passport.session());
 //    });
 //});
 
-app.get('/', passport.authenticate('facebook', {successRedirect: '/game',
-failureRedirect: '/login'}));
+app.get('/auth/facebook', passport.authenticate('facebook'));
 
-app.get('/login', function(req, res) {
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {successRedirect: '/game',
+failureRedirect: '/game'}));
+
+app.get('/', function(req, res) {
+    console.log('you need login!');
     redirect.directLogin(req, res);
 });
 
 app.get('/game', function(req, res) {
+    console.log('success!');
     redirect.directGameCenter(req, res);
 });
 
