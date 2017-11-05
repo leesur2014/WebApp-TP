@@ -1,4 +1,15 @@
--- functions started with two underscores should not be called by the application
+-- NOTE functions started with two underscores should not be called by the application
+
+CREATE OR REPLACE FUNCTION dictionary_get_random_word() RETURNS VARCHAR AS $$
+DECLARE
+  _word VARCHAR;
+  _rows INT;
+BEGIN
+  SELECT count(*) INTO _rows FROM dictionary;
+  SELECT word INTO _word FROM dictionary OFFSET floor(random() * _rows) LIMIT 1;
+  RETURN _word;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE
