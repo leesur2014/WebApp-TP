@@ -1,5 +1,5 @@
 exports.directLogin = function(req, res) {
-    res.render('index', {title: 'Log in'});
+    res.render('login');
 };
 
 exports.directGameCenter = function(req, res) {
