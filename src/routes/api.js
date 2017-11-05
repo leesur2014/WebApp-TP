@@ -1,7 +1,17 @@
 var express = require('express');
 var router = express.Router();
-var User = require('../models/user.js');
+var db = require('../models/db');
+var User = require('../models/user');
+var Room = require('../models/room');
 var randomstring = require("randomstring");
+
+function send_error(res, err, code = -1)
+{
+  res.send({
+    code: code,
+    error: err.message
+  });
+}
 
 
 router.use('/', function (req, res, next) {
@@ -26,27 +36,52 @@ router.get('/user/:id(\\d+)', function(req, res) {
   })
   .catch(function (err)
   {
-    res.send({
-      code: -1,
-      error: err.message
-    })
+    send_error(req, err);
   });
 });
 
+router.get('/lounge', function(req, res) {
+  db.any("SELECT * FROM public_rooms")
+    .then(function (data) {
+      res.send({
+        code: 0,
+        data: data
+      });
+    });
+});
+
+
+
 router.get('/room', function(req, res) {
-  res.send('respond with a resource');
+  if (req.user.room_id)
+  {
+    Room.getInfoById(req.user.room_id)
+      .then(function (data) {
+        res.send({
+          code: 0,
+          data: data
+        });
+      })
+      .catch(function (err)
+      {
+        send_error(req, err, code);
+      });
+  }
+  else {
+    res.send({
+      code: -1,
+      error: "You are not in a room"
+    })
+  }
 });
 
 
 
-router.get('/rooms', function(req, res) {
-  res.send('respond with a resource');
-});
+router.post('/room', function(req, res) {
 
 
 
-router.get('/rooms', function(req, res) {
-  res.send('respond with a resource');
+
 });
 
 
