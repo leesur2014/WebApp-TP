@@ -2,11 +2,12 @@ var db = require('./db');
 
 class User {
 
-  static async getById(user_id) {
-    let user = {};
-    user = await db.proc("user_get_by_id", [user_id]);
-    Object.setPrototypeOf(user, User.prototype);
-    return user;
+  static getById(user_id) {
+    return db.proc("user_get_by_id", [user_id])
+      .then(function (user) {
+        Object.setPrototypeOf(user, User.prototype);
+        return user;
+      });
   }
 
   static getOrCreate(fb_id, displayName) {
@@ -15,6 +16,10 @@ class User {
         Object.setPrototypeOf(user, User.prototype);
         return user;
       });
+  }
+
+  setNickname(nickname) {
+    return db.one('UPDATE users SET nickname = $1 WHERE id = $2', [nickname, this.id]);
   }
 
 
