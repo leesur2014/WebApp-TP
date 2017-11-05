@@ -32,8 +32,8 @@ passport.deserializeUser(function(id, done) {
       done(null, user);
     })
     .catch(function(err) {
-      // console.log(err);
-      done(err);
+      // control reaches here if a logged in user is deleted from the DB
+      done(null, null);
     });
 });
 
