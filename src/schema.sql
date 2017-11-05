@@ -1,17 +1,22 @@
+-- credit https://stackoverflow.com/questions/16609724/using-current-time-in-utc-as-default-value-in-postgresql
+create function now_utc() returns timestamp as $$
+  select now() at time zone 'utc';
+$$ language sql;
+
 CREATE TABLE "users" (
-	"id" serial NOT NULL,
-	"fb_id" varchar(255) NOT NULL UNIQUE,
-	"fb_access_token" char(255) NULL,
-	"fb_token_expire_at" TIMESTAMP NULL,
-	"access_token" char(128) NULL,
-	"nickname" varchar(64) NOT NULL,
-	"score_draw" integer NOT NULL DEFAULT '0',
-	"score_guess" integer NOT NULL DEFAULT '0',
-	"score_penalty" integer NOT NULL DEFAULT '0',
-	"joined_at" TIMESTAMP NOT NULL default current_timestamp,
+	"id" SERIAL NOT NULL,
+	"fb_id" VARCHAR(255) NOT NULL UNIQUE,
+	"fb_access_token" CHAR(255) NULL,
+	"fb_token_expire_at" TIMESTAMP WITHOUT TIME ZONE NULL,
+	"access_token" CHAR(128) NULL,
+	"nickname" VARCHAR(64) NOT NULL,
+	"score_draw" INTEGER NOT NULL DEFAULT '0',
+	"score_guess" INTEGER NOT NULL DEFAULT '0',
+	"score_penalty" INTEGER NOT NULL DEFAULT '0',
+	"joined_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
 
 	"online" boolean NOT NULL default 'FALSE',
-	"room_id" integer NULL,
+	"room_id" INTEGER NULL,
 	"ready" boolean NOT NULL default 'FALSE',
 	"observer" boolean NOT NULL default 'FALSE',
 	PRIMARY KEY ("id")
@@ -22,10 +27,10 @@ CREATE TABLE "users" (
 
 
 CREATE TABLE "rooms" (
-	"id" serial NOT NULL,
-	"passcode" character(10) NOT NULL DEFAULT '',
-	"created_at" TIMESTAMP NOT NULL default current_timestamp,
-	"deleted_at" TIMESTAMP NULL,
+	"id" SERIAL NOT NULL,
+	"passcode" CHAR(10) NOT NULL DEFAULT '',
+	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
+	"deleted_at" TIMESTAMP WITHOUT TIME ZONE NULL,
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -34,33 +39,33 @@ CREATE TABLE "rooms" (
 
 
 CREATE TABLE "rounds" (
-	"id" serial NOT NULL,
-	"painter_id" integer NOT NULL,
-	"painter_score" integer NOT NULL DEFAULT 0,
-	"room_id" integer NOT NULL,
-	"started_at" TIMESTAMP NOT NULL default current_timestamp,
-	"ended_at" TIMESTAMP NULL,
-	"answer" varchar(64) NOT NULL,
+	"id" SERIAL NOT NULL,
+	"painter_id" INTEGER NOT NULL,
+	"painter_score" INTEGER NOT NULL DEFAULT 0,
+	"room_id" INTEGER NOT NULL,
+	"started_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
+	"ended_at" TIMESTAMP WITHOUT TIME ZONE NULL,
+	"answer" VARCHAR(64) NOT NULL,
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
 
 CREATE TABLE "round_user" (
-	"user_id" integer NOT NULL,
-	"round_id" integer NOT NULL,
-	"submission" varchar(64) NULL,
+	"user_id" INTEGER NOT NULL,
+	"round_id" INTEGER NOT NULL,
+	"submission" VARCHAR(64) NULL,
 	"submitted_at" timestamp NULL,
-	"score" integer NOT NULL DEFAULT 0,
+	"score" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY ("user_id", "round_id")
 ) WITH (
   OIDS=FALSE
 );
 
 CREATE TABLE "canvas" (
-	"id" serial NOT NULL,
-	"round_id" integer NOT NULL,
-	"timestamp" TIMESTAMP NOT NULL default current_timestamp,
+	"id" SERIAL NOT NULL,
+	"round_id" INTEGER NOT NULL,
+	"timestamp" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
 	"image" bytea NOT NULL,
 	PRIMARY KEY ("id")
 ) WITH (
@@ -68,7 +73,7 @@ CREATE TABLE "canvas" (
 );
 
 CREATE TABLE "dictionary" (
-	"word" varchar(64) NOT NULL,
+	"word" VARCHAR(64) NOT NULL,
 	PRIMARY KEY ("word")
 ) WITH (
   OIDS=FALSE
@@ -81,7 +86,6 @@ CREATE TABLE "painter_score_map" (
   OIDS=FALSE
 );
 
-INSERT INTO "painter_score_map" VALUES (0, 0), (1, 3), (2, 3), (3, 2), (4, 1), (5, 1);
 
 ALTER TABLE "users" ADD CONSTRAINT "user_fk0" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
 
@@ -93,13 +97,3 @@ ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") RE
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
 
 ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
-
-
-CREATE VIEW public_rooms AS SELECT id, created_at, room_count_users(id) AS user_count,
-room_count_players(id) AS player_count, (SELECT id FROM room_get_current_round(id)) AS round_id
-FROM rooms WHERE passcode = '' AND deleted_at IS NULL ORDER BY id;
-
-CREATE VIEW top_guessers AS SELECT id, nickname, score_guess FROM users ORDER BY score_guess FETCH FIRST 50 ROWS ONLY;
-CREATE VIEW top_painter AS SELECT id, nickname, score_draw FROM users ORDER BY score_draw FETCH FIRST 50 ROWS ONLY;
-CREATE VIEW top_users AS SELECT id, nickname, (score_guess + score_draw - score_penalty) AS score
-FROM users ORDER BY score FETCH FIRST 50 ROWS ONLY;
