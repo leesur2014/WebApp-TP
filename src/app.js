@@ -1,13 +1,14 @@
-import express from 'express';
-import routes from './routes/index';
+//import express from 'express';
+//import routes from './routes/index';
 'use strict';
 
-//var express = require('express');
+var express = require('express');
 var redis = require('redis');
 var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 var api = require('./routes/api');
 //var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -17,16 +18,6 @@ var expressWs = require('express-ws')(app);
 
 // define PORT
 const PORT = 3000;
-
-routes(app);
-//app.get('/', (req, res) =>
-//    res.send(`Node running! ${PORT}`)
-//);
-//
-//app.listen(PORT, () =>
-//    console.log(`your servering is running on port ${PORT}`)
-//);
-
 
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
@@ -42,38 +33,62 @@ routes(app);
 //app.use('/users', users);
 //app.use('/api', api);
 
-/// catch 404 and forwarding to error handler
+// catch 404 and forwarding to error handler
 //app.use(function(req, res, next) {
 //    var err = new Error('Not Found');
 //    err.status = 404;
 //    next(err);
 //});
 
-/// error handlers
+// error handlers
 
-/*
+
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
+//if (app.get('env') === 'development') {
+//    app.use(function(err, req, res, next) {
+//        res.status(err.status || 500);
+//        res.render('error', {
+//            message: err.message,
+//            error: err
+//        });
+//    });
+//}
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
+//app.use(function(err, req, res, next) {
+//    res.status(err.status || 500);
+//    res.render('error', {
+//        message: err.message,
+//        error: {}
+//    });
+//});
+
+//routes(app);
+//app.get('/', (req, res) =>
+//    res.send(`Node running! ${PORT}`)
+//);
+
+app.get('/', function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    fs.readFile('./views/login.html', null, function(error, data) {
+        if (error) {
+            res.writeHead(404);
+            res.write('File not found');
+        } else {
+            res.write(data);
+        }
+
+        res.end();
     });
+//    res.sendFile(path.join(__dirname + 'views/login.html'));
 });
-*/
+
+//
+app.listen(PORT, () =>
+    console.log(`your servering is running on port ${PORT}`)
+);
 
 module.exports = app;
 
