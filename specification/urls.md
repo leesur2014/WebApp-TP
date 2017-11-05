@@ -14,6 +14,7 @@ Method | URL | Description
 GET | `/api/lounge` | Get a list of public rooms
 GET | `/api/room` | Get detailed info about current room
 GET | `/api/user/{user_id}` | Get info about a user
+POST | `/api/room` | Create a room
 POST | `/api/enter` | Join a room
 POST | `/api/exit` | Quit a room
 POST | `/api/ready` | Set/clear the user's ready bit
@@ -24,13 +25,12 @@ All POST requests body is an URLencoded string.
 
 All endpoints require login. Or a HTTP 401 response is returned.
 
-All endpoints return a JSON object on HTTP 200 responses. If the `code` is 0, the request is successful. Otherwise the request failed. In the failure case, the error attribute is a string containing the reason. All JSON responses contains `timestamp`. For example,
+All endpoints return a JSON object on HTTP 200 responses. If the `code` is 0, the request is successful. Otherwise the request failed. In the failure case, the error attribute is a string containing the reason. For example,
 
 ```json
 {
   "code": -1,
-  "error": "lalalala",
-  "timestamp": "2017-10-05T14:48:00.000Z"
+  "error": "lalalala"
 }
 ```
 
