@@ -11,9 +11,9 @@ URL | Description
 
 Method | URL | Description
 ---|----|-------------
-GET | `/api/rooms` | Get a list of public rooms
-GET | `/api/room/{room_id}` | Get the member and round info about a room
-GET | `/api/user/{user_id}` | Get basic info about a user
+GET | `/api/lounge` | Get a list of public rooms
+GET | `/api/room` | Get detailed info about current room
+GET | `/api/user/{user_id}` | Get info about a user
 POST | `/api/enter` | Join a room
 POST | `/api/exit` | Quit a room
 POST | `/api/ready` | Set/clear the user's ready bit
@@ -42,7 +42,7 @@ For brevity, all timestamps are omitted in examples.
 ### Get the list of public rooms
 
 ```
-GET /api/rooms
+GET /api/lounge
 ```
 
 ```json
@@ -64,6 +64,69 @@ GET /api/rooms
       "round_id": 5
     }
   ]
+}
+```
+
+### Get detailed info about current room
+
+```
+GET /api/room
+```
+
+```json
+{
+  "code": 0,
+  "data":
+    {
+      "id": 1,
+      "created_at": "2017-10-05T14:48:00.000Z",
+      "passcode": "xxxxx",
+      "players": [1, 4, 5, 8],
+      "observers": [2, 3],
+      "round": null
+    }
+}
+```
+
+When there is a round in this room
+
+```json
+{
+  "code": 0,
+  "data":
+    {
+      "id": 1,
+      "created_at": "2017-10-05T14:48:00.000Z",
+      "passcode": "ssss",
+      "players": [1, 4, 5, 8],
+      "observers": [2, 3],
+      "round": {
+        "id": 10,
+        "painter_id": 20,
+        "started_at": "2017-10-05T14:48:00.000Z"
+      }
+    }
+}
+```
+
+
+### Get info about a user
+
+```
+GET /api/user/100
+```
+
+```json
+{
+  "code": 0,
+  "data":
+    {
+      "id": 1,
+      "score_guess": 20,
+      "score_draw": 20,
+      "score_penalty": 0,
+      "nickname": "Mike"
+    }
 }
 ```
 
@@ -243,7 +306,7 @@ URL | Description
 `/ws/lounge` | Get notifications about all public rooms (planned)
 
 A client should connect to `/ws/room/{room_id}` after the user enters the room. The connection
-is disconnected when a user leaves a room. The server sends events as JSON objects to the client.
+is closed when a user leaves a room. The server sends events as JSON objects to the client.
 
 The JSON object contains an `event` member and an optional `data` member. The `event` member is
 a string containing the type of the event.
