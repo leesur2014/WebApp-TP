@@ -75,15 +75,21 @@ GET /api/room
 
 ```json
 {
-  "code": 0,
-  "data":
-    {
-      "id": 1,
-      "created_at": "2017-10-05T14:48:00.000Z",
-      "passcode": "xxxxx",
-      "players": [1, 4, 5, 8],
-      "observers": [2, 3],
-      "round": null
+    "code": 0,
+    "data": {
+        "id": 1,
+        "passcode": "          ",
+        "created_at": "2017-11-05T23:43:53.451Z",
+        "deleted_at": null,
+        "users": [
+            {
+                "id": 1,
+                "nickname": "xxxxx",
+                "observer": false,
+                "ready": false
+            }
+        ],
+        "round": null
     }
 }
 ```
@@ -92,19 +98,25 @@ When there is a round in this room
 
 ```json
 {
-  "code": 0,
-  "data":
-    {
-      "id": 1,
-      "created_at": "2017-10-05T14:48:00.000Z",
-      "passcode": "ssss",
-      "players": [1, 4, 5, 8],
-      "observers": [2, 3],
-      "round": {
-        "id": 10,
-        "painter_id": 20,
-        "started_at": "2017-10-05T14:48:00.000Z"
-      }
+    "code": 0,
+    "data": {
+        "id": 1,
+        "passcode": "          ",
+        "created_at": "2017-11-05T23:43:53.451Z",
+        "deleted_at": null,
+        "users": [
+            {
+                "id": 1,
+                "nickname": "xxxx",
+                "observer": false,
+                "ready": false
+            }
+        ],
+        "round": {
+          "id": 10,
+          "painter_id": 20,
+          "started_at": "2017-10-05T14:48:00.000Z"
+        }
     }
 }
 ```
