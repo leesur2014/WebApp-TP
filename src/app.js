@@ -1,38 +1,38 @@
 'use strict';
+
 var express = require('express');
-var redis = require('redis');
 var path = require('path');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+
+var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+
 var api = require('./routes/api');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-var expressWs = require('express-ws')(app);
-
-// define PORT
-const PORT = 3000;
-
-app.get('/', (req, res) =>
-    res.send(`Node running! ${PORT}`)
-);
-
-app.listen(PORT, () =>
-    console.log(`your servering is running on port ${PORT}`)
-);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// app.use(favicon());
 app.use(logger('dev'));
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+    store: new RedisStore({
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: process.env.REDIS_PORT || 6379
+    }),
+    secret: process.env.SESSION_SECRET || 'sessionsecret',
+    resave: false,
+    saveUninitialized: false
+}));
 
+app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/api', api);
@@ -70,4 +70,3 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
-
