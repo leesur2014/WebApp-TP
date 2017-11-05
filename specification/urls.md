@@ -140,4 +140,103 @@ failed responses
 ```
 
 
-###
+### set the user's ready state
+
+field | optional | Description
+-----|-----------|--------------
+ready | No | ready or not
+
+Request example
+```
+POST /api/ready
+
+ready=true
+```
+
+successful response
+```json
+{
+  "code": 0
+}
+```
+
+
+failed response
+
+```json
+{
+  "code": -1,
+  "error": "user 3 is not in a room"
+}
+```
+
+
+
+### submit a user's guess
+
+field | optional | Description
+-----|-----------|--------------
+submission | No | guess word
+
+
+Request example
+```
+POST /api/submit
+
+submission=chicken
+```
+
+successful responses
+```json
+{
+  "code": 0,
+  "correct": true
+}
+```
+
+```json
+{
+  "code": 0,
+  "correct": false
+}
+```
+
+failed response
+
+```json
+{
+  "code": -1,
+  "error": "user 3 is not in a room"
+}
+```
+
+### submit a painter's drawing
+
+field | optional | Description
+-----|-----------|--------------
+canvas | No | Data URLs encoded canvas, image should be in png format
+
+Request example
+
+```
+POST /api/draw
+
+canvas=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAADElEQVQImWNgoBMAAABpAAFEI8ARAAAAAElFTkSuQmCC
+```
+
+successful response
+
+```json
+{
+  "code": 0,
+}
+```
+
+failure response
+
+```json
+{
+  "code": -1,
+  "error": "user 1 is not the painter in round 10"
+}
+```
