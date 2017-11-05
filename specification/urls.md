@@ -34,6 +34,7 @@ All endpoints return a JSON object on HTTP 200 responses. If the `code` is 0, th
 }
 ```
 
+For brevity, all timestamps are omitted in examples.
 
 # Websoket API
 
@@ -58,14 +59,14 @@ GET /api/rooms
   "data": [
     {
       "id": 1,
-      "created_at": "2017-11-04 12:41:32.716245",
+      "created_at": "2017-10-05T14:48:00.000Z",
       "user_count": 2,
       "player_count": 2,
       "round_id": null
     },
     {
       "id": 2,
-      "created_at": "2017-11-05 12:41:32.716245",
+      "created_at": "2017-10-05T14:48:00.000Z",
       "user_count": 2,
       "player_count": 2,
       "round_id": 5
@@ -98,7 +99,7 @@ successful response
 }
 ```
 
-failed responses
+failed response
 
 ```json
 {
@@ -107,22 +108,8 @@ failed responses
 }
 ```
 
-```json
-{
-  "code": -1,
-  "error": "incorrect passcode"
-}
-```
 
-```json
-{
-  "code": -1,
-  "error": "user 3 is in room 2"
-}
-```
-
-
-### exits current room
+### exit current room
 
 field | optional | Description
 -----|-----------|--------------
