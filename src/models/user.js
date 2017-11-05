@@ -19,7 +19,7 @@ class User {
   }
 
   setNickname(nickname) {
-    return db.one('UPDATE users SET nickname = $1 WHERE id = $2', [nickname, this.id]);
+    return db.one('UPDATE users SET nickname = $1 WHERE id = $2 RETURNING *', [nickname, this.id]);
   }
 
 
