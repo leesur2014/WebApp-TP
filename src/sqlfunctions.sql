@@ -280,8 +280,7 @@ DECLARE
 BEGIN
   SELECT * INTO _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
-    -- do nothing
-    RETURN;
+    RAISE EXCEPTION 'user % is not in a room', _user_id
   END IF;
 
   IF user_can_exit_room(_user.id) THEN
