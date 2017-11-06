@@ -10,11 +10,14 @@ var RedisStore = require('connect-redis')(session);
 
 var passport = require('passport');
 
+var app = express();
+var expressWs = require('express-ws')(app);
+
 var api = require('./routes/api');
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var ws = require('./routes/ws')
 
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,11 +40,14 @@ app.use(bodyParser.urlencoded());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/ws', ws);
+
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
 app.use('/api', api);
+
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
