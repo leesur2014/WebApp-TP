@@ -41,11 +41,10 @@ router.get('/login', passport.authenticate('facebook'));
 
 router.get('/callback',
   passport.authenticate('facebook', { successRedirect: '/game-center',
-                                      failureRedirect: '/user/login' }));
+                                      failureRedirect: '/users/login' }));
 
 
 router.get('/logout', function(req, res){
-    console.log('Logged out!');
   req.logout();
   res.redirect('/');
 });
