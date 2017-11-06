@@ -98,3 +98,7 @@ ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") RE
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
 
 ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
+
+
+-- TODO
+-- Implement the constraint that users cannot be in a room whose deleted_at is not null
