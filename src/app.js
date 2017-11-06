@@ -39,7 +39,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(passport.initialize());
 app.use(passport.session());
