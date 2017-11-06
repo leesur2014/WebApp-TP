@@ -40,7 +40,7 @@ passport.deserializeUser(function(id, done) {
 router.get('/login', passport.authenticate('facebook'));
 
 router.get('/callback',
-  passport.authenticate('facebook', { successRedirect: '/',
+  passport.authenticate('facebook', { successRedirect: '/game-center',
                                       failureRedirect: '/user/login' }));
 
 
