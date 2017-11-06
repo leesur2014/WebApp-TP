@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Game Center</title>
-    <link rel='stylesheet' href='/static/stylesheets/style.css' />
+    <link rel='stylesheet' href='/static/css/navBar.css' />
   </head>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
     <script src="/static/js/game-center.js"></script>
   <body ng-controller="gameCenterController">
-
+    <% include head %>
+    <% include navBar %>
     <h3>Game Center</h3>
     <button ng-click="joinRoom()">Join a Room</button>
     <button ng-click="createRoom()">Create a new Room</button>
