@@ -11,14 +11,23 @@ router.get('/game-center',function(req,res) {
         res.redirect('/');
     res.render('gameCenter');
 });
+
 router.get('/change-nickname',function(req,res) {
-    res.sendfile('./public/change-nickname.html');
+    if (!req.isAuthenticated())
+        res.redirect('/');
+    res.render('change-nickname');
 });
+
 router.get('/join-room',function(req,res) {
-    res.sendfile('./public/join-room.html');
+    if (!req.isAuthenticated())
+        res.redirect('/');
+    res.render('join-room');
 });
+
 router.get('/create-room',function(req,res) {
-    res.sendfile('./public/create-room.html');
+    if (!req.isAuthenticated())
+        res.redirect('/');
+    res.render('create-room');
 });
 // UI Ends
 
