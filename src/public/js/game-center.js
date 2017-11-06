@@ -1,5 +1,5 @@
 $(function() {
-    $.get('/api/lounge', function(data) {
+    $.get('http://guessmydrawing.fun/api/lounge', function(data) {
         console.log(JSON.stringify(data));
         var l = data['data'].length;
         for (var i = 0; i < l; ++i) {
@@ -21,3 +21,4 @@ $(function() {
         alert( "error" );
     });
 });
+

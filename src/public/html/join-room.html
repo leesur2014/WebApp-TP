@@ -1,22 +1,55 @@
-  <!DOCTYPE html>
-<html ng-app="joinRoom">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Join room</title>
-    <link rel='stylesheet' href='/static/stylesheets/style.css' />
-  </head>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
-    <script src="/static/js/join-room.js"></script>
-  <body ng-controller="joinRoomController">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="You Draw I Guess">
+  <meta name="author" content="Xuhui Wang">
 
-    <div class="joinroom">
-      <h3>Join a room</h3>
-      <input type="text" placeholder="Room Id" ng-model="formData.room_id"><br><br>
-      <input type="password" placeholder="Passcode" ng-model="formData.passcode"><br><br>
-      <input type="checkbox" ng-click="isObserver()">Observer<br><br>
-      <button type="submit" ng-click="joinRoom()">Join</button>
+  <link rel="icon" href="/static/images/drawing.jpg">
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+
+  <title>Join Room</title>
+  <link rel="stylesheet" href="/static/css/navBar.css">
+  <link rel='stylesheet' href='/static/css/style.css' />
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/static/html/gameCenter.html">You Draw I Guess</a>
     </div>
-  </body>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="/static/html/gameCenter.html">Game Center</a></li>
+      <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Operations<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/change-nickname">Change your nickname</a></li>
+          <li><a href="/create-room">Create Room</a></li>
+          <li><a href="/join-room">Join Room</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Scoreboard</a></li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0"  action="/users/logout" method="get">
+      <button id="logOutButton" class="btn btn-outline-success my-2 my-sm-0" type="submit">Log out</button>
+    </form>
+  </div>
+</nav>
+
+<div class="container">
+  <form action="/action_page.php">
+    First name:<br>
+    <input type="text" name="firstname" value="Mickey">
+    <br>
+    Last name:<br>
+    <input type="text" name="lastname" value="Mouse">
+    <br><br>
+    <input type="submit" value="Submit">
+  </form>
+  <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/popper.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/js/join-room.js"></script>
+</body>
 </html>
