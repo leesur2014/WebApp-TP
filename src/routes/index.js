@@ -6,8 +6,10 @@ router.get('/', passport.authenticate('facebook'));
 
 // UI Starts
 router.get('/game-center',function(req,res) {
-    console.log('hah');
-    res.sendfile('./public/game-center.html');
+    // if not authenticated, redirect to login page
+    if (!req.isAuthenticated())
+        res.redirect('/');
+    res.render('gameCenter');
 });
 router.get('/change-nickname',function(req,res) {
     res.sendfile('./public/change-nickname.html');
