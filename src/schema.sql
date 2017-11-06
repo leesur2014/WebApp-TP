@@ -57,6 +57,7 @@ CREATE TABLE "round_user" (
 	"submission" VARCHAR(64) NULL,
 	"submitted_at" timestamp NULL,
 	"score" INTEGER NOT NULL DEFAULT 0,
+  "attempt" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY ("user_id", "round_id")
 ) WITH (
   OIDS=FALSE
