@@ -20,7 +20,7 @@ POST | `/api/room` | Create a room
 POST | `/api/enter` | Join a room
 POST | `/api/exit` | Quit a room
 POST | `/api/ready` | Set/clear the user's ready bit
-POST | `/api/submit` | Submit the answer for a round
+POST | `/api/guess` | Submit the answer for a round
 POST | `/api/draw` | Send the painter's drawing
 
 All POST requests body is an URLencoded string.
@@ -94,6 +94,30 @@ nickname=whatever
     }
 }
 ```
+
+### create a room
+
+field | optional | Description
+-----|-----------|--------------
+passcode | Yes | passcode for that room, if not set, the room is public
+
+```
+POST /api/room
+```
+
+```json
+{
+    "code": 0,
+    "data": {
+        "id": 3,
+        "passcode": "          ",
+        "created_at": "2017-11-06T07:29:09.304Z",
+        "deleted_at": null
+    }
+}
+```
+
+
 
 ### Get the list of public rooms
 
@@ -310,7 +334,7 @@ submission | No | guess word
 
 Request example
 ```
-POST /api/submit
+POST /api/guess
 
 submission=chicken
 ```
@@ -392,7 +416,7 @@ event type | desc
 `user_guess` | a user submitted a guess
 `round_start` | a round started
 `round_end` | a round ended
-`image` | painter's drawing
+`user_draw` | painter's drawing
 
 ## Examples
 
@@ -419,7 +443,7 @@ event type | desc
 {
   "event": "round_start",
   "data": {
-    "round_id": 110,
+    "id": 110,
   }
 }
 ```
@@ -436,7 +460,7 @@ event type | desc
 
 ```json
 {
-  "event": "image",
+  "event": "user_draw",
   "data": {
     "round_id": 110,
   }

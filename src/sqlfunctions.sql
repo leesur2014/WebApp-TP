@@ -235,39 +235,30 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- round_end() should be called by the application when it is time to end a round
-CREATE OR REPLACE FUNCTION round_end(_round_id INT, _aborted BOOLEAN DEFAULT FALSE) RETURNS SETOF round_user AS $$
+CREATE OR REPLACE FUNCTION round_end(_round_id INT, _aborted BOOLEAN DEFAULT FALSE) RETURNS rounds AS $$
+DECLARE
+  _round RECORD;
+  _correct_guesses INT;
+BEGIN
+
+  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
+  RETURNING * INTO STRICT _round;
+
+  -- TODO : calculate score for each user
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION round_abort(_round_id INT) RETURNS rounds AS $$
 DECLARE
   _round RECORD;
   _row RECORD;
-  _correct_guesses INT;
 BEGIN
-  -- ensure the round is not ended
-  SELECT * INTO STRICT _round FROM round_get_by_id(_round_id);
-  IF _round.ended_at IS NOT NULL THEN
-    RAISE EXCEPTION 'round % is alreayd eneded', _round_id;
+  IF round_can_abort(_round_id) THEN
+    UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
+    RETURNING * INTO STRICT _round;
   END IF;
-  -- mark this round as ended
-  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id;
-
-  IF NOT _aborted THEN
-    -- get the # of correct_guesses
-    SELECT count(*) INTO _correct_guesses FROM round_user WHERE round_user.submission = _round.answer;
-    RAISE INFO '% players got the correct answer', _correct_guesses;
-    -- TODO: calculate each guesser's score and save in their round_user row;
-
-    -- caculate the painter's score thourgh painter_score_map
-    UPDATE rounds SET painter_score = map_correct_guesses_to_painter_score(_correct_guesses)
-      WHERE id = _round_id;
-    -- increment the painter's score in users table
-    UPDATE users SET score_draw = score_draw + map_correct_guesses_to_painter_score(_correct_guesses)
-      WHERE id = _round.painter_id;
-    -- increment each guesser's score
-    FOR _row IN SELECT * FROM round_user WHERE round_id = _round_id LOOP
-      UPDATE users SET score_guess = score_guess + _row.score WHERE id = _row.user_id;
-      RETURN NEXT _row;
-    END LOOP;
-  END IF;
-  RETURN;
+  RETURN _round;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -321,6 +312,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION round_can_abort (_round_id INT) RETURNS BOOLEAN AS $$
+DECLARE
+  _round rounds%ROWTYPE;
+BEGIN
+  SELECT * INTO STRICT _round FROM rounds WHERE id = _round_id AND ended_at IS NULL;
+  -- CASE 1: the painter is not in the room
+  IF NOT EXISTS (SELECT id FROM users WHERE room_id = _round.room_id AND id = _round.painter_id) THEN
+    RETURN TRUE;
+  END IF;
+  -- CASE 2: no guessers in the room
+  IF NOT EXISTS (SELECT id FROM room_get_players(_round.room_id) WHERE id <> _round.painter_id) THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN FALSE;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT, _force BOOLEAN DEFAULT FALSE, _penalty INTEGER DEFAULT 5) RETURNS void AS $$
 DECLARE
 	_user users%ROWTYPE;
@@ -335,20 +346,6 @@ BEGIN
     NULL;
   ELSIF _force THEN
     PERFORM __user_inc_penalty(_user_id, _penalty);
-    SELECT * INTO STRICT _round FROM user_get_current_round(_user.id);
-    IF _round.painter_id = _user.id THEN
-      -- the exiting user is the painter
-      RAISE INFO 'round % ended due to painter % exit', _round.id, _user.id;
-      PERFORM round_end(_round.id, TRUE);
-    ELSE
-      -- the exiting user is a guesser
-      DELETE FROM round_user WHERE round_id = _round.id AND user_id = _user.id;
-      IF NOT EXISTS (SELECT * FROM round_user WHERE round_id = _round.id) THEN
-        -- end the round if there are no guessers
-        RAISE INFO 'round % ended due to no guessers', _round.id;
-        PERFORM round_end(_round.id, TRUE);
-      END IF;
-    END IF;
   ELSE
     RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
   END IF;
@@ -362,7 +359,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_set_ready_status (_user_id INT, _ready BOOLEAN) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_change_state (_user_id INT, _ready BOOLEAN) RETURNS VOID AS $$
 DECLARE
   _user RECORD;
 BEGIN
@@ -382,14 +379,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_submit_answer (_user_id INT, _answer VARCHAR) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION user_guess (_user_id INT, _answer VARCHAR) RETURNS BOOLEAN AS $$
 DECLARE
   _round RECORD;
 BEGIN
 
   SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
 
-  -- TODO: decide whether a user is allow to guess multiple times
   UPDATE round_user SET submission = _answer, submitted_at = now_utc(), attempt = attempt + 1
     WHERE round_id = _round.id AND user_id = _user_id;
 
@@ -406,18 +402,35 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION user_submit_image (_user_id INT, _image BYTEA) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_draw (_user_id INT, _image BYTEA) RETURNS VOID AS $$
 DECLARE
   _round RECORD;
 BEGIN
+  SELECT * INTO STRICT _round FROM rounds WHERE ended_at IS NULL AND painter_id = _user_id;
+  INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
+END;
+$$ LANGUAGE plpgsql;
 
-  SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
-
-  IF _round.painter_id = _user_id THEN
-    INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
-  ELSE
-    RAISE EXCEPTION 'user % is not the painter in round %', _user_id, _round.id;
+CREATE OR REPLACE FUNCTION update_score_draw() RETURNS trigger AS
+$$
+BEGIN
+  ASSERT NEW.painter_id = OLD.painter_id;
+  IF NEW.painter_score <> OLD.painter_score THEN
+    UPDATE users SET score_draw = score_draw + NEW.painter_score - OLD.painter_score
+    WHERE id = NEW.painter_id;
   END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_score_guess() RETURNS trigger AS
+$$
+BEGIN
+  ASSERT NEW.user_id = OLD.user_id;
+  IF NEW.score <> OLD.score THEN
+    UPDATE users SET score_guess = score_guess + NEW.score - OLD.score
+    WHERE id = NEW.user_id;
+  END IF;
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
