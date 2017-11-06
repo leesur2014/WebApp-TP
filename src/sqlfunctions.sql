@@ -410,14 +410,7 @@ CREATE OR REPLACE FUNCTION user_submit_image (_user_id INT, _image BYTEA) RETURN
 DECLARE
   _round RECORD;
 BEGIN
-
-  SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
-
-  IF _round.painter_id = _user_id THEN
-    INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
-  ELSE
-    RAISE EXCEPTION 'user % is not the painter in round %', _user_id, _round.id;
-  END IF;
-
+  SELECT * INTO STRICT _round FROM rounds WHERE ended_at IS NULL AND painter_id = _user_id;
+  INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
 END;
 $$ LANGUAGE plpgsql;
