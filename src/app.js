@@ -13,7 +13,6 @@ var passport = require('passport');
 var app = express();
 
 var api = require('./routes/api');
-var routes = require('./routes/index');
 var users = require('./routes/users');
 
 // view engine setup
@@ -44,8 +43,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use('/', routes);
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use('/users', users);
 app.use('/api', api);
 
