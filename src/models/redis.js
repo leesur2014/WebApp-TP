@@ -21,5 +21,5 @@ module.exports.createClient = function (){
 
   client.on("error", logError);
 
-  return client
+  return client;
 };
