@@ -74,21 +74,6 @@ app.use(function(err, req, res, next) {
     });
 });
 
-// UI Starts
-app.get('/game-center',function(req,res) {
-    res.sendfile('./public/game-center.html');
-});
-app.get('/change-nickname',function(req,res) {
-    res.sendfile('./public/change-nickname.html');
-});
-app.get('/join-room',function(req,res) {
-    res.sendfile('./public/join-room.html');
-});
-app.get('/create-room',function(req,res) {
-    res.sendfile('./public/create-room.html');
-});
-// UI Ends
-
 
 module.exports = app;
 
