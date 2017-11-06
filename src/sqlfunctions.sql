@@ -410,3 +410,25 @@ BEGIN
   INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_score_draw() RETURNS trigger AS
+$$
+BEGIN
+  IF NEW.painter_score <> OLD.painter_score THEN
+    UPDATE users SET score_draw = score_draw + NEW.painter_score - OLD.painter_score
+    WHERE id = NEW.painter_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_score_guess() RETURNS trigger AS
+$$
+BEGIN
+  IF NEW.score <> OLD.score THEN
+    UPDATE users SET score_guess = score_guess + NEW.score - OLD.score
+    WHERE id = NEW.user_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
