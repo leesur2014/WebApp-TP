@@ -1,4 +1,5 @@
 var db = require('./db');
+var redis = require('./redis').pubClient;
 var Room = require('./room');
 
 class User {
@@ -31,33 +32,81 @@ class User {
 
 
   enterRoom(room_id, passcode = '', observer = false) {
+    var user = this;
     return db.proc('user_enter_room', [this.id, room_id, passcode, observer])
-    // TODO push to redis channel
+      .then(function () {
+        var evt = {
+          event: "user_enter",
+          data: {
+            user_id: user.id
+          }
+        };
+        redis.publish("room:" + room_id, JSON.stringify(evt));
+      });
   }
 
 
   exitRoom(force = false) {
-    return db.proc('user_exit_room', [this.id, force]);
-    // TODO push to redis channel
-  }
-
-  setReady(state) {
-    let user = this;
-    return db.proc('user_set_ready_status', [this.id, state])
+    var user = this;
+    return db.proc('user_exit_room', [this.id, force])
       .then(function () {
-        Room.startNewRound(user.room_id);
-        return true;
+        var evt = {
+          event: "user_exit",
+          data: {
+            user_id: user.id
+          }
+        };
+        redis.publish("room:" + user.room_id, JSON.stringify(evt));
       });
   }
 
-  submit(guess) {
-    return db.proc('user_submit_answer', [this.id, guess]);
-    // TODO push to redis channel
+  setReady(state) {
+    var user = this;
+    return db.proc('user_change_state', [this.id, state])
+      .then(function () {
+        var evt = {
+          event: "user_change_state",
+          data: {
+            user_id: user.id,
+            ready: state
+          }
+        };
+        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+        Room.startNewRound(user.room_id);
+      });
+  }
+
+  guess(submission) {
+    var user = this;
+    return db.proc('user_guess', [this.id, submission], (d) => d.user_guess)
+      .then(function (correct) {
+        var evt = {
+          event: "user_guess",
+          data: {
+            user_id: user.id,
+            correct: correct
+          }
+        };
+        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+        if (correct)
+        {
+          // TODO check if this round can end early
+        }
+        return correct;
+      });
   }
 
   draw(image) {
-    return db.proc('user_submit_image', [this.id, image]);
-    // TODO push to redis channel
+    return db.proc('user_draw', [this.id, image])
+      .then(function () {
+        var evt = {
+          event: "user_draw",
+          data: {
+            image: image
+          }
+        };
+        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+      });
   }
 
 }
