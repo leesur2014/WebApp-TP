@@ -11,11 +11,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION user_get_or_create (_fb_id VARCHAR, _nickname VARCHAR) RETURNS users AS $$
+DECLARE
+  _user users%ROWTYPE;
+BEGIN
+  SELECT * INTO _user FROM users WHERE fb_id = _fb_id;
+  IF NOT FOUND THEN
+    INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
+  END IF;
+  RETURN _user;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE
   _user users%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _user FROM users WHERE id = _user_id;
+  BEGIN
+    SELECT * INTO STRICT _user FROM users WHERE id = _user_id;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'user % not found', _user_id;
+      WHEN TOO_MANY_ROWS THEN
+          RAISE EXCEPTION 'user % not unique', _user_id;
+  END;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
@@ -24,7 +44,14 @@ CREATE OR REPLACE FUNCTION room_get_by_id (_room_id INT) RETURNS rooms AS $$
 DECLARE
   _row rooms%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _row FROM rooms WHERE id = _room_id;
+  BEGIN
+    SELECT * INTO STRICT _row FROM rooms WHERE id = _room_id;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'room % not found', _room_id;
+      WHEN TOO_MANY_ROWS THEN
+          RAISE EXCEPTION 'room % not unique', _room_id;
+  END;
   RETURN _row;
 END;
 $$ LANGUAGE plpgsql;
@@ -33,7 +60,14 @@ CREATE OR REPLACE FUNCTION round_get_by_id (_round_id INT) RETURNS rounds AS $$
 DECLARE
   _row rounds%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _row FROM rounds WHERE id = _round_id;
+  BEGIN
+    SELECT * INTO STRICT _row FROM rounds WHERE id = _round_id;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'round % not found', _round_id;
+      WHEN TOO_MANY_ROWS THEN
+          RAISE EXCEPTION 'round % not unique', _round_id;
+  END;
   RETURN _row;
 END;
 $$ LANGUAGE plpgsql;
@@ -59,7 +93,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION room_create(_user_id INT, _passcode VARCHAR DEFAULT NULL) RETURNS rooms AS $$
+CREATE OR REPLACE FUNCTION user_create_room(_user_id INT, _passcode VARCHAR DEFAULT '') RETURNS rooms AS $$
 DECLARE
   _room rooms%ROWTYPE;
   _user RECORD;
@@ -72,7 +106,7 @@ BEGIN
   -- create a new room
 	INSERT INTO rooms (passcode) VALUES (_passcode) RETURNING * INTO _room;
   -- add this user into this room as a non-observer
-	PERFORM user_enter_room(_user.id, _room.id, passcode);
+	PERFORM user_enter_room(_user.id, _room.id, _passcode);
 	RETURN _room;
 END;
 $$ LANGUAGE plpgsql;
@@ -80,9 +114,9 @@ $$ LANGUAGE plpgsql;
 -- This function is automatically called when the last user leaves the room
 CREATE OR REPLACE FUNCTION __room_delete(_room_id INT) RETURNS VOID AS $$
 BEGIN
-	IF NOT EXISTS (SELECT * FROM users WHERE room_id = _room_id) THEN
+	IF NOT EXISTS (SELECT id FROM users WHERE room_id = _room_id) THEN
     RAISE INFO 'room % is marked deleted', _room_id;
-		UPDATE rooms SET deleted_at = current_timestamp WHERE id = _room_id;
+		UPDATE rooms SET deleted_at = now_utc() WHERE id = _room_id;
 	ELSE
 		RAISE EXCEPTION 'room % is not empty', _room_id;
 	END IF;
@@ -163,7 +197,7 @@ $$ LANGUAGE plpgsql;
 
 -- room_start_new_round should be called by the application when it wishes to start a new round in a room
 -- may throw exception if requirements are not met
-CREATE OR REPLACE FUNCTION room_start_new_round(_room_id INT, word varchar) RETURNS rounds AS $$
+CREATE OR REPLACE FUNCTION room_start_new_round(_room_id INT) RETURNS rounds AS $$
 DECLARE
 	_round rounds%ROWTYPE;
  	_painter RECORD;
@@ -177,7 +211,7 @@ BEGIN
 	SELECT * INTO _painter FROM room_get_random_player(_room_id);
 	-- create the round entry
 	INSERT INTO rounds (room_id, painter_id, answer)
-    VALUES (_room_id, _painter.id, word)
+    VALUES (_room_id, _painter.id, dictionary_get_random_word())
 		RETURNING * INTO _round;
 	-- create a row for each of the rest players in round_user table
 	FOR _player IN SELECT * FROM room_get_players(_room_id) LOOP
@@ -201,7 +235,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- round_end() should be called by the application when it is time to end a round
-CREATE OR REPLACE FUNCTION round_end(_round_id INT, _aborted BOOLEAN DEFAULT FALSE) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION round_end(_round_id INT, _aborted BOOLEAN DEFAULT FALSE) RETURNS SETOF round_user AS $$
 DECLARE
   _round RECORD;
   _row RECORD;
@@ -213,7 +247,7 @@ BEGIN
     RAISE EXCEPTION 'round % is alreayd eneded', _round_id;
   END IF;
   -- mark this round as ended
-  UPDATE rounds SET ended_at = current_timestamp WHERE id = _round_id;
+  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id;
 
   IF NOT _aborted THEN
     -- get the # of correct_guesses
@@ -230,8 +264,10 @@ BEGIN
     -- increment each guesser's score
     FOR _row IN SELECT * FROM round_user WHERE round_id = _round_id LOOP
       UPDATE users SET score_guess = score_guess + _row.score WHERE id = _row.user_id;
+      RETURN NEXT _row;
     END LOOP;
   END IF;
+  RETURN;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -277,7 +313,7 @@ BEGIN
     -- if user if an observer, he/she can exits any time as he/she wants
     RETURN TRUE;
   ELSE
-    IF EXISTS (SELECT * FROM room_get_current_round(_user.room_id)) THEN
+    IF EXISTS (SELECT id FROM room_get_current_round(_user.room_id)) THEN
       RETURN FALSE;
     END IF;
   END IF;
@@ -341,6 +377,8 @@ BEGIN
     RAISE EXCEPTION 'user % is in an active round', _user_id;
   END IF;
   UPDATE users SET ready = _ready WHERE id = _user_id;
+
+
 END;
 $$ LANGUAGE plpgsql;
 
@@ -352,7 +390,7 @@ BEGIN
   SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
 
   -- TODO: decide whether a user is allow to guess multiple times
-  UPDATE round_user SET submission = _answer, submitted_at = now_utc()
+  UPDATE round_user SET submission = _answer, submitted_at = now_utc(), attempt = attempt + 1
     WHERE round_id = _round.id AND user_id = _user_id;
 
   IF NOT FOUND THEN

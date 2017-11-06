@@ -1,23 +1,63 @@
 var db = require('./db');
+var Room = require('./room');
 
 class User {
 
-  static async getById(user_id) {
-    let user = {};
-    user = await db.one("SELECT * FROM users WHERE id = $1", [user_id]);
-    user.prototype = User;
-    return user;
+  static getById(user_id) {
+    return db.proc("user_get_by_id", [user_id])
+      .then(function (user) {
+        Object.setPrototypeOf(user, User.prototype);
+        return user;
+      });
   }
 
-  static async getOrCreate(fb_id, displayName) {
-    let user;
-    try {
-      user = await db.one("SELECT * FROM users WHERE fb_id = $1", [fb_id]);
-    } catch(e) {
-        user = await db.one("INSERT INTO users (fb_id, nickname) VALUES ($1, $2) RETURNING *", [fb_id, displayName]);
-    }
-    user.prototype = User;
-    return user;
+  static getOrCreate(fb_id, displayName) {
+    return db.proc("user_get_or_create", [fb_id, displayName])
+      .then(function (user) {
+        Object.setPrototypeOf(user, User.prototype);
+        return user;
+      });
+  }
+
+  setNickname(nickname) {
+    return db.one('UPDATE users SET nickname = $1 WHERE id = $2 RETURNING *', [nickname, this.id]);
+  }
+
+
+  createRoom(passcode = '') {
+    return db.proc('user_create_room', [this.id, passcode])
+    // TODO push to redis channel
+  }
+
+
+  enterRoom(room_id, passcode = '', observer = false) {
+    return db.proc('user_enter_room', [this.id, room_id, passcode, observer])
+    // TODO push to redis channel
+  }
+
+
+  exitRoom(force = false) {
+    return db.proc('user_exit_room', [this.id, force]);
+    // TODO push to redis channel
+  }
+
+  setReady(state) {
+    let user = this;
+    return db.proc('user_set_ready_status', [this.id, state])
+      .then(function () {
+        Room.startNewRound(user.room_id);
+        return true;
+      });
+  }
+
+  submit(guess) {
+    return db.proc('user_submit_answer', [this.id, guess]);
+    // TODO push to redis channel
+  }
+
+  draw(image) {
+    return db.proc('user_submit_image', [this.id, image]);
+    // TODO push to redis channel
   }
 
 }
