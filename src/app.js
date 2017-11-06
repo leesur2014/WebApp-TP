@@ -37,7 +37,6 @@ app.use(bodyParser.urlencoded());
 app.use(passport.initialize());
 app.use(passport.session());
 
-console.log('my disk name: ' + path.join(__dirname, 'public'));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
