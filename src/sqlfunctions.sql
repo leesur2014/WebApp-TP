@@ -197,7 +197,7 @@ $$ LANGUAGE plpgsql;
 
 -- room_start_new_round should be called by the application when it wishes to start a new round in a room
 -- may throw exception if requirements are not met
-CREATE OR REPLACE FUNCTION room_start_new_round(_room_id INT, word varchar) RETURNS rounds AS $$
+CREATE OR REPLACE FUNCTION room_start_new_round(_room_id INT) RETURNS rounds AS $$
 DECLARE
 	_round rounds%ROWTYPE;
  	_painter RECORD;
@@ -211,7 +211,7 @@ BEGIN
 	SELECT * INTO _painter FROM room_get_random_player(_room_id);
 	-- create the round entry
 	INSERT INTO rounds (room_id, painter_id, answer)
-    VALUES (_room_id, _painter.id, word)
+    VALUES (_room_id, _painter.id, dictionary_get_random_word())
 		RETURNING * INTO _round;
 	-- create a row for each of the rest players in round_user table
 	FOR _player IN SELECT * FROM room_get_players(_room_id) LOOP
