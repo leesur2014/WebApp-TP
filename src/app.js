@@ -15,8 +15,6 @@ var app = express();
 var api = require('./routes/api');
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var ws = require('./routes/ws')
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
