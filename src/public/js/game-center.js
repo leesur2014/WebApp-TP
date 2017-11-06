@@ -10,10 +10,11 @@ $(function() {
             var player_count = data['data'][i].user_count;
             node.innerHTML = "<img src=\"/static/images/game-table/"+String(player_count)+".png\" class=\"img\">";
             room.click(function() {
+                console.log('enter room!');
                 window.location.href = "/join-room";
             });
+            room.append(node);
             $('#roomContainer').append(room);           
-            $('#roomContainer').append(node);
         }
     })
     .fail(function() {
