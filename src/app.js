@@ -11,7 +11,6 @@ var RedisStore = require('connect-redis')(session);
 var passport = require('passport');
 
 var app = express();
-var expressWs = require('express-ws')(app);
 
 var api = require('./routes/api');
 var routes = require('./routes/index');
@@ -24,6 +23,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 
 app.use(session({
     store: new RedisStore({
@@ -40,10 +46,7 @@ app.use(bodyParser.urlencoded());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/ws', ws);
-
 app.use('/static', express.static(path.join(__dirname, 'public')));
-
 app.use('/', routes);
 app.use('/users', users);
 app.use('/api', api);
