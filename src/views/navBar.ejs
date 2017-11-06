@@ -1,34 +1,23 @@
-<nav class="navbar navbar-inverse bg-inverse">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Grumblr</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="{% url 'globalStream' %}">Home</a></li>
-                <li><a href="{% url 'editProfile' %}">Edit My Profile</a></li>
-                <li><a href="{% url 'followers' %}">Following </a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">More about this site <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Be Bold</a></li>
-                        <li><a href="#">Focus on Impact</a></li>
-                        <li><a href="#">Move Fast</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li class="dropdown-header">Be Open</li>
-                        <li><a href="#">Build Social Value</a></li>
-                    </ul>
-                </li>
-            </ul>
-        <form class="form-inline my-2 my-lg-0"  action="/logout" method="post">
-            <button id="logOutButton" class="btn btn-outline-success my-2 my-sm-0" type="submit">Log out</button>
-        </form>
-        </div><!--/.nav-collapse -->
-    </div><!--/.container-fluid -->
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">WebSiteName</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Home</a></li>
+      <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#">Page 1-1</a></li>
+          <li><a href="#">Page 1-2</a></li>
+          <li><a href="#">Page 1-3</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Page 2</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    </ul>
+  </div>
 </nav>
