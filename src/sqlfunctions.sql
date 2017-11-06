@@ -362,7 +362,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_set_ready_status (_user_id INT, _ready BOOLEAN) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_change_state (_user_id INT, _ready BOOLEAN) RETURNS VOID AS $$
 DECLARE
   _user RECORD;
 BEGIN
@@ -382,14 +382,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_submit_answer (_user_id INT, _answer VARCHAR) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION user_guess (_user_id INT, _answer VARCHAR) RETURNS BOOLEAN AS $$
 DECLARE
   _round RECORD;
 BEGIN
 
   SELECT * INTO STRICT _round FROM user_get_current_round(_user_id);
 
-  -- TODO: decide whether a user is allow to guess multiple times
   UPDATE round_user SET submission = _answer, submitted_at = now_utc(), attempt = attempt + 1
     WHERE round_id = _round.id AND user_id = _user_id;
 
@@ -406,7 +405,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION user_submit_image (_user_id INT, _image BYTEA) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_draw (_user_id INT, _image BYTEA) RETURNS VOID AS $$
 DECLARE
   _round RECORD;
 BEGIN
