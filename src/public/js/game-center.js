@@ -6,15 +6,14 @@ $(function() {
             console.log(JSON.stringify(data['data'][i]));
             var room = $('<div/>');
             room.append(document.createTextNode(data['data'][i].user_count));
-            room.css('border', '2px solid black');
-            room.width(150);
-            room.height(150);
-            room.css('display', 'inline-block');
-            room.css('margin', 20);
+            var node = document.createElement("div");
+            var player_count = data['data'][i].user_count;
+            node.innerHTML = "<img src=\"/static/images/game-table/"+String(player_count)+".png\" class=\"img\">";
             room.click(function() {
                 window.location.href = "/join-room";
             });
-            $('#roomContainer').append(room);
+            $('#roomContainer').append(room);           
+            $('#roomContainer').append(node);
         }
     })
     .fail(function() {
