@@ -109,8 +109,17 @@ router.post('/room', function(req, res) {
 });
 
 router.post('/enter', function(req, res) {
-  // TODO input validation
-  req.user.enterRoom(req.body.room_id, req.body.passcode || '', req.body.observer || false)
+  if (req.body.room_id === undefined)
+  {
+    send_error(res, "room_id is required");
+    return;
+  }
+  if (!validator.isBoolean(req.body.observer))
+  {
+    send_error(res, "observer should be boolean")
+    return;
+  }
+  req.user.enterRoom(req.body.room_id, req.body.passcode || '', req.body.observer)
     .then(function (room) {
       res.send({
         code: 0,
@@ -123,7 +132,12 @@ router.post('/enter', function(req, res) {
 })
 
 router.post('/exit', function(req, res) {
-  // console.log(req.user);
+  let force = req.body.force || "false";
+  if (!validator.isBoolean(force))
+  {
+    send_error(res, "force should be boolean");
+    return;
+  }
   req.user.exitRoom(req.body.force || false)
     .then(function (room) {
       res.send({
@@ -135,11 +149,45 @@ router.post('/exit', function(req, res) {
     });
 });
 
+router.post('/ready', function(req, res) {
+  if (req.body.ready === undefined)
+  {
+    send_error(res, "ready is required");
+    return;
+  }
+  if (!validator.isBoolean(req.body.ready))
+  {
+    send_error(res, "ready should be boolean");
+    return;
+  }
+  req.user.setReady(req.body.ready)
+    .then(function (room) {
+      res.send({
+        code: 0
+      });
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
+})
 
-
-router.get('/rooms', function(req, res) {
-  res.send('respond with a resource');
-});
-
+router.post('/submit', function(req, res) {
+  if (req.body.submission === undefined)
+  {
+    send_error(res, "submission is required");
+    return;
+  }
+  let submission = validator.escape(req.body.submission);
+  req.user.submit(submission)
+    .then(function (correct) {
+      res.send({
+        code: 0,
+        correct: correct
+      });
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
+})
 
 module.exports = router;

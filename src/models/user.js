@@ -1,4 +1,5 @@
 var db = require('./db');
+var Room = require('./room');
 
 class User {
 
@@ -41,8 +42,12 @@ class User {
   }
 
   setReady(state) {
-    return db.proc('user_set_ready_status', [this.id, state]);
-    // TODO push to redis channel
+    let user = this;
+    return db.proc('user_set_ready_status', [this.id, state])
+      .then(function () {
+        Room.startNewRound(user.room_id);
+        return true;
+      });
   }
 
   submit(guess) {
