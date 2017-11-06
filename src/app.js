@@ -8,14 +8,12 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 
 var app = express();
-var socketIO = require('socket.io');
 
 var api = require('./routes/api');
 var users = require('./routes/users');
 
 var server = app.listen(process.env.PORT || 3000);
-
-var sio = socketIO(server);
+var sio = require('./sio')(server);
 
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
