@@ -109,14 +109,19 @@ router.post('/room', function(req, res) {
 });
 
 router.post('/enter', function(req, res) {
-  if (req.body.room_id === undefined)
+  if (req.body.room_id === undefined || req.body.observer === undefined)
   {
-    send_error(res, "room_id is required");
+    send_error(res, "missing params");
     return;
   }
   if (!validator.isBoolean(req.body.observer))
   {
     send_error(res, "observer should be boolean")
+    return;
+  }
+  if (!validator.isNumeric(req.body.room_id))
+  {
+    send_error(res, "room_id should be number")
     return;
   }
   req.user.enterRoom(req.body.room_id, req.body.passcode || '', req.body.observer)
