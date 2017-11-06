@@ -210,7 +210,7 @@ field | optional | Description
 -----|-----------|--------------
 room_id | No | id of room to enter
 passcode | Yes | user provided passcode
-observer | yes | enter as observer?
+observer | No | enter as observer?
 
 Request example
 ```
