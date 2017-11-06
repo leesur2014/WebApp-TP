@@ -171,4 +171,23 @@ router.post('/ready', function(req, res) {
     });
 })
 
+router.post('/submit', function(req, res) {
+  if (req.body.submission === undefined)
+  {
+    send_error(res, "submission is required");
+    return;
+  }
+  let submission = validator.escape(req.body.submission);
+  req.user.submit(submission)
+    .then(function (correct) {
+      res.send({
+        code: 0,
+        correct: correct
+      });
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
+})
+
 module.exports = router;
