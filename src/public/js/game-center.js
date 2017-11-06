@@ -6,6 +6,11 @@ $(function() {
             console.log(JSON.stringify(data['data'][i]));
             var room = $('<div/>');
             room.append(document.createTextNode(data['data'][i].user_count));
+            room.css('border', '2px solid black');
+            room.width(150);
+            room.height(150);
+            room.css('display', 'inline-block');
+            room.css('margin', 20);
             room.click(function() {
                 window.location.href = "/join-room";
             });
