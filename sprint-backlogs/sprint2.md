@@ -25,6 +25,7 @@ all | complete APIs for User model | 2 | Hancheng Zhong
 all | complete APIs for Room model | 4 | Hancheng Zhong 
 all | complete APIs for Round model | 6 | Hancheng Zhong 
 all | complete APIs for Canvas model | 4 | Hancheng Zhong 
+4， 5， 6| socket.io backend modules | 4 | Hancheng Zhong
 all | add necessary unit test cases | 4 | Peipei Li
 all | Powerpoint | 4 | Peipei Li
 1 | socket.io modules for game center | 4 | Xuhui Wang
