@@ -29,6 +29,7 @@ all | add necessary unit test cases | 4 | Peipei Li
 all | Powerpoint | 4 | Peipei Li
 1 | socket.io modules for game center | 4 | Xuhui Wang
 2 | clicking redirection - event handling | 2 | Xuhui Wang
+3 | get ready logic and 'kick out' redirection' | 2 | Xuhui Wang
 4 | game state events handling using jQuery| 4 | Xuhui Wang
 5 | canvas, drawing logic, and socket.io integration | 6 | Xuhui Wang
 6 | game finishing logic and display | 4 | Xuhui Wang
