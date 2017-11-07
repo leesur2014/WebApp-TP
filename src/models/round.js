@@ -10,11 +10,10 @@ Round.end = function (round_id) {
         event: "round_end",
         data: round
       };
-      redis.publish("room:" + round.room_id, JSON.stringify(evt));
-      return data;
+      // send to socketio send to socketio
+      return round;
     })
     .catch(function (err) {
-      console.log(err);
       return null;
     });
 };
@@ -28,11 +27,10 @@ Round.abort = function (round_id) {
         event: "round_abort",
         data: round
       };
-      redis.publish("room:" + round.room_id, JSON.stringify(evt));
-      return data;
+      // send to socketio
+      return round;
     })
     .catch(function (err) {
-      console.log(err);
       return null;
     });
 };

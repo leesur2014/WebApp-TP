@@ -1,5 +1,4 @@
 var promise = require('bluebird');
-var monitor = require('pg-monitor');
 
 var options = {
   promiseLib: promise
@@ -16,7 +15,5 @@ const config = {
 
 var pgp = require('pg-promise')(options);
 var db = pgp(config);
-
-monitor.attach(options); // attach to all events at once;
 
 module.exports = db;

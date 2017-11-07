@@ -1,5 +1,4 @@
 var db = require('./db');
-var redis = require('./redis').pubClient;
 var Room = require('./room');
 
 class User {
@@ -41,7 +40,7 @@ class User {
             user_id: user.id
           }
         };
-        redis.publish("room:" + room_id, JSON.stringify(evt));
+        //redis.publish("room:" + room_id, JSON.stringify(evt));
       });
   }
 
@@ -56,7 +55,7 @@ class User {
             user_id: user.id
           }
         };
-        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+        //redis.publish("room:" + user.room_id, JSON.stringify(evt));
       });
   }
 
@@ -71,7 +70,7 @@ class User {
             ready: state
           }
         };
-        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+        //redis.publish("room:" + user.room_id, JSON.stringify(evt));
         Room.startNewRound(user.room_id);
       });
   }
@@ -87,7 +86,7 @@ class User {
             correct: correct
           }
         };
-        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+        //redis.publish("room:" + user.room_id, JSON.stringify(evt));
         if (correct)
         {
           // TODO check if this round can end early
@@ -105,7 +104,7 @@ class User {
             image: image
           }
         };
-        redis.publish("room:" + user.room_id, JSON.stringify(evt));
+        //redis.publish("room:" + user.room_id, JSON.stringify(evt));
       });
   }
 
