@@ -11,13 +11,16 @@ var RedisStore = require('connect-redis')(session);
 var passport = require('passport');
 
 var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
+var index = require('./routes/index');
 var api = require('./routes/api');
 var users = require('./routes/users');
 
 // // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
+ app.set('views', path.join(__dirname, 'views'));
+ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 
@@ -40,13 +43,19 @@ app.use(session({
     saveUninitialized: false
 }));
 
+//io.on('connection', function(socket){
+//  console.log('a user connected');
+//});
+
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/', index);
 app.use('/users', users);
 app.use('/api', api);
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
