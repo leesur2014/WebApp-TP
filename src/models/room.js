@@ -1,28 +1,37 @@
 var db = require('./db');
 
+var io = require('./socket');
+
 Room = {};
 
 Room.getById = function (id) {
   return db.proc("room_get_by_id", [id]);
 };
 
+Room.getAllPublicRooms = function () {
+  return db.any("SELECT * FROM public_rooms");
+}
+
+Room.getPublicRoomById = function (room_id) {
+  return db.one("SELECT * FROM public_rooms WHERE id = $1", room_id);
+}
 
 Room.getInfoById = async function (room_id) {
-  let room;
-  room = await Room.getById(room_id);
-  room.users = await db.any('SELECT id, nickname, observer, ready FROM room_get_users($1)', room_id);
-  room.round = await db.oneOrNone('SELECT id, painter_id, started_at FROM room_get_current_round($1)', room_id);
+  let room = await db.proc("room_get_by_id", room_id)
+  room.users = await db.any('SELECT id, nickname, observer, ready FROM room_get_users($1)', room.id)
+  room.round_id = await db.proc('room_get_current_round', room.id, r => r.id);
   return room;
 };
 
 Room.startNewRound = function (room_id) {
   return db.proc('room_start_round', room_id)
     .then(function (round) {
-      delete round.answer;
-      // TODO send to socket.io
-      return round;
+      io.to('room_' + room_id)
+        .emit('round_start', {round_id: round.id});
+      return null;
     })
     .catch(function (err) {
+      // this is not an error
       console.log(err);
       return null;
     });

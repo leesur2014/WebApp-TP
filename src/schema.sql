@@ -6,13 +6,10 @@ $$ language sql;
 CREATE TABLE "users" (
 	"id" SERIAL NOT NULL,
 	"fb_id" VARCHAR(64) NOT NULL UNIQUE,
-	-- "fb_access_token" CHAR(255) NULL,
-	-- "fb_token_expire_at" TIMESTAMP WITHOUT TIME ZONE NULL,
-	"access_token" VARCHAR(64) NULL,
+	"token" VARCHAR(64) NULL,
 	"nickname" VARCHAR(64) NOT NULL,
 	"score_draw" INTEGER NOT NULL DEFAULT '0',
 	"score_guess" INTEGER NOT NULL DEFAULT '0',
-	"score_penalty" INTEGER NOT NULL DEFAULT '0',
 	"joined_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
 
 	"online" boolean NOT NULL default 'FALSE',
@@ -67,7 +64,7 @@ CREATE TABLE "canvas" (
 	"id" SERIAL NOT NULL,
 	"round_id" INTEGER NOT NULL,
 	"timestamp" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
-	"image" bytea NOT NULL,
+	"image" TEXT NOT NULL,
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
