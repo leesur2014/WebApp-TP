@@ -3,6 +3,9 @@ var router = express.Router();
 var passport = require('passport');
 
 router.get('/', function(req, res) {
+    console.log('[INFO] Is authenticated? ' + req.isAuthenticated());
+    if (req.isAuthenticated())
+        res.redirect('/game-center');
     res.render('login');
 });
 
@@ -30,6 +33,12 @@ router.get('/create-room',function(req,res) {
     if (!req.isAuthenticated())
         res.redirect('/');
     res.render('create-room');
+});
+
+router.get('/room', function(req,res) {
+    if (!req.isAuthenticated())
+        res.redirect('/');
+    res.render('room', {user: {'name': 'hah'}});
 });
 // UI Ends
 
