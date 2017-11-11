@@ -3,13 +3,14 @@ var router = express.Router();
 var db = require('../models/db');
 var User = require('../models/user');
 var Room = require('../models/room');
+var Round = require('../models/round');
 var randomstring = require("randomstring");
 var validator = require('validator');
 
 
-function send_error(res, err, code = -1)
+function send_error(res, err = 'error', code = -1)
 {
-  res.send({
+  return res.send({
     code: code,
     error: err.message || err
   });
@@ -17,7 +18,7 @@ function send_error(res, err, code = -1)
 
 function send_data(res, data)
 {
-  res.send({
+  return res.send({
     code: 0,
     data: data
   });
@@ -53,41 +54,43 @@ router.post('/me', function(req, res) {
 
 router.get('/user/:id(\\d+)', function(req, res) {
   User.getById(req.params.id)
-  .then(function (user) {
-    delete user.fb_id;
-    send_data(res, user);
-  })
-  .catch(function (err)
-  {
-    send_error(res, err);
-  });
+    .then(function (user) {
+      delete user.fb_id;
+      delete user.token;
+      delete user.room_id;
+      send_data(res, user);
+    })
+    .catch(function (err)
+    {
+      send_error(res, err);
+    });
 });
 
 router.get('/round/:id(\\d+)', function(req, res) {
   Round.getInfoById(req.params.id)
-  .then(function (round) {
-    // TODO: only allow a user's access to his/her rournds
-    if (round.end_at === null)
+    .then(function (round) {
+      // TODO: only allow a user's access to his/her rounds
+      if (round.ended_at === null)
+      {
+        // do not display answer for ongoing rounds
+        round.answer = '******';
+      }
+      send_data(res, round);
+    })
+    .catch(function (err)
     {
-      // do not display answer for ongoing rounds
-      round.answer = '******';
-    }
-    send_data(res, round);
-  })
-  .catch(function (err)
-  {
-    send_error(res, err);
-  });
+      send_error(res, err);
+    });
 });
 
 
 router.get('/image/:id(\\d+)', function(req, res) {
   Round.getLatestCanvas(req.params.id)
     .then(function (data) {
-
+      send_data(res, data);
     })
     .catch(function (err) {
-
+      send_error(res, err);
     });
 });
 
@@ -194,7 +197,7 @@ router.post('/ready', function(req, res) {
   }
   req.user.setReady(req.body.ready == 'true')
     .then(function () {
-      send_data(res, null);
+      send_data(res, req.body.ready == 'true');
     })
     .catch(function (err) {
       send_error(res, err);
