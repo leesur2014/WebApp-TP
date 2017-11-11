@@ -5,6 +5,8 @@ src/npm
 *.xml
 *.iml
 
+package-lock.json
+
 # Class-specific section #
 
 
