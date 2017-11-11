@@ -17,7 +17,7 @@ class User {
 
   static login(fb_id, displayName) {
     var token = randomstring.generate(32);
-    return db.proc("user_get_or_create", [fb_id, displayName, token])
+    return db.proc("user_login", [fb_id, displayName, token])
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
         return user;
@@ -51,7 +51,7 @@ class User {
 
   exitRoom(force = false) {
     var user = this;
-    return db.proc('user_exit_room', [this.id, force])
+    return db.proc('user_exit_room', [user.id, force])
       .then(function () {
         io.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
       });
@@ -78,6 +78,7 @@ class User {
   }
 
   draw(image) {
+    var user = this;
     return db.proc('user_draw', [this.id, image])
       .then(function () {
         io.to('room_' + user.room_id).emit('user_draw');
