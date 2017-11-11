@@ -7,5 +7,5 @@ CREATE VIEW open_rounds AS SELECT * FROM rounds WHERE ended_at IS NULL ORDER BY 
 
 CREATE VIEW top_guessers AS SELECT id, nickname, score_guess FROM users ORDER BY score_guess FETCH FIRST 50 ROWS ONLY;
 CREATE VIEW top_painter AS SELECT id, nickname, score_draw FROM users ORDER BY score_draw FETCH FIRST 50 ROWS ONLY;
-CREATE VIEW top_users AS SELECT id, nickname, (score_guess + score_draw - score_penalty) AS score
+CREATE VIEW top_users AS SELECT id, nickname, (score_guess + score_draw) AS score
 FROM users ORDER BY score FETCH FIRST 50 ROWS ONLY;
