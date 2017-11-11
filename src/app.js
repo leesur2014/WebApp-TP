@@ -43,9 +43,9 @@ app.use(session({
     saveUninitialized: false
 }));
 
-//io.on('connection', function(socket){
-//  console.log('a user connected');
-//});
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
 
 app.use(bodyParser.urlencoded({extended: false}));
 
