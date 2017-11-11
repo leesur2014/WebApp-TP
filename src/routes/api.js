@@ -15,6 +15,14 @@ function send_error(res, err, code = -1)
   });
 }
 
+function send_data(res, data)
+{
+  res.send({
+    code: 0,
+    data: data
+  });
+}
+
 
 router.use('/', function (req, res, next) {
     // if user is authenticated in the session, carry on
@@ -28,30 +36,26 @@ router.use('/', function (req, res, next) {
 
 router.get('/me', function(req, res) {
   res.send(req.user);
-})
+});
 
 router.post('/me', function(req, res) {
-  console.log(req.params);
   if (req.body.nickname)
   {
     req.user.setNickname(validator.escape(req.body.nickname))
       .then(function (user) {
-        res.send({
-          code: 0,
-          data: user
-        });
+        send_data(res, user);
       });
   }
   else {
     send_error(res, "nickname required");
   }
-})
+});
 
 router.get('/user/:id(\\d+)', function(req, res) {
   User.getById(req.params.id)
   .then(function (user) {
-    user.fb_id = undefined;
-    res.send(user);
+    delete user.fb_id;
+    send_data(res, user);
   })
   .catch(function (err)
   {
@@ -59,27 +63,62 @@ router.get('/user/:id(\\d+)', function(req, res) {
   });
 });
 
+router.get('/round/:id(\\d+)', function(req, res) {
+  Round.getInfoById(req.params.id)
+  .then(function (round) {
+    // TODO: only allow a user's access to his/her rournds
+    if (round.end_at === null)
+    {
+      // do not display answer for ongoing rounds
+      round.answer = '******';
+    }
+    send_data(res, round);
+  })
+  .catch(function (err)
+  {
+    send_error(res, err);
+  });
+});
+
+
+router.get('/image/:id(\\d+)', function(req, res) {
+  Round.getLatestCanvas(req.params.id)
+    .then(function (data) {
+
+    })
+    .catch(function (err) {
+
+    });
+});
+
 router.get('/lounge', function(req, res) {
   db.any("SELECT * FROM public_rooms")
     .then(function (data) {
-      res.send({
-        code: 0,
-        data: data
-      });
+      send_data(res, data);
+    })
+    .catch(function (err)
+    {
+      send_error(res, err);
     });
 });
 
 
+router.get('/room/:id(\\d+)', function (req, res) {
+  Room.getPublicRoomById(req.params.id)
+    .then(function (data) {
+      send_data(res, data);
+    })
+    .catch(function (err) {
+      send_error(res, err);
+    });
+});
 
 router.get('/room', function(req, res) {
   if (req.user.room_id)
   {
     Room.getInfoById(req.user.room_id)
       .then(function (data) {
-        res.send({
-          code: 0,
-          data: data
-        });
+        send_data(res, data);
       })
       .catch(function (err)
       {
@@ -87,21 +126,14 @@ router.get('/room', function(req, res) {
       });
   }
   else {
-    res.send({
-      code: -1,
-      error: "You are not in a room"
-    })
+    send_error(res, "You are not in a room");
   }
 });
 
 router.post('/room', function(req, res) {
-  // console.log(req.user);
   req.user.createRoom(req.body.passcode || '')
     .then(function (room) {
-      res.send({
-        code: 0,
-        data: room
-      });
+      send_data(res, room);
     })
     .catch(function (err) {
       send_error(res, err);
@@ -126,10 +158,7 @@ router.post('/enter', function(req, res) {
   }
   req.user.enterRoom(req.body.room_id, req.body.passcode || '', req.body.observer == 'true')
     .then(function (room) {
-      res.send({
-        code: 0,
-        data: room
-      });
+      send_data(res, room);
     })
     .catch(function (err) {
       send_error(res, err);
@@ -143,11 +172,9 @@ router.post('/exit', function(req, res) {
     send_error(res, "force should be boolean");
     return;
   }
-  req.user.exitRoom(req.body.force == 'true')
-    .then(function (room) {
-      res.send({
-        code: 0
-      });
+  req.user.exitRoom(req.body.force === 'true')
+    .then(function () {
+      send_data(res, null);
     })
     .catch(function (err) {
       send_error(res, err);
@@ -166,10 +193,8 @@ router.post('/ready', function(req, res) {
     return;
   }
   req.user.setReady(req.body.ready == 'true')
-    .then(function (room) {
-      res.send({
-        code: 0
-      });
+    .then(function () {
+      send_data(res, null);
     })
     .catch(function (err) {
       send_error(res, err);
@@ -208,10 +233,8 @@ router.post('/draw', function(req, res) {
     return;
   }
   req.user.draw(req.body.image)
-    .then(function (correct) {
-      res.send({
-        code: 0
-      });
+    .then(function () {
+      send_data(res, null);
     })
     .catch(function (err) {
       send_error(res, err);
