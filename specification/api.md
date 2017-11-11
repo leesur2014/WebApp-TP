@@ -16,6 +16,8 @@ POST | `/api/me` | change my nickname
 GET | `/api/lounge` | Get a list of public rooms
 GET | `/api/room` | Get detailed info about current room
 GET | `/api/user/{user_id}` | Get info about a user
+GET | `/api/round/{round_id}` | Get info about a round
+GET | `/api/image/{round_id}` | Get the latest image of a round
 POST | `/api/room` | Create a room
 POST | `/api/enter` | Join a room
 POST | `/api/exit` | Quit a room
@@ -35,8 +37,6 @@ All endpoints return a JSON object on HTTP 200 responses. If the `code` is 0, th
   "error": "lalalala"
 }
 ```
-
-For brevity, all timestamps are omitted in examples.
 
 
 ## Examples
@@ -219,21 +219,64 @@ GET /api/user/100
   "code": 0,
   "data":
     {
-      "id": 1,
+      "id": 100,
       "score_guess": 20,
       "score_draw": 20,
-      "score_penalty": 0,
       "nickname": "Mike"
     }
 }
 ```
+
+
+### Get info about a round
+
+```
+GET /api/round/100
+```
+
+```json
+{
+  "code": 0,
+  "data": {
+    "id": 100,
+    "painter_id": 20,
+    "painter_score": 10,
+    "started_at": "2017-10-05T14:48:00.000Z",
+    "ended_at": "2017-10-05T14:50:00.000Z",
+    "users": [
+      {
+          "id": 1,
+          "score": 0
+      },
+      {
+          "id": 4,
+          "score": 2
+      }
+    ]
+  }
+}
+```
+
+### Get the latest image of a round
+
+```
+GET /api/round/image
+```
+
+```json
+{
+  "code": 0,
+  "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAU..."
+}
+```
+
 
 ### enter a room
 
 field | optional | Description
 -----|-----------|--------------
 room_id | No | id of room to enter
-passcode | Yes | user provided passcode
+passcode | No | user provided passcode for this room, use an empty string for public rooms
 observer | No | enter as observer?
 
 Request example
@@ -266,7 +309,7 @@ failed response
 
 field | optional | Description
 -----|-----------|--------------
-force | No | whether to exit forcefully
+force | No | whether to exit forcefully, i.e. during a round
 
 Request example
 ```
@@ -391,89 +434,5 @@ failure response
 {
   "code": -1,
   "error": "user 1 is not the painter in round 10"
-}
-```
-
-
-# Websoket API
-
-
-URL | Description
-----|--------------
-`/ws/room/{room_id}` | Get notifications about events in the room
-`/ws/lounge` | Get notifications about all public rooms (planned)
-
-A client should connect to `/ws/room/{room_id}` after the user enters the room. The connection
-is closed when a user leaves a room. The server sends events as JSON objects to the client.
-
-The JSON object contains an `event` member and an optional `data` member. The `event` member is
-a string containing the type of the event.
-
-event type | desc    
------------|---------
-`user_enter` | a user entered this room
-`user_exit` | a user left this room
-`user_guess` | a user submitted a guess
-`round_start` | a round started
-`round_end` | a round ended
-`user_draw` | painter's drawing
-
-## Examples
-
-```json
-{
-  "event": "user_enter",
-  "data": {
-    "user_id": 120,
-  }
-}
-```
-
-```json
-{
-  "event": "user_exit",
-  "data": {
-    "user_id": 120,
-  }
-}
-```
-
-
-```json
-{
-  "event": "round_start",
-  "data": {
-    "id": 110,
-  }
-}
-```
-
-```json
-{
-  "event": "round_end",
-  "data": {
-    "round_id": 110,
-  }
-}
-```
-
-
-```json
-{
-  "event": "user_draw",
-  "data": {
-    "round_id": 110,
-  }
-}
-```
-
-
-```json
-{
-  "event": "user_guess",
-  "data": {
-    "user_id": 120,
-    "correct": false
-  }
 }
 ```

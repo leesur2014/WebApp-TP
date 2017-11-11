@@ -18,7 +18,7 @@ Room.getInfoById = async function (room_id) {
 Room.startNewRound = function (room_id) {
   return db.proc('room_start_round', room_id)
     .then(function (round) {
-      round.answer = undefined;
+      delete round.answer;
       // TODO send to socket.io
       return round;
     })
