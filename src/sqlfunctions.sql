@@ -26,11 +26,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION round_get_latest_canvas(_round_id) RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION round_get_latest_canvas(_round_id INT) RETURNS TEXT AS $$
 DECLARE
   _res TEXT;
 BEGIN
-  SELECT image INTO STRICT _res FROM canvas WHERE round_id = _round_id;
+  SELECT image INTO STRICT _res FROM canvas WHERE round_id = _round_id ORDER BY timestamp DESC LIMIT 1;
   RETURN _res;
 END;
 $$ LANGUAGE plpgsql;
@@ -84,7 +84,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_get_current_room(_user_id INT) RETURNS SETOF rooms AS $$
+CREATE OR REPLACE FUNCTION user_get_current_room(_user_id INT) RETURNS rooms AS $$
 DECLARE
   _room rooms%ROWTYPE;
 BEGIN
@@ -110,7 +110,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION room_get_current_round(_room_id INT) RETURNS SETOF rounds AS $$
-DECLARE
+BEGIN
   RETURN QUERY SELECT * FROM open_rounds WHERE room_id = _room_id LIMIT 1;
   RETURN;
 END;
@@ -234,6 +234,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION room_delete(_room_id INT) RETURNS VOID AS $$
 BEGIN
+  PERFORM room_get_by_id(_room_id);
 	IF NOT EXISTS (SELECT id FROM room_get_users(_room_id)) THEN
     RAISE INFO 'deleting room %', _room_id;
     -- Delete the room when there is no one it
@@ -281,11 +282,14 @@ DECLARE
   _round RECORD;
   _correct_guesses INT;
 BEGIN
-  UPDATE opend_rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
+  UPDATE open_rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
   RETURNING * INTO STRICT _round;
 
-  -- TODO : calculate score for each user
+  SELECT count(*) INTO _correct_guesses FROM round_user WHERE round_id = _round_id
+    AND submission = _round.answer;
 
+  UPDATE rounds SET painter_score = calc_painter_score(_correct_guesses) WHERE id = _round_id
+  RETURNING * INTO STRICT _round;
   RETURN _round;
 END;
 $$ LANGUAGE plpgsql;
@@ -303,7 +307,7 @@ BEGIN
   ELSE
     UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
     RETURNING * INTO STRICT _round;
-  ELSE
+  END IF;
 
   RETURN _round;
 END;
@@ -362,19 +366,22 @@ BEGIN
   ELSE
     SELECT * INTO _round FROM user_get_current_round(_user.id);
 
-    IF NOT FOUND THEN
-      UPDATE users SET room_id = NULL WHERE id = _user.id;
-    ELSIF _force THEN
-      IF _user.id = _round.painter_id THEN
-        -- the painter exits
-        UPDATE rounds SET painter_score = painter_score - _penalty WHERE id = _round.id;
+    IF FOUND THEN
+      IF _force THEN
+        IF _user.id = _round.painter_id THEN
+          -- the painter exits
+          UPDATE rounds SET painter_score = painter_score - _penalty WHERE id = _round.id;
+        ELSE
+          -- a guesser exits
+          UPDATE round_user SET score = score - _penalty WHERE round_id = _round.id AND user_id = _user.id;
+        END IF;
       ELSE
-        -- a guesser exits
-        UPDATE round_user SET score = score - _penalty WHERE round_id = _round.id AND user_id = _user.id;
+        RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
       END IF;
-    ELSE
-      RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
     END IF;
+
+    UPDATE users SET room_id = NULL WHERE id = _user.id;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -412,10 +419,10 @@ BEGIN
     RAISE EXCEPTION 'you are not in a round';
   END IF;
 
-  SELECT * INTO _record FROM round_user WHERE round_id = _round.id AND user_id = _user_id;
+  SELECT * INTO STRICT _record FROM round_user WHERE round_id = _round.id AND user_id = _user_id;
 
   IF _record.submission = _round.answer THEN
-    RAISE EXCEPTION 'you have submitted the correct answer'
+    RAISE EXCEPTION 'you have submitted the correct answer';
   ELSE
     _score := 0;
     IF _submission = _round.answer THEN
@@ -425,6 +432,8 @@ BEGIN
     UPDATE round_user SET submission = _submission, score = _score, attempt = attempt + 1
     WHERE round_id = _round.id AND user_id = _user_id;
   END IF;
+
+  RETURN _submission = _round.answer;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -440,7 +449,7 @@ BEGIN
   IF _round.painter_id = _user_id THEN
     INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
   ELSE
-    RAISE EXCEPTION 'you are not the painter'
+    RAISE EXCEPTION 'you are not the painter';
   END IF;
 END;
 $$ LANGUAGE plpgsql;
