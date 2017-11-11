@@ -40,19 +40,7 @@ Event name | Description
 `room_change` | The state of a public room has changed, e.g. a user entered the room, a round started, etc
 `room_delete` | A public room is deleted
 
-The data of the first two events has the following structure
-
-```json
-{
-  "id": 111,
-  "created_at": "2017-11-06T03:07:27.708Z",
-  "user_count": 3,
-  "player_count": 2
-}
-```
-
-The data of `room_delete` event has only the `id` field.
-
+The data of all events has an `room_id` field containing the relevant room_id;
 
 ### Room events
 
@@ -67,14 +55,14 @@ Event name | Description
 
 #### `user_enter` and `user_exit`
 
-The data has only one `id` field, containing the id of the involved user. The client
+The data has only one `user_id` field, containing the id of the involved user. The client
 may GET `/api/user/id` for more information, such as nickname, observer state of that user.
 
 #### `user_guess`
 
 ```json
 {
-  "id": 10,
+  "user_id": 10,
   "correct": true
 }
 ```
@@ -87,7 +75,7 @@ the latest drawing of the painter. No data is associated with this event.
 
 #### `round_start` and `round_end`
 
-The data has only one `id` field, containing the id of the round in question.
+The data has only one `round_id` field, containing the id of the round in question.
 The client may GET `/api/round/id` for more information on the round.
 
 
