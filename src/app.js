@@ -11,8 +11,6 @@ var RedisStore = require('connect-redis')(session);
 var passport = require('passport');
 
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
 
 var index = require('./routes/index');
 var api = require('./routes/api');
@@ -42,10 +40,6 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
-
-io.on('connection', function(socket){
-  console.log('a user connected');
-});
 
 app.use(bodyParser.urlencoded({extended: false}));
 
