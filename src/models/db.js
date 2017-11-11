@@ -1,7 +1,7 @@
-var promise = require('bluebird');
+// var promise = require('bluebird');
 
 var options = {
-  promiseLib: promise
+  // promiseLib: promise
 };
 
 const config = {
