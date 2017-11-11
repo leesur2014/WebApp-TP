@@ -2,14 +2,30 @@
 
 -- start read-only functions
 
-CREATE OR REPLACE FUNCTION map_correct_guesses_to_painter_score(_correct_guesses INT) RETURNS INT AS $$
-DECLARE
-  _score INT;
+CREATE OR REPLACE FUNCTION calc_painter_score(_correct_guesses INT, _total_guesser_count INT) RETURNS INT AS $$
 BEGIN
-  SELECT score INTO STRICT _score FROM painter_score_map WHERE correct_guesses = _correct_guesses;
-  RETURN _score;
+  IF _correct_guesses = 0 THEN
+    RETURN 0;
+  ELSE
+    RETURN 2 * _total_guesser_count / _correct_guesses;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION calc_guesser_score(_attempt INT) RETURNS INT AS $$
+BEGIN
+  CASE _attempt
+    WHEN 1, 2, 3 THEN
+      RETURN 5;
+    WHEN 4, 5, 6 THEN
+      RETURN 2;
+    ELSE
+      RETURN 0;
+  END CASE;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE
@@ -63,19 +79,22 @@ CREATE OR REPLACE FUNCTION user_get_current_room(_user_id INT) RETURNS SETOF roo
 DECLARE
   _room rooms%ROWTYPE;
 BEGIN
-  RETURN QUERY SELECT * FROM rooms WHERE id = (SELECT room_id FROM user_get_by_id(_user_id));
-  RETURN;
+  BEGIN
+    SELECT * INTO STRICT _room FROM rooms WHERE id = (SELECT room_id FROM user_get_by_id(_user_id));
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'user % is not in a room', _user_id;
+  END;
+  RETURN _room;
 END;
 $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION user_get_current_round(_user_id INT) RETURNS SETOF rounds AS $$
-DECLARE
-  _round rounds%ROWTYPE;
 BEGIN
   -- NOTE: if the users.room_id is null, this function will return 0 rows
   -- because rounds.room_id if not null
-  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = (SELECT room_id FROM user_get_by_id(_user_id));
+  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = (SELECT id FROM user_get_current_room(_user_id)) LIMIT 1;
   RETURN;
 END;
 $$ LANGUAGE plpgsql;
@@ -83,9 +102,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION room_get_current_round(_room_id INT) RETURNS SETOF rounds AS $$
 DECLARE
-  _round rounds%ROWTYPE;
-BEGIN
-  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = _room_id;
+  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = _room_id LIMIT 1;
   RETURN;
 END;
 $$ LANGUAGE plpgsql;
@@ -117,7 +134,7 @@ CREATE OR REPLACE FUNCTION room_count_players(_room_id INT) RETURNS INT AS $$
 DECLARE
   _count INT;
 BEGIN
-	SELECT count(*) INTO _count FROM room_get_players(_room_id);
+	SELECT count(*) INTO _count FROM users WHERE room_id = _room_id AND observer = FALSE;
   return _count;
 END;
 $$ LANGUAGE plpgsql;
@@ -126,7 +143,12 @@ CREATE OR REPLACE FUNCTION room_get_random_player(_room_id INT) RETURNS users AS
 DECLARE
   _user users%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _user FROM room_get_players(_room_id) ORDER BY RANDOM() LIMIT 1;
+  BEGIN
+    SELECT * INTO STRICT _user FROM room_get_players(_room_id) ORDER BY RANDOM() LIMIT 1;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'no users in room %', _room_id;
+  END;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
@@ -138,31 +160,11 @@ DECLARE
   _rows INT;
 BEGIN
   SELECT count(*) INTO _rows FROM dictionary;
-  SELECT word INTO _word FROM dictionary OFFSET floor(random() * _rows) LIMIT 1;
+  SELECT word INTO STRICT _word FROM dictionary OFFSET floor(random() * _rows) LIMIT 1;
   RETURN _word;
 END;
 $$ LANGUAGE plpgsql;
 
-
-CREATE OR REPLACE FUNCTION __round_should_abort (_round_id INT) RETURNS BOOLEAN AS $$
-DECLARE
-  _round rounds%ROWTYPE;
-BEGIN
-  SELECT * INTO _round FROM open_rounds WHERE id = _round_id;
-  IF NOT FOUND THEN
-    RETURN FALSE;
-  END IF;
-  -- CASE 1: the painter is not in the room
-  IF NOT EXISTS (SELECT id FROM users WHERE room_id = _round.room_id AND id = _round.painter_id) THEN
-    RETURN TRUE;
-  END IF;
-  -- CASE 2: no guessers in the room
-  IF NOT EXISTS (SELECT id FROM room_get_players(_round.room_id) WHERE id <> _round.painter_id) THEN
-    RETURN TRUE;
-  END IF;
-  RETURN FALSE;
-END;
-$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION __room_can_start_round(_room_id INT) RETURNS BOOLEAN AS $$
@@ -187,28 +189,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION __user_can_exit_room (_user_id INT) RETURNS BOOLEAN AS $$
-DECLARE
-	_user users%ROWTYPE;
-BEGIN
-  SELECT * INTO _user FROM user_get_by_id(_user_id);
-  IF _user.observer THEN
-    -- if user if an observer, he/she can exits any time as he/she wants
-    RETURN TRUE;
-  ELSE
-    IF EXISTS (SELECT id FROM room_get_current_round(_user.room_id)) THEN
-      RETURN FALSE;
-    END IF;
-  END IF;
-  RETURN TRUE;
-END;
-$$ LANGUAGE plpgsql;
+-- END read-only functionssss
 
-
-
--- END read-only functions
-
-CREATE OR REPLACE FUNCTION user_get_or_create (_fb_id VARCHAR, _nickname VARCHAR) RETURNS users AS $$
+CREATE OR REPLACE FUNCTION user_login(_fb_id VARCHAR, _nickname VARCHAR, _token VARCHAR) RETURNS users AS $$
 DECLARE
   _user users%ROWTYPE;
 BEGIN
@@ -216,24 +199,15 @@ BEGIN
   IF NOT FOUND THEN
     INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
   END IF;
+  UPDATE users SET access_token = _token WHERE id = _user.id RETURNING * INTO _user;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION __user_inc_penalty (_user_id INT, _val INT) RETURNS void AS $$
-BEGIN
-  UPDATE users SET score_penalty = score_penalty + _val WHERE id = _user_id;
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'user % does not exist', _user_id;
-  END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-
 CREATE OR REPLACE FUNCTION user_create_room(_user_id INT, _passcode VARCHAR DEFAULT '') RETURNS rooms AS $$
 DECLARE
   _room rooms%ROWTYPE;
-  _user RECORD;
+  _user users%ROWTYPE;
 BEGIN
 	SELECT * INTO STRICT _user FROM user_get_by_id(_user_id);
   -- ensure user is not in a room
@@ -253,6 +227,7 @@ CREATE OR REPLACE FUNCTION room_delete(_room_id INT) RETURNS VOID AS $$
 BEGIN
 	IF NOT EXISTS (SELECT id FROM room_get_users(_room_id)) THEN
     RAISE INFO 'deleting room %', _room_id;
+    -- Delete the room when there is no one it
 		UPDATE rooms SET deleted_at = now_utc() WHERE id = _room_id;
 	ELSE
 		RAISE EXCEPTION 'room % is not empty', _room_id;
@@ -292,12 +267,12 @@ $$ LANGUAGE plpgsql;
 
 
 -- round_end() should be called by the application when it is time to end a round
-CREATE OR REPLACE FUNCTION round_end(_round_id INT, _aborted BOOLEAN DEFAULT FALSE) RETURNS rounds AS $$
+CREATE OR REPLACE FUNCTION round_end(_round_id INT) RETURNS rounds AS $$
 DECLARE
   _round RECORD;
   _correct_guesses INT;
 BEGIN
-  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
+  UPDATE opend_rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
   RETURNING * INTO STRICT _round;
 
   -- TODO : calculate score for each user
@@ -311,12 +286,16 @@ CREATE OR REPLACE FUNCTION round_abort(_round_id INT) RETURNS rounds AS $$
 DECLARE
   _round RECORD;
 BEGIN
-  IF __round_should_abort(_round_id) THEN
+  SELECT * INTO STRICT _round FROM open_rounds WHERE id = _round_id;
+
+  IF EXISTS (SELECT id FROM room_get_players(_round.room_id) WHERE id = _round.painter_id)
+    AND EXISTS (SELECT id FROM room_get_players(_round.room_id) WHERE id <> _round.painter_id) THEN
+    RAISE EXCEPTION 'round % cannot be aborted', _round.id;
+  ELSE
     UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
     RETURNING * INTO STRICT _round;
   ELSE
-    RAISE EXCEPTION 'round % cannot be aborted', _round.id;
-  END IF;
+
   RETURN _round;
 END;
 $$ LANGUAGE plpgsql;
@@ -324,7 +303,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION user_enter_room(_user_id INT, _room_id INT, _passcode VARCHAR DEFAULT '',
-  _is_observer BOOLEAN DEFAULT FALSE, _max_players INT DEFAULT 6) RETURNS rooms AS $$
+  _is_observer BOOLEAN DEFAULT FALSE, _max_players INT DEFAULT 6) RETURNS VOID AS $$
 DECLARE
 	_user users%ROWTYPE;
 	_room rooms%ROWTYPE;
@@ -354,42 +333,46 @@ BEGIN
   END IF;
 
 	UPDATE users SET room_id = _room.id, observer = _is_observer, ready = FALSE WHERE id = _user.id;
-	RETURN _room;
 
 END;
 $$ LANGUAGE plpgsql;
 
 
-
-
-CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT, _force BOOLEAN DEFAULT FALSE, _penalty INTEGER DEFAULT 5) RETURNS void AS $$
+CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT, _force BOOLEAN DEFAULT FALSE, _penalty INTEGER DEFAULT 5) RETURNS VOID AS $$
 DECLARE
 	_user users%ROWTYPE;
   _round rounds%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _user FROM user_get_by_id(_user_id);
+  SELECT * INTO _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
     RAISE EXCEPTION 'you are not in a room';
   END IF;
 
-  IF __user_can_exit_room(_user.id) THEN
-    NULL;
-  ELSIF _force THEN
-    PERFORM __user_inc_penalty(_user_id, _penalty);
+  IF _user.observer THEN
+    UPDATE users SET room_id = NULL WHERE id = _user.id;
   ELSE
-    RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
-  END IF;
+    SELECT * INTO _round FROM user_get_current_round(_user.id);
 
-  -- remove user from current room
-  UPDATE users SET room_id = NULL WHERE id = _user.id;
-
+    IF NOT FOUND THEN
+      UPDATE users SET room_id = NULL WHERE id = _user.id;
+    ELSIF _force THEN
+      IF _user.id = _round.painter_id THEN
+        -- the painter exits
+        UPDATE rounds SET painter_score = painter_score - _penalty WHERE id = _round.id;
+      ELSE
+        -- a guesser exits
+        UPDATE round_user SET score = score - _penalty WHERE round_id = _round.id AND user_id = _user.id;
+      END IF;
+    ELSE
+      RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION user_change_state (_user_id INT, _ready BOOLEAN) RETURNS VOID AS $$
 DECLARE
-  _user RECORD;
+  _user users%ROWTYPE;
 BEGIN
   SELECT * INTO _user FROM user_get_by_id(_user_id);
   IF _user.room_id IS NULL THEN
@@ -408,9 +391,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION user_guess (_user_id INT, _answer VARCHAR) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION user_guess (_user_id INT, _submission VARCHAR) RETURNS BOOLEAN AS $$
 DECLARE
-  _round RECORD;
+  _round rounds%ROWTYPE;
+  _score INT;
+  _record round_user%ROWTYPE;
 BEGIN
 
   SELECT * INTO _round FROM user_get_current_round(_user_id);
@@ -418,24 +403,24 @@ BEGIN
     RAISE EXCEPTION 'you are not in a round';
   END IF;
 
-  UPDATE round_user SET submission = _answer, submitted_at = now_utc(), attempt = attempt + 1
-    WHERE round_id = _round.id AND user_id = _user_id;
+  SELECT * INTO _record FROM round_user WHERE round_id = _round.id AND user_id = _user_id;
 
-  IF NOT FOUND THEN
-    -- this should never happen
-    RAISE EXCEPTION 'no round_user entry found';
-  END IF;
-
-  IF _answer = _round.answer THEN
-    RETURN TRUE;
+  IF _record.submission = _round.answer THEN
+    RAISE EXCEPTION 'you have submitted the correct answer'
   ELSE
-    RETURN FALSE;
+    _score := 0;
+    IF _submission = _round.answer THEN
+      _score := calc_guesser_score(_record.attempt + 1);
+    END IF;
+
+    UPDATE round_user SET submission = _submission, score = _score, attempt = attempt + 1
+    WHERE round_id = _round.id AND user_id = _user_id;
   END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION user_draw (_user_id INT, _image BYTEA) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_draw (_user_id INT, _image TEXT) RETURNS VOID AS $$
 DECLARE
   _round RECORD;
 BEGIN
@@ -443,7 +428,11 @@ BEGIN
   IF NOT FOUND THEN
     RAISE EXCEPTION 'you are not in a round';
   END IF;
-  INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
+  IF _round.painter_id = _user_id THEN
+    INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
+  ELSE
+    RAISE EXCEPTION 'you are not the painter'
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
