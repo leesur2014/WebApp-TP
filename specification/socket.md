@@ -48,6 +48,7 @@ Event name | Description
 ------------|-------------
 `user_enter` | A user entered this room
 `user_exit` | A user exited this room
+`user_change` | A user changed his/her ready state
 `user_guess` | A user submitted a guess
 `user_draw` | The painter updated his/her canvas
 `round_start` | A round has started
@@ -57,6 +58,11 @@ Event name | Description
 
 The data has only one `user_id` field, containing the id of the involved user. The client
 may GET `/api/user/id` for more information, such as nickname, observer state of that user.
+
+
+#### `user_change`
+
+Data has `user_id` and `ready` field.
 
 #### `user_guess`
 
