@@ -26,6 +26,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION round_get_latest_canvas(_round_id) RETURNS TEXT AS $$
+DECLARE
+  _res TEXT;
+BEGIN
+  SELECT image INTO STRICT _res FROM canvas WHERE round_id = _round_id;
+  RETURN _res;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE
@@ -171,7 +180,7 @@ CREATE OR REPLACE FUNCTION __room_can_start_round(_room_id INT) RETURNS BOOLEAN 
 BEGIN
 	-- ensure there is no active rounds in this room
 	IF EXISTS (SELECT * FROM room_get_current_round(_room_id)) THEN
-    RAISE INFO 'there is an open round in this room';
+    RAISE INFO 'there is an open round in room %', _room_id;
 		RETURN FALSE;
 	END IF;
 	-- ensure that there are at least two players in this room
@@ -199,7 +208,7 @@ BEGIN
   IF NOT FOUND THEN
     INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
   END IF;
-  UPDATE users SET access_token = _token WHERE id = _user.id RETURNING * INTO _user;
+  UPDATE users SET token = _token WHERE id = _user.id RETURNING * INTO _user;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
