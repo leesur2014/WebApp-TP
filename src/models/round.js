@@ -1,37 +1,36 @@
 var db = require('./db');
-var redis = require('./redis').pubClient;
+var io = require('./socket');
 
 Round = {};
 
 Round.end = function (round_id) {
   return db.proc('round_end', round_id)
     .then(function (round) {
-      var evt = {
-        event: "round_end",
-        data: round
-      };
-      // send to socketio send to socketio
-      return round;
+      io.to('room_' + round.room_id)
+        .emit('round_end', {round_id: round_id});
     })
     .catch(function (err) {
-      return null;
+      // this is an error
+      console.log(err);
     });
 };
 
-
+Round.getInfoById = async function (id) {
+  let round;
+  round = await db.proc("round_get_by_id", [id]);
+  round.users = await db.any('SELECT user_id, score FROM round_user WHERE round_id = $1', id);
+  return round;
+}
 
 Round.abort = function (round_id) {
   return db.proc('round_abort', round_id)
     .then(function (round) {
-      var evt = {
-        event: "round_abort",
-        data: round
-      };
-      // send to socketio
-      return round;
+      io.to('room_' + round.room_id)
+        .emit('round_end', {round_id: round_id});
     })
     .catch(function (err) {
-      return null;
+      // this is not an error
+      console.log(err);
     });
 };
 
