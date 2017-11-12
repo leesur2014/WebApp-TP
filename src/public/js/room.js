@@ -13,7 +13,19 @@ $('#logOutButton').click(function() {
         if (data.code == 0) {
             location.href = '/game-center';
         } else {
-            alert('[ERROR]' + data.error);
+            console.log('[ERROR]' + data.error);
+            var r = confirm("It seems that you can't exit the room normally for now. Do you still want to exit?");
+            if (r == true) {
+                $.post("/api/exit", {force: "No"}, function(data) {
+                    console.log('data: ' + JSON.stringify(data));
+                    if (data.code == 0) {
+                        location.href = '/game-center';
+                        alert('[ERROR]' + data.error);
+                    }
+                });
+            } else {
+                // return to the room, no state change
+            }
         }
     });
 })

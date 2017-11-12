@@ -1,6 +1,6 @@
 $(function() {
     $.get('/api/lounge', function(data) {
-        console.log(JSON.stringify(data));
+        console.log('[INFO]all the rooms: ' + JSON.stringify(data));
         var l = data['data'].length;
         for (var i = 0; i < l; ++i) {
             console.log(JSON.stringify(data['data'][i]));

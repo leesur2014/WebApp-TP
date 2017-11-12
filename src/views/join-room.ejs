@@ -10,9 +10,34 @@
 <% include navBar %>
 
 <div class="container">
-    <input type = "text" placeholder = "Room Id"><br><br><br>
-    <input type = "password" placeholder = "Passcode"><br><br>
-    <input type = "checkbox"> Observer<br><br>
+    <div class = "row">
+        <div class = "col-0 col-md-3"></div>
+        <div class = "col-12 col-md-6">
+            <div id = "form_container">
+                <form id="join_room" action = "/api/enter">
+                    <div class="form-group">
+                        <label for="room_id">Room ID</label>
+                        <input type="text" name = "room_id" class="form-control" id="room_id" aria-describedby="room_id_help" placeholder="Room Id" required>
+                        <small id="room_id_help" class="form-text text-muted">Have fun in our painting room! </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Pass Code (for Private Rooms)</label>
+                        <input type="password" name ="passcode" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="checkbox" id = "observer" name = "observer" class="form-check-input">
+                          Do you want to join as an observer?
+                        </label>
+                    </div>
+                    <button type="submit" class = "btn btn-primary">Join</button>
+                </form>
+
+            </div>
+        </div>
+        <div class = "col-0 col-md-3"></div>
+    </div>
+
 </div>
 <% include foot %>
     <script src="/static/js/join-room.js"></script>
