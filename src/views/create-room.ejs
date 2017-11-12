@@ -1,25 +1,44 @@
-  <!DOCTYPE html>
-<html ng-app="createRoom">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Join room</title>
-    <link rel='stylesheet' href='/static/stylesheets/style.css' />
-  </head>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
-    <script src="/static/js/create-room.js"></script>
-  <body ng-controller="createRoomController">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include head %>
+    <title>Game Center</title>
+    <link rel="stylesheet" href="/static/css/navBar.css">
+    <link rel="stylesheet" href="/static/css/game-center.css">
+</head>
+<body>
 
-    <div class="createroom">
-      <h3>Create a room</h3>
-      <input type="password" placeholder="Passcode" ng-model="formData.passcode"><br><br>
-      <button type="submit" ng-click="createRoom()">Create</button>
+<% include navBar %>
+
+<div class="container">
+    <div class = "row">
+        <div class = "col-0 col-md-3"></div>
+        <div class = "col-12 col-md-6">
+            <div id = "form_container">
+                <form id="create_room" action = "/api/enter">
+                    <div class="form-group">
+                        <label for="password">Pass Code (for Private Rooms)</label>
+                        <input type="password" name ="passcode" class="form-control" id="password" placeholder="Passcode">
+                    </div>
+                    <br>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="checkbox" id = "is_private" name = "private" class="form-check-input">
+                              Is it a private room?
+                        </label>
+                    </div>
+                    <br>
+                    <button  id = "game_submit" type="submit" class = "btn btn-primary">Create</button>
+                </form>
+
+            </div>
+        </div>
+        <div class = "col-0 col-md-3"></div>
     </div>
-  </body>
+</div>
+<% include foot %>
+    <script src="/static/js/create-room.js"></script>
+</body>
 </html>
-
-  
-
 
     

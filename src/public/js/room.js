@@ -1,8 +1,11 @@
 $(function() {
-    console.log('[INFO 1]');
     $.get( "/api/me", function( data ) {
-        console.log('data: ' + JSON.stringify(data));
-        console.log('data: ' + data['nickname']);
+        console.log('[INFO]data: ' + JSON.stringify(data));
+        console.log('[INFO]nickname: ' + data['nickname']);
+        if (!data['room_id']) {
+            alert("Your are not in any room");
+            location.href = '/game-center';
+        }
         $('#nameContainer').html(data.nickname);
     });
 });

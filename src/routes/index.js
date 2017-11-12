@@ -38,7 +38,7 @@ router.get('/create-room',function(req,res) {
 router.get('/room', function(req,res) {
     if (!req.isAuthenticated())
         res.redirect('/');
-    res.render('room', {user: {'name': 'hah'}});
+    res.render('room');
 });
 // UI Ends
 

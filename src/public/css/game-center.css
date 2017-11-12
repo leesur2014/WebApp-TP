@@ -1,0 +1,21 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.container {
+    height: 100%;
+}
+
+.container .row {
+    margin-top: 10%;
+}
+
+.container .row #form_container {
+    border: 1px solid #ccc!important;
+    padding: 40px;
+}
+
+button#game_submit {
+    width: 100%;
+}
