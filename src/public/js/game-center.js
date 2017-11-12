@@ -1,4 +1,13 @@
 $(function() {
+    var node = document.createElement("div");
+    var player_count = 4;//data['data'][i].user_count;
+    node.innerHTML = "<img src=\"/static/images/game-table/"+String(player_count)+".png\" class=\"img\">";
+    var text = document.createElement("div");
+    var room_id = 1;
+    text.innerHTML = "<a id=\"room_id\">Room"+String(room_id)+"</a>";
+    node.append(text);
+    $('#roomContainer').append(node); 
+    /*
     $.get('/api/lounge', function(data) {
         console.log(JSON.stringify(data));
         var l = data['data'].length;
@@ -20,5 +29,6 @@ $(function() {
     .fail(function() {
         alert( "error" );
     });
+    */
 });
 
