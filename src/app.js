@@ -18,7 +18,7 @@ var http = require('http').Server(app);
 var api = require('./routes/api');
 var users = require('./routes/users');
 
-var io = require('./io');
+var io = require('./io').io;
 
 io.attach(http);
 
