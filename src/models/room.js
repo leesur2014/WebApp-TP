@@ -1,6 +1,6 @@
 var db = require('./db');
 
-var io = require('./socket');
+var io = require('../io');
 
 Room = {};
 

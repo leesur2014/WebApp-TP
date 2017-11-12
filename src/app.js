@@ -12,12 +12,15 @@ var passport = require('passport');
 
 var app = express();
 
+var http = require('http').Server(app);
+
+
 var api = require('./routes/api');
 var users = require('./routes/users');
 
-// // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
+var io = require('./io');
+
+io.attach(http);
 
 app.use(logger('dev'));
 
@@ -76,4 +79,5 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+
+http.listen(process.env.PORT || 3000);

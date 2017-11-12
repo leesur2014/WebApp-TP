@@ -2,7 +2,7 @@ var db = require('./db');
 var Room = require('./room');
 var randomstring = require('randomstring');
 
-var io = require('./socket');
+var io = require('../io');
 
 
 class User {
