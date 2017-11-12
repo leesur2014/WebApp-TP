@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var db = require('../models/db');
+var db = require('../db');
 var User = require('../models/user');
 var Room = require('../models/room');
 var Round = require('../models/round');
