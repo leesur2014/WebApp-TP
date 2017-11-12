@@ -26,7 +26,7 @@ Room.getInfoById = async function (room_id) {
 Room.startNewRound = function (room_id) {
   return db.proc('room_start_round', room_id)
     .then(function (round) {
-      io.to('room_' + room_id)
+      io.room.to('room_' + room_id)
         .emit('round_start', {round_id: round.id});
       return null;
     })
