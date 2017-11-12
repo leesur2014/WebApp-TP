@@ -45,8 +45,6 @@ BEGIN
   EXCEPTION
       WHEN NO_DATA_FOUND THEN
           RAISE EXCEPTION 'user % not found', _user_id;
-      WHEN TOO_MANY_ROWS THEN
-          RAISE EXCEPTION 'user % not unique', _user_id;
   END;
   RETURN _user;
 END;
@@ -61,8 +59,6 @@ BEGIN
   EXCEPTION
       WHEN NO_DATA_FOUND THEN
           RAISE EXCEPTION 'room % not found', _room_id;
-      WHEN TOO_MANY_ROWS THEN
-          RAISE EXCEPTION 'room % not unique', _room_id;
   END;
   RETURN _row;
 END;
@@ -77,8 +73,6 @@ BEGIN
   EXCEPTION
       WHEN NO_DATA_FOUND THEN
           RAISE EXCEPTION 'round % not found', _round_id;
-      WHEN TOO_MANY_ROWS THEN
-          RAISE EXCEPTION 'round % not unique', _round_id;
   END;
   RETURN _row;
 END;
@@ -376,7 +370,7 @@ BEGIN
           UPDATE round_user SET score = score - _penalty WHERE round_id = _round.id AND user_id = _user.id;
         END IF;
       ELSE
-        RAISE EXCEPTION 'cannot exit room % normally', _user.room_id;
+        RAISE EXCEPTION 'cannot exit room % normally because you are in a round', _user.room_id;
       END IF;
     END IF;
 

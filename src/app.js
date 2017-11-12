@@ -12,13 +12,20 @@ var passport = require('passport');
 
 var app = express();
 
-var index = require('./routes/index');
 var api = require('./routes/api');
 var users = require('./routes/users');
 
 // // view engine setup
- app.set('views', path.join(__dirname, 'views'));
- app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+var http = require('http').Server(app);
+
+var index = require('./routes/index');
+var api = require('./routes/api');
+var users = require('./routes/users');
+
+var io = require('./io').io;
+io.attach(http);
 
 app.use(logger('dev'));
 
@@ -64,20 +71,16 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (process.env.NODE_ENV === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.send(err);
     });
+} else {
+  app.use(function(err, req, res, next) {
+      res.status(err.status || 500);
+      res.send('error');
+  });
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.send('error');
-});
-
-
-module.exports = app;
-
+http.listen(process.env.PORT || 3000);
