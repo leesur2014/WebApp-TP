@@ -8,10 +8,15 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var socket = io('/lounge?token=8CXd24UuCb6uSynKR28MOb9H5kQet4b5');
-        socket.on('room_create', function(msg) {console.log(msg);});
-        socket.on('room_change', function(msg) {console.log(msg);});
-        socket.on('room_delete', function(msg) {console.log(msg);});
+        var token;
+        $.get("/api/me", function(data) {
+          token = data.token;
+          var socket = io('/lounge?token='+ token);
+          socket.on('room_create', function(msg) {console.log(msg);});
+          socket.on('room_change', function(msg) {console.log(msg);});
+          socket.on('room_delete', function(msg) {console.log(msg);});
+        });
+
       });
     </script>
   </body>
