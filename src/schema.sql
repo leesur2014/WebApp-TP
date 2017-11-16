@@ -43,6 +43,8 @@ CREATE TABLE "rounds" (
 	"started_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
 	"ended_at" TIMESTAMP WITHOUT TIME ZONE NULL,
 	"answer" VARCHAR(64) NOT NULL,
+  "image" TEXT NULL,
+  "image_timestamp" TIMESTAMP WITHOUT TIME ZONE NULL,
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -56,16 +58,6 @@ CREATE TABLE "round_user" (
 	"score" INTEGER NOT NULL DEFAULT 0,
   "attempt" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY ("user_id", "round_id")
-) WITH (
-  OIDS=FALSE
-);
-
-CREATE TABLE "canvas" (
-	"id" SERIAL NOT NULL,
-	"round_id" INTEGER NOT NULL,
-	"timestamp" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
-	"image" TEXT NOT NULL,
-	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
@@ -93,8 +85,6 @@ ALTER TABLE "rounds" ADD CONSTRAINT "round_fk1" FOREIGN KEY ("room_id") REFERENC
 
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
-
-ALTER TABLE "canvas" ADD CONSTRAINT "canvas_fk0" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
 
 
 -- TODO
