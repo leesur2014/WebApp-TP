@@ -24,7 +24,7 @@ Round.getInfoByUserId = function (user_id) {
       {
         return null;
       }
-      return db.any('SELECT user_id, score FROM round_user WHERE round_id = $1', id)
+      return db.any('SELECT user_id, score FROM round_user WHERE round_id = $1', round.id)
         .then(function (data) {
           round.users = data;
           return round;

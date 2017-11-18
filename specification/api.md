@@ -16,8 +16,8 @@ POST | `/api/me` | change my nickname
 GET | `/api/lounge` | Get a list of public rooms
 GET | `/api/room` | Get detailed info about current room
 GET | `/api/user/{user_id}` | Get info about a user
-GET | `/api/round/{round_id}` | Get info about a round
-GET | `/api/image/{round_id}` | Get the latest image of a round
+GET | `/api/round` | Get detailed info about current round
+GET | `/api/round/{round_id}` | Get result of a past round
 POST | `/api/room` | Create a room
 POST | `/api/enter` | Join a room
 POST | `/api/exit` | Quit a room
@@ -99,7 +99,7 @@ nickname=whatever
 
 field | optional | Description
 -----|-----------|--------------
-passcode | Yes | passcode for that room, if not set, the room is public
+passcode | Yes | passcode for that room, if not exist, the room is public
 
 ```
 POST /api/room
@@ -147,6 +147,27 @@ GET /api/lounge
 }
 ```
 
+### Get stats of a public room
+
+This endpoint if useful for incremental updates in the client's list of public rooms.
+```
+GET /api/room/10
+```
+
+
+```JSON
+{
+  "code": 0,
+  "data": {
+    "id": 2,
+    "created_at": "2017-11-18T23:19:39.873Z",
+    "user_count": 3,
+    "player_count": 3,
+    "round_id": null
+  }
+}
+```
+
 ### Get detailed info about current room
 
 ```
@@ -155,55 +176,34 @@ GET /api/room
 
 ```json
 {
-    "code": 0,
-    "data": {
-        "id": 1,
-        "passcode": "          ",
-        "created_at": "2017-11-05T23:43:53.451Z",
-        "deleted_at": null,
-        "users": [
-            {
-                "id": 1,
-                "nickname": "xxxxx",
-                "observer": false,
-                "ready": false
-            }
-        ],
-        "round": null
-    }
-}
-```
-
-When there is a round in this room
-
-```json
-{
-    "code": 0,
-    "data": {
-        "id": 1,
-        "passcode": "          ",
-        "created_at": "2017-11-05T23:43:53.451Z",
-        "deleted_at": null,
-        "users": [
-            {
-                "id": 1,
-                "nickname": "xxxx",
-                "observer": false,
-                "ready": false
-            },
-            {
-                "id": 4,
-                "nickname": "whatever",
-                "observer": false,
-                "ready": false
-            }
-        ],
-        "round": {
-          "id": 10,
-          "painter_id": 20,
-          "started_at": "2017-10-05T14:48:00.000Z"
-        }
-    }
+  "code": 0,
+  "data": {
+    "id": 2,
+    "passcode": " ",
+    "created_at": "2017-11-18T23:19:39.873Z",
+    "deleted_at": null,
+    "users": [
+        {
+      "id": 4,
+      "nickname": "Test User 3",
+      "observer": false,
+      "ready": false
+      },
+        {
+      "id": 1,
+      "nickname": "xxxxxxxxx",
+      "observer": false,
+      "ready": false
+      },
+        {
+      "id": 2,
+      "nickname": "xxxxxxxxxxxxx",
+      "observer": false,
+      "ready": false
+      }
+    ],
+    "round_id": null
+  }
 }
 ```
 
@@ -238,19 +238,23 @@ GET /api/round/100
 {
   "code": 0,
   "data": {
-    "id": 100,
-    "painter_id": 20,
-    "painter_score": 10,
-    "started_at": "2017-10-05T14:48:00.000Z",
-    "ended_at": "2017-10-05T14:50:00.000Z",
+    "id": 8,
+    "painter_id": 2,
+    "painter_score": 2,
+    "room_id": 2,
+    "started_at": "2017-11-19T00:42:24.516Z",
+    "ended_at": "2017-11-19T00:46:52.803Z",
+    "answer": "keyboard",
+    "image": null,
+    "image_timestamp": null,
     "users": [
-      {
-          "id": 1,
-          "score": 0
+        {
+      "user_id": 1,
+      "score": 0
       },
-      {
-          "id": 4,
-          "score": 2
+        {
+      "user_id": 4,
+      "score": 0
       }
     ]
   }
@@ -410,14 +414,14 @@ failed response
 
 field | optional | Description
 -----|-----------|--------------
-canvas | No | Data URLs encoded canvas, image should be in png format
+image | No | Data URLs encoded canvas, image should be in png format
 
 Request example
 
 ```
 POST /api/draw
 
-canvas=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAADElEQVQImWNgoBMAAABpAAFEI8ARAAAAAElFTkSuQmCC
+image=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAADElEQVQImWNgoBMAAABpAAFEI8ARAAAAAElFTkSuQmCC
 ```
 
 successful response

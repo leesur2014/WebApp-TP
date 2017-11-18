@@ -26,9 +26,8 @@ class User {
   }
 
   logout() {
-    var token = randomstring.generate(32);
     io.lounge.emit('user_logout', {user_id: this.id});
-    return db.none('UPDATE users SET token = $1, online = false WHERE id = $2', [token, this.id]);
+    return db.proc('user_logout', this.id);
   }
 
   setNickname(nickname) {
@@ -59,14 +58,15 @@ class User {
     return db.proc('user_exit_room', [user.id, force])
       .then(function () {
         io.room.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
-        io.lounge.emit('room_change', {room_id: user.room_id});
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
           .then(function () {
+            console.log("room delete: ", user.room_id);
             io.lounge.emit('room_delete', {room_id: user.room_id})
           })
           .catch(function () {
             // this is not an error
+            io.lounge.emit('room_change', {room_id: user.room_id});
           });
       });
   }
@@ -77,7 +77,21 @@ class User {
       .then(function () {
         io.room.to('room_' + user.room_id)
           .emit('user_change', {user_id: user.id, ready: state});
-        // TODO attempt to start a round
+
+        if (state)
+        {
+          // attempt to start a round
+          db.proc("room_start_round", user.room_id)
+          .then(function (round) {
+            console.log("round start: ", round.id);
+            io.lounge.emit('room_change', {room_id: user.room_id});
+            io.room.to("room_" + user.room_id).emit('round_start', {round_id: round.id});
+          })
+          .catch(function (e) {
+            // this is not an error
+            console.log(e);
+          });
+        }
       });
   }
 
@@ -87,17 +101,35 @@ class User {
       .then(function (correct) {
         io.room.to('room_' + user.room_id)
           .emit('user_guess', {user_id: user.id, correct: correct});
+
+        if (correct)
+        {
+            db.proc("user_get_current_round", user.id)
+              .then(function (round) {
+                if (round)
+                {
+                  db.proc("try_round_end", round.id)
+                    .then(function () {
+                      console.log("round end: ", round.id);
+                      io.lounge.emit('room_change', {room_id: user.room_id});
+                      io.room.to("room_" + user.room_id).emit('round_end', {round_id: round.id});
+                    })
+                    .catch(function (e)
+                    {
+                      console.log(e);
+                      // this is not an error
+                    });
+                }
+              })
+        }
+
         return correct;
-        // TODO: end this round if all people are correct
       });
   }
 
   draw(image) {
-    var user = this;
-    return db.proc('user_draw', [this.id, image])
-      .then(function () {
-        io.room.to('room_' + user.room_id).emit('user_draw');
-      });
+    io.room.to('room_' + this.room_id).emit('user_draw', {image: image});
+    return db.proc('user_draw', [this.id, image]);
   }
 
 }
