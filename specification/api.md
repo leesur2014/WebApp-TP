@@ -15,6 +15,7 @@ GET | `/api/me` | Get current user's info
 POST | `/api/me` | change my nickname
 GET | `/api/lounge` | Get a list of public rooms
 GET | `/api/room` | Get detailed info about current room
+GET | `/api/room/{room_id}` | Get detailed info about a public room
 GET | `/api/user/{user_id}` | Get info about a user
 GET | `/api/round` | Get detailed info about current round
 GET | `/api/round/{round_id}` | Get result of a past round
