@@ -1,4 +1,13 @@
 $(function() {
+    $.get("/api/me", function(data) {
+        console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
+        var token = data.token;
+        console.log('[INFO]token: ' + token);
+        var socket = io('/lounge?token='+ token);
+        socket.on('room_create', function(msg) {console.log(msg);});
+        socket.on('room_change', function(msg) {console.log(msg);});
+        socket.on('room_delete', function(msg) {console.log(msg);});
+    });
     $.get('/api/lounge', function(data) {
         console.log('[INFO]all the rooms: ' + JSON.stringify(data));
         var l = data['data'].length;
@@ -21,4 +30,3 @@ $(function() {
         alert( "error" );
     });
 });
-
