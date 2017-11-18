@@ -17,14 +17,53 @@ $(function() {
         console.log('[INFO]token: ' + token);
         var socket = io('/lounge?token='+ token);
         socket.on('room_create', function(msg) {
-            console.log('[INFO] Room Id: ' + msg.room_id);
+            console.log('[INFO] Created - room Id: ' + msg.room_id);
             var room_id = msg.room_id;
-            $.get('/api/room/' + room_id, function(data) {
-                $('#roomContainer').append(generate_room(data));
+            $.get('/api/room/' + room_id, function(new_room_data) {
+                console.log('[INFO] New room has been created: ' + JSON.stringify(new_room_data));
+                $('#roomContainer').prepend(generate_room(new_room_data['data']));
             });
         });
-        socket.on('room_change', function(msg) {console.log(msg);});
-        socket.on('room_delete', function(msg) {console.log(msg);});
+        socket.on('room_change', function(msg) {
+            console.log('[INFO] Changed - room Id: ' + msg.room_id);
+            var room_id = msg.room_id;
+            var num_rooms = $('#roomContainer').children().length;
+            // delete original room
+            for (var i = 0; i < num_rooms; ++i) {
+                var this_room = $('#roomContainer .room:nth-child(' + (i + 1) + ')');
+                var this_id = this_room.attr('id');
+                console.log('[INFO] This room id: ' + this_id);
+                if (this_id == room_id) {
+                    this_room.remove();
+                    break;
+                }
+            }
+
+            // add a new room
+            $.get('/api/room/' + room_id, function(new_room_data) {
+                console.log('[INFO] New room has been created: ' + JSON.stringify(new_room_data));
+                $('#roomContainer').prepend(generate_room(new_room_data['data']));
+            });
+        });
+        socket.on('room_delete', function(msg) {
+            console.log('[INFO] Deleted - room Id: ' + msg.room_id);
+            var num_rooms = $('#roomContainer').children().length;
+            console.log('[INFO] number of rooms: ' + num_rooms);
+            $('#roomContainer').children().each(function(index) {
+                // For debug
+                console.log('[INFO]' + index + ": " + $( this ).attr('id'));
+            });
+
+            for (var i = 0; i < num_rooms; ++i) {
+                var this_room = $('#roomContainer .room:nth-child(' + (i + 1) + ')');
+                var this_id = this_room.attr('id');
+                console.log('[INFO] This room id: ' + this_id);
+                if (this_id == msg.room_id) {
+                    this_room.remove();
+                    break;
+                }
+            }
+        });
     });
 
     $.get('/api/lounge', function(data) {
@@ -33,8 +72,9 @@ $(function() {
         for (var i = 0; i < l; ++i) {
 //            console.log(JSON.stringify(data['data'][i]));
             var room = generate_room(data['data'][i]);
-            $('#roomContainer').append(room);           
+            $('#roomContainer').prepend(room);
         }
+        console.log('[INFO] Initial page: we have: ' + $('#roomContainer').children().length + ' rooms.');
     })
     .fail(function() {
         alert( "error" );
