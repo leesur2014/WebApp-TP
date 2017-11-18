@@ -58,14 +58,15 @@ class User {
     return db.proc('user_exit_room', [user.id, force])
       .then(function () {
         io.room.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
-        io.lounge.emit('room_change', {room_id: user.room_id});
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
           .then(function () {
+            console.log("room delete: ", user.room_id);
             io.lounge.emit('room_delete', {room_id: user.room_id})
           })
           .catch(function () {
             // this is not an error
+            io.lounge.emit('room_change', {room_id: user.room_id});
           });
       });
   }
@@ -76,7 +77,20 @@ class User {
       .then(function () {
         io.room.to('room_' + user.room_id)
           .emit('user_change', {user_id: user.id, ready: state});
-        // TODO attempt to start a round
+
+        if (state)
+        {
+          // attempt to start a round
+          db.proc("room_start_round", user.room_id)
+          .then(function (round) {
+            console.log("round start: ", round.id);
+            io.room.to("room_" + user.room_id).emit('round_start', {round_id: round.id});
+          })
+          .catch(function (e) {
+            // this is not an error
+            console.log(e);
+          });
+        }
       });
   }
 
@@ -92,11 +106,8 @@ class User {
   }
 
   draw(image) {
-    var user = this;
-    return db.proc('user_draw', [this.id, image])
-      .then(function () {
-        io.room.to('room_' + user.room_id).emit('user_draw', {image: image});
-      });
+    io.room.to('room_' + this.room_id).emit('user_draw', {image: image});
+    return db.proc('user_draw', [this.id, image]);
   }
 
 }
