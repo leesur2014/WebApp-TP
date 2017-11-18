@@ -16,10 +16,17 @@ $(function() {
         $('.time_container').html(d);
         console.log('[INFO]token: ' + token);
         var socket = io('/lounge?token='+ token);
-        socket.on('room_create', function(msg) {console.log(msg);});
+        socket.on('room_create', function(msg) {
+            console.log('[INFO] Room Id: ' + msg.room_id);
+            var room_id = msg.room_id;
+            $.get('/api/room/' + room_id, function(data) {
+                $('#roomContainer').append(generate_room(data));
+            });
+        });
         socket.on('room_change', function(msg) {console.log(msg);});
         socket.on('room_delete', function(msg) {console.log(msg);});
     });
+
     $.get('/api/lounge', function(data) {
         console.log('[INFO]all the rooms: ' + JSON.stringify(data));
         var l = data['data'].length;
@@ -39,12 +46,12 @@ function generate_room(entry) {
     room.attr('id', entry.id);
     room.addClass('room');
     // room id
-    room.append($('<div/>').html('<h2> Room ' + entry.id + '</h2>'));
+    room.append($('<div/>').addClass('room_id_container').html('<h2> Room ' + entry.id + '</h2>'));
     room.append('<hr>');
 
     // # of players & observers
-    room.append($('<div/>').html('Players: ' + entry.player_count));
-    room.append($('<div/>').html('Observers: ' + (entry.user_count - entry.player_count)));
+    room.append($('<div/>').addClass('players_number_container').html('Players: ' + entry.player_count));
+    room.append($('<div/>').addClass('observers_number_container').html('Observers: ' + (entry.user_count - entry.player_count)));
 
     // is the room playing?
     var is_playing = entry.round_id != null ? '<span class="label label-default">Playing</span>':'<span class="label label-success">Idle</span>';
