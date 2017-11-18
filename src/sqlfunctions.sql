@@ -201,7 +201,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION user_logout(_user_id INT) RETURNS void AS $$
 BEGIN
-  UPDATE users SET online = FALSE, token = NULL WHERE id = _user_id;
+  UPDATE users SET online = FALSE, token = NULL, room_id = NULL WHERE id = _user_id;
 END;
 $$ LANGUAGE plpgsql;
 
