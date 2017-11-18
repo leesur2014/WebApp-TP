@@ -441,7 +441,7 @@ BEGIN
     RAISE EXCEPTION 'you are not in a round';
   END IF;
   IF _round.painter_id = _user_id THEN
-    INSERT INTO canvas (round_id, image) VALUES (_round.id, _image);
+    UPDATE rounds SET image = _image, image_timestamp = now_utc() WHERE id = _round.id;
   ELSE
     RAISE EXCEPTION 'you are not the painter';
   END IF;
