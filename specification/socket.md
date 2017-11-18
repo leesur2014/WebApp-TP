@@ -40,7 +40,8 @@ Event name | Description
 `room_change` | The state of a public room has changed, e.g. a user entered the room, a round started, etc
 `room_delete` | A public room is deleted
 
-The data of all events has an `room_id` field containing the relevant room_id;
+The data of all events has an `room_id` field containing the relevant room_id.
+The client should GET `/api/room/{room_id}` if it needs more specific information.
 
 ### Room events
 
@@ -59,7 +60,6 @@ Event name | Description
 The data has only one `user_id` field, containing the id of the involved user. The client
 may GET `/api/user/id` for more information, such as nickname, observer state of that user.
 
-
 #### `user_change`
 
 Data has `user_id` and `ready` field.
@@ -75,15 +75,20 @@ Data has `user_id` and `ready` field.
 
 #### `user_draw`
 
-This event instructs the client to GET `/api/image/round_id` in order to display
+This event instructs the client to GET `/api/round` to fetch
 the latest drawing of the painter. No data is associated with this event.
 
 
 #### `round_start` and `round_end`
 
 The data has only one `round_id` field, containing the id of the round in question.
-The client may GET `/api/round/id` for more information on the round.
 
+When a round is underway, users (players and observers) can GET `/api/round` in order
+to see the detail information of the current round. If there is no round in the room,
+this call will return code -1.
+
+When a round has ended, the client may GET `/api/round/{round_id}` to fetch the
+score of players and the correct answer.
 
 ### References
 
