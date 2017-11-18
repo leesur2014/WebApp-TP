@@ -21,14 +21,14 @@ The client should connect to the server's socket io endpoint in the following wa
 const socket = io("https://guessmydrawing.fun/{endpoint}?token=xxxxxxx");
 ```
 
-The connection will be disconnected immediately if the authentication fails.
+The connection will be disconnected immediately if authentication fails.
 
 The endpoint has two values: `lounge` and `room`. The `lounge` endpoint allows the server
 to push changes in the game center. While the `room` allows the server to push changes in
-the room the current user is in.
+the room the user is in.
 
 If the user is not in a room. The client should not connect to the `room` endpoint.
-When a user exits a room, the socket.io connection should also be disconnected.
+When a user exits a room, the socket.io connection to `room` should be disconnected.
 
 ### Lounge events
 
@@ -57,7 +57,7 @@ Event name | Description
 
 #### `user_enter` and `user_exit`
 
-The data has only one `user_id` field, containing the id of the involved user. The client
+Returned data has only one `user_id` field, containing the id of the involved user. The client
 may GET `/api/user/id` for more information, such as nickname, observer state of that user.
 
 #### `user_change`
