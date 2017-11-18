@@ -84,6 +84,7 @@ class User {
           db.proc("room_start_round", user.room_id)
           .then(function (round) {
             console.log("round start: ", round.id);
+            io.lounge.emit('room_change', {room_id: user.room_id});
             io.room.to("room_" + user.room_id).emit('round_start', {round_id: round.id});
           })
           .catch(function (e) {
@@ -100,8 +101,29 @@ class User {
       .then(function (correct) {
         io.room.to('room_' + user.room_id)
           .emit('user_guess', {user_id: user.id, correct: correct});
+
+        if (correct)
+        {
+            db.proc("user_get_current_round", user.id)
+              .then(function (round) {
+                if (round)
+                {
+                  db.proc("try_round_end", round.id)
+                    .then(function () {
+                      console.log("round end: ", round.id);
+                      io.lounge.emit('room_change', {room_id: user.room_id});
+                      io.room.to("room_" + user.room_id).emit('round_end', {round_id: round.id});
+                    })
+                    .catch(function (e)
+                    {
+                      console.log(e);
+                      // this is not an error
+                    });
+                }
+              })
+        }
+
         return correct;
-        // TODO: end this round if all people are correct
       });
   }
 
