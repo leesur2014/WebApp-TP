@@ -238,19 +238,23 @@ GET /api/round/100
 {
   "code": 0,
   "data": {
-    "id": 100,
-    "painter_id": 20,
-    "painter_score": 10,
-    "started_at": "2017-10-05T14:48:00.000Z",
-    "ended_at": "2017-10-05T14:50:00.000Z",
+    "id": 8,
+    "painter_id": 2,
+    "painter_score": 2,
+    "room_id": 2,
+    "started_at": "2017-11-19T00:42:24.516Z",
+    "ended_at": "2017-11-19T00:46:52.803Z",
+    "answer": "keyboard",
+    "image": null,
+    "image_timestamp": null,
     "users": [
-      {
-          "id": 1,
-          "score": 0
+        {
+      "user_id": 1,
+      "score": 0
       },
-      {
-          "id": 4,
-          "score": 2
+        {
+      "user_id": 4,
+      "score": 0
       }
     ]
   }
