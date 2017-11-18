@@ -26,9 +26,8 @@ class User {
   }
 
   logout() {
-    var token = randomstring.generate(32);
     io.lounge.emit('user_logout', {user_id: this.id});
-    return db.none('UPDATE users SET token = $1, online = false WHERE id = $2', [token, this.id]);
+    return db.proc('user_logout', this.id);
   }
 
   setNickname(nickname) {
@@ -96,7 +95,7 @@ class User {
     var user = this;
     return db.proc('user_draw', [this.id, image])
       .then(function () {
-        io.room.to('room_' + user.room_id).emit('user_draw');
+        io.room.to('room_' + user.room_id).emit('user_draw', {image: image});
       });
   }
 
