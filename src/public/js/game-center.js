@@ -2,6 +2,18 @@ $(function() {
     $.get("/api/me", function(data) {
         console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
         var token = data.token;
+        var nickname = data.nickname;
+        $('.name_container').html(nickname);
+        // display: if the user is in a room
+        if (data.room_id != null) {
+            console.log('[INFO] This user is in room' + data.room_id);
+            var link_to_room = 'You are in room ' + data.room_id + ', click <a href = "/room" > here </a> to go back to game room';
+            $('.room_id_container').html(link_to_room);
+
+        }
+        var d = new Date(data.joined_at);
+        console.log('[INFO] join date: ' + d);
+        $('.time_container').html(d);
         console.log('[INFO]token: ' + token);
         var socket = io('/lounge?token='+ token);
         socket.on('room_create', function(msg) {console.log(msg);});
@@ -12,17 +24,8 @@ $(function() {
         console.log('[INFO]all the rooms: ' + JSON.stringify(data));
         var l = data['data'].length;
         for (var i = 0; i < l; ++i) {
-            console.log(JSON.stringify(data['data'][i]));
-            var room = $('<div/>');
-            room.append(document.createTextNode(data['data'][i].user_count));
-            var node = document.createElement("div");
-            var player_count = data['data'][i].user_count;
-            node.innerHTML = "<img src=\"/static/images/game-table/"+String(player_count)+".png\" class=\"img\">";
-            room.click(function() {
-                console.log('enter room!');
-                window.location.href = "/join-room";
-            });
-            room.append(node);
+//            console.log(JSON.stringify(data['data'][i]));
+            var room = generate_room(data['data'][i]);
             $('#roomContainer').append(room);           
         }
     })
@@ -30,3 +33,46 @@ $(function() {
         alert( "error" );
     });
 });
+
+function generate_room(entry) {
+    var room = $('<div/>');
+    room.attr('id', entry.id);
+    room.addClass('room');
+    // room id
+    room.append($('<div/>').html('<h2> Room ' + entry.id + '</h2>'));
+    room.append('<hr>');
+
+    // # of players & observers
+    room.append($('<div/>').html('Players: ' + entry.player_count));
+    room.append($('<div/>').html('Observers: ' + (entry.user_count - entry.player_count)));
+
+    // is the room playing?
+    var is_playing = entry.round_id != null ? '<span class="label label-default">Playing</span>':'<span class="label label-success">Idle</span>';
+    room.append(is_playing);
+
+    // join the room button
+    var join_room_form = $('<form/>');
+    join_room_form.addClass('join_room_form');
+    join_room_form.attr('method', 'post');
+    join_room_form.append('<label class="radio-inline"><input type="radio" name="person_type" value = "player" checked>Player</label>');
+    join_room_form.append('<label class="radio-inline"><input type="radio" name="person_type" value = "observer">Observer</label>');
+    join_room_form.append('&nbsp; <input class = "btn btn-primary" type="submit" value="Join">');
+
+    $(join_room_form).submit(function(event) {
+        event.preventDefault();
+        var v = $(this).find("input[name='person_type']:checked").val();
+        console.log('[INFO] type: ' + v);
+        var parameters = {room_id: $(this).parent().attr('id'), observer: v == 'observer'};
+        console.log('[INFO] join_room parameters' + JSON.stringify(parameters));
+        $.post( "/api/enter", parameters, function( data ) {
+            if (data.code == 0) {
+                console.log('[INFO]enter successfully!');
+                location.href = '/room';
+            } else {
+                alert('[ERROR]' + data.error);
+            }
+        });
+    });
+    room.append(join_room_form);
+    return room;
+}

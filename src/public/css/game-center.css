@@ -7,15 +7,12 @@ html, body {
     color: red;
 }
 
-.container .row {
-    margin-top: 10%;
-}
-
-.container .row #form_container {
+.room {
+    padding: 1em;
     border: 1px solid #ccc!important;
-    padding: 40px;
+    text-align: center;
 }
 
-button#game_submit {
-    width: 100%;
+.room .join_room_form {
+    margin: 1em;
 }
