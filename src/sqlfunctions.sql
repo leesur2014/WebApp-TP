@@ -26,15 +26,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION round_get_latest_canvas(_round_id INT) RETURNS TEXT AS $$
-DECLARE
-  _res TEXT;
-BEGIN
-  SELECT image INTO STRICT _res FROM canvas WHERE round_id = _round_id ORDER BY timestamp DESC LIMIT 1;
-  RETURN _res;
-END;
-$$ LANGUAGE plpgsql;
-
 
 CREATE OR REPLACE FUNCTION user_get_by_id (_user_id INT) RETURNS users AS $$
 DECLARE

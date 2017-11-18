@@ -35,6 +35,18 @@ router.use('/', function (req, res, next) {
 });
 
 
+router.get('/lounge', function(req, res) {
+  db.any("SELECT * FROM public_rooms")
+    .then(function (data) {
+      send_data(res, data);
+    })
+    .catch(function (err)
+    {
+      send_error(res, err);
+    });
+});
+
+
 router.get('/me', function(req, res) {
   res.send(req.user);
 });
@@ -69,13 +81,24 @@ router.get('/user/:id(\\d+)', function(req, res) {
 router.get('/round/:id(\\d+)', function(req, res) {
   Round.getInfoById(req.params.id)
     .then(function (round) {
-      // TODO: only allow a user's access to his/her rounds
+      if (round.painter_id == req.user.id)
+      {
+        send_data(res, round);
+      }
+
       if (round.ended_at === null)
       {
         // do not display answer for ongoing rounds
         round.answer = '******';
       }
-      send_data(res, round);
+      for (var i = 0; i < round.users.length; i++)
+      {
+        if(round.users[i].user_id == req.user.id)
+        {
+          send_data(res, round);
+        }
+      }
+      send_error(res, "Access denied");
     })
     .catch(function (err)
     {
@@ -83,21 +106,18 @@ router.get('/round/:id(\\d+)', function(req, res) {
     });
 });
 
-
-router.get('/image/:id(\\d+)', function(req, res) {
-  Round.getLatestCanvas(req.params.id)
-    .then(function (data) {
-      send_data(res, data);
-    })
-    .catch(function (err) {
-      send_error(res, err);
-    });
-});
-
-router.get('/lounge', function(req, res) {
-  db.any("SELECT * FROM public_rooms")
-    .then(function (data) {
-      send_data(res, data);
+router.get('/round', function(req, res) {
+  Round.getInfoByUserId(req.user.id)
+    .then(function (round) {
+      if (round == null)
+      {
+        send_error(res, "You are not in a round");
+      }
+      if (round.painter_id != req.user.id)
+      {
+        round.answer = "********"
+      }
+      send_data(res, round);
     })
     .catch(function (err)
     {
@@ -132,6 +152,8 @@ router.get('/room', function(req, res) {
     send_error(res, "You are not in a room");
   }
 });
+
+
 
 router.post('/room', function(req, res) {
   req.user.createRoom(req.body.passcode || '')
