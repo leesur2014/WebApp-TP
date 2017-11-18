@@ -414,14 +414,14 @@ failed response
 
 field | optional | Description
 -----|-----------|--------------
-canvas | No | Data URLs encoded canvas, image should be in png format
+image | No | Data URLs encoded canvas, image should be in png format
 
 Request example
 
 ```
 POST /api/draw
 
-canvas=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAADElEQVQImWNgoBMAAABpAAFEI8ARAAAAAElFTkSuQmCC
+image=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAADElEQVQImWNgoBMAAABpAAFEI8ARAAAAAElFTkSuQmCC
 ```
 
 successful response
