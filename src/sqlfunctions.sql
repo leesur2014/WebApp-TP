@@ -193,10 +193,18 @@ BEGIN
   IF NOT FOUND THEN
     INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
   END IF;
-  UPDATE users SET token = _token WHERE id = _user.id RETURNING * INTO _user;
+  UPDATE users SET token = _token, online = TRUE WHERE id = _user.id RETURNING * INTO _user;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION user_logout(_user_id INT) RETURNS void AS $$
+BEGIN
+  UPDATE users SET online = FALSE, token = NULL WHERE id = _user_id;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION user_create_room(_user_id INT, _passcode VARCHAR DEFAULT '') RETURNS rooms AS $$
 DECLARE
