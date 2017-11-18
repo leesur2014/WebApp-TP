@@ -17,7 +17,22 @@ Round.end = function (round_id) {
     });
 };
 
-Round.getInfoById = async function (id) {
+Round.getInfoByUserId = function (user_id) {
+  return db.proc("user_get_current_round", [user_id])
+    .then(function (round) {
+      if (!round)
+      {
+        return null;
+      }
+      return db.any('SELECT user_id, score FROM round_user WHERE round_id = $1', id)
+        .then(function (data) {
+          round.users = data;
+          return round;
+        });
+    });
+};
+
+Round.getInfoById = function (id) {
   return db.proc("round_get_by_id", [id])
     .then(function (round) {
       return db.any('SELECT user_id, score FROM round_user WHERE round_id = $1', id)
@@ -26,7 +41,7 @@ Round.getInfoById = async function (id) {
           return round;
         });
     });
-}
+};
 
 Round.abort = function (round_id) {
   return db.proc('round_abort', round_id)
@@ -42,9 +57,6 @@ Round.abort = function (round_id) {
     });
 };
 
-Round.getLatestCanvas = function (round_id) {
-  return db.proc('round_get_latest_canvas', round_id, c => c.round_get_latest_canvas);
-}
 
 
 module.exports = Round;
