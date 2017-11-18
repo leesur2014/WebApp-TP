@@ -19,7 +19,11 @@ Room.getPublicRoomById = function (room_id) {
 Room.getInfoById = async function (room_id) {
   let room = await db.proc("room_get_by_id", room_id)
   room.users = await db.any('SELECT id, nickname, observer, ready FROM room_get_users($1)', room.id)
-  room.round_id = await db.proc('room_get_current_round', room.id, r => r.id);
+  room.round_id = await db.proc('room_get_current_round', room.id, function (round) {
+    if (round)
+      return round.id;
+    return null;
+  });
   return room;
 };
 
