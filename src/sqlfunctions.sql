@@ -267,22 +267,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION try_round_end(_round_id INT) RETURNS rounds AS $$
+DECLARE
+  _round RECORD;
+BEGIN
+  SELECT * INTO _round FROM rounds WHERE id = _round_id;
 
+  IF EXISTS( SELECT * FROM round_user WHERE submission <> _round.answer AND round_id = _round_id) THEN
+    RAISE EXCEPTION 'There is still someone who has not got the correct answer';
+  ELSE
+    SELECT * INTO STRICT _round FROM round_end(_round_id);
+  END IF;
+
+  RETURN _round;
+END;
+$$ LANGUAGE plpgsql;
 
 -- round_end() should be called by the application when it is time to end a round
 CREATE OR REPLACE FUNCTION round_end(_round_id INT) RETURNS rounds AS $$
 DECLARE
   _round RECORD;
   _correct_guesses INT;
+  _total_guesser_count INT;
 BEGIN
-  UPDATE open_rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
+  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
   RETURNING * INTO STRICT _round;
 
   SELECT count(*) INTO _correct_guesses FROM round_user WHERE round_id = _round_id
     AND submission = _round.answer;
 
-  UPDATE rounds SET painter_score = calc_painter_score(_correct_guesses) WHERE id = _round_id
-  RETURNING * INTO STRICT _round;
+  SELECT count(*) INTO _total_guesser_count FROM round_user WHERE round_id = _round_id;
+
+  UPDATE rounds SET painter_score = calc_painter_score(_correct_guesses, _total_guesser_count)
+    WHERE id = _round_id RETURNING * INTO STRICT _round;
   RETURN _round;
 END;
 $$ LANGUAGE plpgsql;
@@ -422,8 +439,8 @@ BEGIN
       _score := calc_guesser_score(_record.attempt + 1);
     END IF;
 
-    UPDATE round_user SET submission = _submission, score = _score, attempt = attempt + 1
-    WHERE round_id = _round.id AND user_id = _user_id;
+    UPDATE round_user SET submission = _submission, score = _score, attempt = attempt + 1,
+    submitted_at = now_utc() WHERE round_id = _round.id AND user_id = _user_id;
   END IF;
 
   RETURN _submission = _round.answer;
