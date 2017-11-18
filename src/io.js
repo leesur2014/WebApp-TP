@@ -9,7 +9,7 @@ var socketToUserID = {};
 
 var auth = function (socket, next) {
   let token = socket.handshake.query.token;
-  db.one('SELECT * FROM users WHERE token = $1', token || 'token_missing')
+  db.one('SELECT * FROM users WHERE token = $1 AND online = TRUE', token || 'token_missing')
     .then(function (user) {
       socketToUserID[socket.id] = user.id;
       return next();
