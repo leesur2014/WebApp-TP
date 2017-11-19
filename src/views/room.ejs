@@ -5,11 +5,36 @@
     <% include head %>
     <title>Game Room</title>
     <link rel="stylesheet" href="/static/css/navBar.css">
+     <link rel="stylesheet" href="/static/css/room.css">
   </head>
 
   <body>
     <% include navBarRoom %>
-    <h1>Hello, <span id = 'nameContainer'></span>! </h1>
+    <div class="container">
+        <div class = "row">
+            <div class = "col-12 col-md-4">
+                <div class="jumbotron" id = "side_bar">
+                    <h2 class="display-3">Hello, <span class = 'name_container'>Anonymous</span></h2>
+                    <p class = 'room_id_container'>You are not in any room now.</p>
+                    <hr class="my-4">
+                    <div class = 'players_container'>
+                        <h2>Players</h2>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class = 'observers_container'>
+                        <h2>Observers</h2>
+                    </div>
+                </div>
+            </div>
+            <div class = "col-12 col-md-6">
+
+              <canvas id = "drawing"></canvas>
+            </div>
+            <div class = "col-12 col-md-2"></div>
+        </div>
+
+    </div>
     <% include foot %>
     <script src="/static/js/room.js"></script>
   </body>
