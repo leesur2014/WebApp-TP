@@ -10,6 +10,13 @@ function getUser(socket) {
   return db.one('SELECT * FROM users WHERE token = $1 AND online = TRUE', token || 'token_missing');
 };
 
+function pingUser(userId) {
+  return db.proc('user_ping', userId)
+    .catch(function (e) {
+      console.log(e);
+    });
+}
+
 lounge.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
@@ -17,10 +24,8 @@ lounge.on('connection', function(socket) {
 
       socket.conn.on('packet', function (packet) {
         console.log("received", packet.type, "packet from user", user.id);
-        db.proc('user_ping', user.id)
-          .catch(function (e) {
-            console.log(e);
-          });
+        if (packet.type === 'ping')
+          pingUser(user.id);
       });
 
       socket.on('disconnecting', function(reason) {
@@ -28,8 +33,9 @@ lounge.on('connection', function(socket) {
       });
 
       socket.on('error', function(reason) {
-        console.log("socket", socket.id, "error");
+        console.log("socket", socket.id, "error:", reason);
       });
+
     })
     .catch(function (e) {
       console.log("disconnect due to auth failure");
@@ -44,14 +50,20 @@ room.on('connection', function(socket) {
     .then(function (user) {
       console.log("user", user.id, "connected to /room");
 
-      // console.log(socket.conn);
+      if (user.room_id == null)
+      {
+        console.log("user", user.id, "not in a room, disconnect");
+        socket.disconnect(true);
+        return;
+      }
+
+      console.log("user", user.id, "in room", user.room_id)
+      socket.join("room_" + user.room_id);
 
       socket.conn.on('packet', function (packet) {
         console.log("received", packet.type, "packet from user", user.id);
-        db.proc('user_ping', user.id)
-          .catch(function (e) {
-            console.log(e);
-          });
+        if (packet.type === 'ping')
+          pingUser(user.id);
       });
 
       socket.on('disconnecting', function(reason) {
@@ -59,17 +71,9 @@ room.on('connection', function(socket) {
       });
 
       socket.on('error', function(reason) {
-        console.log("socket ", socket.id, "error");
+        console.log("socket", socket.id, "error:", reason);
       });
 
-      if (user.room_id == null)
-      {
-        console.log("user", user.id, "not in a room, disconnect");
-        socket.disconnect(true);
-      } else {
-        console.log("user", user.id, "in room", user.room_id)
-        socket.join("room_" + user.room_id);
-      }
     })
     .catch(function (e) {
       console.log("disconnect due to auth failure");
