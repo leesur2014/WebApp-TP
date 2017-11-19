@@ -76,7 +76,7 @@ Data has `user_id` and `ready` field.
 #### `user_draw`
 
 This event instructs the client to GET `/api/round` to fetch
-the latest drawing of the painter. No data is associated with this event.
+the latest drawing of the painter. Data has a `image` field containing the DataURI of the new image.
 
 
 #### `round_start` and `round_end`
