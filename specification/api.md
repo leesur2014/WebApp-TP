@@ -229,7 +229,7 @@ GET /api/user/100
 ```
 
 
-### Get info about a round
+### Get info about a past round
 
 ```
 GET /api/round/100
@@ -239,7 +239,7 @@ GET /api/round/100
 {
   "code": 0,
   "data": {
-    "id": 8,
+    "id": 100,
     "painter_id": 2,
     "painter_score": 2,
     "room_id": 2,
@@ -265,13 +265,33 @@ GET /api/round/100
 ### Get the latest image of a round
 
 ```
-GET /api/round/image
+GET /api/round
 ```
 
 ```json
 {
   "code": 0,
-  "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAU..."
+  "data": {
+    "id": 8,
+    "painter_id": 2,
+    "painter_score": 2,
+    "room_id": 2,
+    "started_at": "2017-11-19T00:42:24.516Z",
+    "ended_at": null,
+    "answer": "*******",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAU...",
+    "image_timestamp": "2017-11-19T00:46:52.803Z",
+    "users": [
+        {
+      "user_id": 1,
+      "score": 0
+      },
+        {
+      "user_id": 4,
+      "score": 0
+      }
+    ]
+  }
 }
 ```
 
