@@ -84,6 +84,7 @@ router.get('/round/:id(\\d+)', function(req, res) {
       if (round.painter_id == req.user.id)
       {
         send_data(res, round);
+        return;
       }
 
       if (round.ended_at === null)
@@ -96,6 +97,7 @@ router.get('/round/:id(\\d+)', function(req, res) {
         if(round.users[i].user_id == req.user.id)
         {
           send_data(res, round);
+          return;
         }
       }
       send_error(res, "Access denied");
