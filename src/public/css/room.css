@@ -1,7 +1,6 @@
 #canvas_container {
-    min-height: 100%;
-}
-
-#canvas_container #drawing {
-    display: block;
+    width: 500px;
+    height: 300px;
+    border: 1px solid;
+    margin-top: 2em;
 }

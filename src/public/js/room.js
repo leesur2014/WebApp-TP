@@ -1,4 +1,45 @@
 $(function() {
+    // Get an initial list of players & observers
+    $.get('/api/room', function(data) {
+        if (data.code == 0) {
+             console.log('[INFO] Room info: ' + JSON.stringify(data));
+             list_players = [];
+             list_observers = [];
+             var users = data.data.users;
+             /* list all players and observers in this room */
+             for (var i = 0; i < users.length; ++i) {
+                if (users[i].observer == false) {
+                    list_players.push(users[i]);
+                } else {
+                    list_observers.push(users[i]);
+                }
+             }
+
+             if (list_players.length > 0) {
+
+                var dom_players = $('<ul/>').addClass('list-group');
+                for (var i in list_players) {
+                    var this_player_entry = $('<li/>').html(list_players[i].nickname).attr('id', list_players[i].id).addClass("list-group-item list-group-item-action list-group-item-success");
+                    dom_players.append(this_player_entry);
+                }
+
+                $('#side_bar .players_container').append(dom_players);
+             }
+
+              if (list_observers.length > 0) {
+
+                 var dom_obs= $('<ul/>').addClass('list-group');
+                 for (var i in list_observers) {
+                    var this_observer_entry = $('<li/>').html(list_observers[i].nickname).attr('id', list_observers[i].id).addClass("list-group-item list-group-item-action");
+                     dom_obs.append(this_observer_entry);
+                 }
+                 $('#side_bar .observers_container').append(dom_obs);
+              }
+        } else {
+            alert('[ERROR] Cannot get this room information');
+        }
+    });
+
     $.get( "/api/me", function( data ) {
         console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
         console.log('[INFO]nickname: ' + data['nickname']);
@@ -14,40 +55,17 @@ $(function() {
             location.href = '/game-center';
         }
 
-        $.get('/api/room', function(data) {
-            if (data.code == 0) {
-                 console.log('[INFO] Room info: ' + JSON.stringify(data));
-                 list_players = [];
-                 list_observers = [];
-                 var users = data.data.users;
-                 /* list all players and observers in this room */
-                 for (var i = 0; i < users.length; ++i) {
-                    if (users[i].observer == false) {
-                        list_players.push(users[i]);
-                    } else {
-                        list_observers.push(users[i]);
-                    }
-                 }
-
-                 if (list_players.length > 0) {
-
-                    var dom_players = $('<ul/>').addClass('list-group');
-                    for (var i in list_players)
-                        dom_players.append($('<li/>').html(list_players[i].nickname).attr('id', list_players[i].id).addClass("list-group-item list-group-item-action list-group-item-success"));
-                    $('#side_bar .players_container').append(dom_players);
-                 }
-
-                  if (list_observers.length > 0) {
-
-                     var dom_obs= $('<ul/>').addClass('list-group');
-                     for (var i in list_observers)
-                         dom_obs.append($('<li/>').html(list_observers[i].nickname).attr('id', list_observers[i].id).addClass("list-group-item list-group-item-action"));
-                     $('#side_bar .observers_container').append(dom_obs);
-                  }
+        // initialize the ready_bar to indicate whether I am ready
+        console.log('Is observer? ' + (data.observer == false));
+        console.log('Is ready? ' + (data.ready == false));
+        if (data.observer == false) {
+            if (data.ready == false) {
+                unready();
             } else {
-                alert('[ERROR] Cannot get this room information');
+                ready();
             }
-        });
+        }
+
 
         var token = data.token;
 
@@ -60,9 +78,9 @@ $(function() {
             $.get('/api/user/' + msg.user_id, function(data) {
                 if (data.code == 0) {
                     if (data.data.observer == false) {
-                        $('#side_bar .players_container ul').prepend($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action list-group-item-success"));
+                        $('#side_bar .players_container ul').append($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action list-group-item-success"));
                     } else {
-                        $('#side_bar .observers_container ul').prepend($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action"));
+                        $('#side_bar .observers_container ul').append($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action"));
                     }
                 } else {
                     alert('[ERROR] Cannot get the user info');
@@ -75,22 +93,53 @@ $(function() {
             console.log('[INFO] User exit: ' + JSON.stringify(msg));
             $('#' + msg.user_id).remove();
         });
+
+
     });
 });
 
 function is_gaming(round_id) {
-    $('#ready_bar').empty();
-    $('')
+    // maintain invariants - display the game states while this round is ongoing
+    $('#game_ongoing_container').empty();
+    $.get('/api/round', function(data) {
+        if (data.code == 0) {
+            var painter_display = $('<h2/>').html('Gaming! - The painter of this round: ' + '');
+        } else {
+            alert('[ERROR] Cannot get the painter information');
+        }
+    });
 }
 
-function get_ready() {
+// set the button to 'ready' state
+function ready() {
     $('#ready_bar').empty();
-
+    var unready_btn = $('<button/>').attr('type', 'button').addClass('btn btn-success').html('You are ready! Click here to cancel');
+    $(unready_btn).click(function() {
+        $.post('/api/ready', {ready: false}, function(data) {
+            if (data.code == 0) {
+                unready();
+            } else {
+                alert('[ERROR] Cannot unready!');
+            }
+        });
+    });
+    $('#ready_bar').append(unready_btn);
 }
 
-function get_unready() {
+// set the button to 'unready' state
+function unready() {
     $('#ready_bar').empty();
-
+    var ready_btn = $('<button/>').attr('type', 'button').addClass('btn btn-default').html('Your are not ready! Click here to get ready for a game');
+    $(ready_btn).click(function() {
+        $.post('/api/ready', {ready: true}, function(data) {
+            if (data.code == 0) {
+                ready();
+            } else {
+                alert('[ERROR] Cannot get ready!');
+            }
+        });
+    });
+    $('#ready_bar').append(ready_btn);
 }
 
 
