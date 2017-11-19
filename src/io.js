@@ -36,7 +36,7 @@ lounge.on('connection', function(socket) {
 
   console.log("user", userId, "connected to /lounge");
 
-  socket.on('ping', function () {
+  socket.on('packet', function () {
     console.log("socket", socketId, "ping");
     db.proc('user_ping', userId)
       .catch(function (e) {
@@ -45,12 +45,12 @@ lounge.on('connection', function(socket) {
   });
 
   socket.on('disconnecting', function(reason) {
-    console.log("socket " + socketId + " disconnecting");
+    console.log("socket", socketId, "disconnecting");
     delete socketToUserID[socketId];
   });
 
   socket.on('error', function(reason) {
-    console.log("socket " + socketId + " error");
+    console.log("socket", socketId, "error");
     delete socketToUserID[socketId];
   });
 
@@ -71,7 +71,7 @@ room.on('connection', function(socket){
 
   console.log("user", userId, "connected to /room");
 
-  socket.on('ping', function () {
+  socket.on('packet', function () {
     console.log("socket", socketId, "ping");
     db.proc('user_ping', userId)
       .catch(function (e) {
@@ -80,12 +80,12 @@ room.on('connection', function(socket){
   });
 
   socket.on('disconnecting', function(reason) {
-    console.log("socket " + socketId + " disconnecting");
+    console.log("socket", socketId, "disconnecting");
     delete socketToUserID[socketId];
   });
 
   socket.on('error', function(reason) {
-    console.log("socket " + socketId + " error");
+    console.log("socket ", socketId, "error");
     delete socketToUserID[socketId];
   });
 
