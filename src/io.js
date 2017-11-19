@@ -15,8 +15,8 @@ lounge.on('connection', function(socket) {
     .then(function (user) {
       console.log("user", user.id, "connected to /lounge");
 
-      socket.conn.on('packet', function () {
-        console.log("socket", socket.id, "ping");
+      socket.conn.on('packet', function (packet) {
+        console.log("received", packet.type, "packet from user", user.id);
         db.proc('user_ping', user.id)
           .catch(function (e) {
             console.log(e);
@@ -43,6 +43,16 @@ room.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
       console.log("user", user.id, "connected to /room");
+
+      // console.log(socket.conn);
+
+      socket.conn.on('packet', function (packet) {
+        console.log("received", packet.type, "packet from user", user.id);
+        db.proc('user_ping', user.id)
+          .catch(function (e) {
+            console.log(e);
+          });
+      });
 
       socket.on('disconnecting', function(reason) {
         console.log("socket", socket.id, "disconnecting");
