@@ -36,6 +36,14 @@ lounge.on('connection', function(socket) {
 
   console.log("user", userId, "connected to /lounge");
 
+  socket.on('ping', function () {
+    console.log("socket", socketId, "ping");
+    db.proc('user_ping', userId)
+      .catch(function (e) {
+        console.log(e);
+      });
+  });
+
   socket.on('disconnecting', function(reason) {
     console.log("socket " + socketId + " disconnecting");
     delete socketToUserID[socketId];
@@ -62,6 +70,14 @@ room.on('connection', function(socket){
   var userId = socketToUserID[socket.id];
 
   console.log("user", userId, "connected to /room");
+
+  socket.on('ping', function () {
+    console.log("socket", socketId, "ping");
+    db.proc('user_ping', userId)
+      .catch(function (e) {
+        console.log(e);
+      });
+  });
 
   socket.on('disconnecting', function(reason) {
     console.log("socket " + socketId + " disconnecting");
