@@ -76,9 +76,23 @@ $(function() {
             $('#' + msg.user_id).remove();
         });
     });
-
-
 });
+
+function is_gaming(round_id) {
+    $('#ready_bar').empty();
+    $('')
+}
+
+function get_ready() {
+    $('#ready_bar').empty();
+
+}
+
+function get_unready() {
+    $('#ready_bar').empty();
+
+}
+
 
 $('#logOutButton').click(function() {
     $.post( "/api/exit", function( data ) {

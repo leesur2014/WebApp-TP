@@ -1,5 +1,7 @@
-#drawing {
+#canvas_container {
+    min-height: 100%;
+}
+
+#canvas_container #drawing {
     display: block;
-    width: 100%;
-    height: 80%;
 }
