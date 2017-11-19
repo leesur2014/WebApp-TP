@@ -33,7 +33,7 @@ $(function() {
 
                     var dom_players = $('<ul/>').addClass('list-group');
                     for (var i in list_players)
-                        dom_players.append($('<li/>').html(list_players[i].nickname).addClass("list-group-item list-group-item-action list-group-item-success"));
+                        dom_players.append($('<li/>').html(list_players[i].nickname).attr('id', list_players[i].id).addClass("list-group-item list-group-item-action list-group-item-success"));
                     $('#side_bar .players_container').append(dom_players);
                  }
 
@@ -41,7 +41,7 @@ $(function() {
 
                      var dom_obs= $('<ul/>').addClass('list-group');
                      for (var i in list_observers)
-                         dom_obs.append($('<li/>').html(list_observers[i].nickname).addClass("list-group-item list-group-item-action"));
+                         dom_obs.append($('<li/>').html(list_observers[i].nickname).attr('id', list_observers[i].id).addClass("list-group-item list-group-item-action"));
                      $('#side_bar .observers_container').append(dom_obs);
                   }
             } else {
@@ -53,18 +53,27 @@ $(function() {
 
         console.log('[INFO]token: ' + token);
         var socket = io('/room?token='+ token);
-        // Listen events:
+        // Listen events: If a user enter or exit this room, update the page in real-time
         socket.on('user_enter', function(msg) {
+
             console.log('[INFO] User enter: ' + JSON.stringify(msg));
-//            var room_id = msg.room_id;
-//            $.get('/api/room/' + room_id, function(new_room_data) {
-//                console.log('[INFO] New room has been created: ' + JSON.stringify(new_room_data));
-//                $('#roomContainer').prepend(generate_room(new_room_data['data']));
-//            });
+            $.get('/api/user/' + msg.user_id, function(data) {
+                if (data.code == 0) {
+                    if (data.data.observer == false) {
+                        $('#side_bar .players_container ul').prepend($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action list-group-item-success"));
+                    } else {
+                        $('#side_bar .observers_container ul').prepend($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action"));
+                    }
+                } else {
+                    alert('[ERROR] Cannot get the user info');
+                }
+            });
+
         });
 
         socket.on('user_exit', function(msg) {
             console.log('[INFO] User exit: ' + JSON.stringify(msg));
+            $('#' + msg.user_id).remove();
         });
     });
 
