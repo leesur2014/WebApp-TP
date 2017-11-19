@@ -11,7 +11,7 @@ CREATE TABLE "users" (
 	"score_draw" INTEGER NOT NULL DEFAULT '0',
 	"score_guess" INTEGER NOT NULL DEFAULT '0',
 	"joined_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
-
+  "last_seen" TIMESTAMP WITHOUT TIME ZONE NULL,
 	"online" boolean NOT NULL default 'FALSE',
 	"room_id" INTEGER NULL,
 	"ready" boolean NOT NULL default 'FALSE',

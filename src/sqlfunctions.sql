@@ -185,6 +185,13 @@ $$ LANGUAGE plpgsql;
 
 -- END read-only functionssss
 
+CREATE OR REPLACE FUNCTION user_ping(_user_id INT) RETURNS void AS $$
+BEGIN
+  UPDATE users SET last_seen = now_utc() WHERE id = _user_id AND online = TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION user_login(_fb_id VARCHAR, _nickname VARCHAR, _token VARCHAR) RETURNS users AS $$
 DECLARE
   _user users%ROWTYPE;
@@ -193,7 +200,8 @@ BEGIN
   IF NOT FOUND THEN
     INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
   END IF;
-  UPDATE users SET token = _token, online = TRUE WHERE id = _user.id RETURNING * INTO _user;
+  UPDATE users SET last_seen = now_utc(), token = _token, online = TRUE
+    WHERE id = _user.id RETURNING * INTO _user;
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
