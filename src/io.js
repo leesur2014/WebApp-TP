@@ -57,7 +57,7 @@ room.on('connection', function(socket) {
         console.log("user", user.id, "not in a room, disconnect");
         socket.disconnect(true);
       } else {
-        console.log("user join room", user.room_id)
+        console.log("user", user.id, "in room", user.room_id)
         socket.join("room_" + user.room_id);
       }
     })
