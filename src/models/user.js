@@ -65,7 +65,7 @@ class User {
             io.lounge.emit('room_delete', {room_id: user.room_id})
           })
           .catch(function () {
-            // this is not an error
+            // reach here if room cannot be deleted
             io.lounge.emit('room_change', {room_id: user.room_id});
           });
       });
@@ -80,19 +80,9 @@ class User {
 
         if (state)
         {
-          // attempt to start a round
-          db.proc("room_start_round", user.room_id)
-          .then(function (round) {
-            console.log("round start: ", round.id);
-            io.lounge.emit('room_change', {room_id: user.room_id});
-            io.room.to("room_" + user.room_id).emit('round_start', {round_id: round.id});
-          })
-          .catch(function (e) {
-            // this is not an error
-            console.log(e);
-          });
+          return Room.startNewRound(user.room_id);
         }
-      });
+      })
   }
 
   guess(submission) {
