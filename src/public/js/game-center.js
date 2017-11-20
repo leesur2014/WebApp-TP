@@ -22,14 +22,16 @@ $(document).ready(function() {
 
         socket.on('room_change', function(msg) {
             var room_id = msg.room_id;
-            $.get('/api/room/' + room_id, function(resp) {
-              if (rooms[room_id] != null)
-              {
-                rooms[room_id].remove();
-              }
-              rooms[room_id] = generate_room(resp.data);
-              $('#room-table').prepend(rooms[room_id]);
-            });
+            if (rooms[room_id])
+            {
+              // update only if the room id is in the rooms array
+              $.get('/api/room/' + room_id, function(resp) {
+                var new_element = generate_room(resp.data);
+                rooms[room_id].replaceWith(new_element);
+                rooms[room_id] = new_element;
+                console.log("updated room", room_id);
+              });
+            }
         });
 
         socket.on('room_delete', function(msg) {
@@ -80,10 +82,10 @@ function generate_room(room) {
     td_players.text(room.player_count);
     td_observers.text(room.user_count - room.player_count);
 
-    var join_as_player = $('<button>Join as player</button>');
-    var join_as_observer = $('<button>Join as observer</button>');
+    var join_as_player = $('<button>Enter room as a player</button>');
+    var join_as_observer = $('<button>Enter room as a observer</button>');
     join_as_player.addClass("btn btn-primary btn-sm");
-    join_as_observer.addClass("btn btn-success btn-sm");
+    join_as_observer.addClass("btn btn-default btn-sm");
 
     join_as_player.click(function () {
       enter_public_room(room.id, false);
