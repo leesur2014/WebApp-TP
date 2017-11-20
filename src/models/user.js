@@ -75,7 +75,7 @@ class User {
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
           .then(function () {
-            console.log("room delete: ", user.room_id);
+            console.log("room", user.room_id, "deleted");
             io.lounge.emit('room_delete', {room_id: user.room_id})
           })
           .catch(function () {
