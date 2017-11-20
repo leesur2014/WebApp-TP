@@ -81,10 +81,12 @@ $(function() {
             if(res_round.code == 0) {
                 var img = new Image;
                 console.log('[INFO] Initial canvas image: ' + res_round.data.image);
+
+                var img = new Image;
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                }
                 img.src = res_round.data.image;
-                ctx.beginPath();
-                ctx.drawImage(img, 0, 0);
-                ctx.stroke();
             }
         });
 
@@ -138,10 +140,10 @@ $(function() {
         socket.on('user_draw', function(msg) {
             console.log('[INFO] New stroke: ' + JSON.stringify(msg));
             var img = new Image;
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            }
             img.src = msg.image;
-            ctx.beginPath();
-            ctx.drawImage(img, 0, 0);
-            ctx.stroke();
         });
     });
 });
