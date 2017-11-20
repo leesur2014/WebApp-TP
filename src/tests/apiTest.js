@@ -8,7 +8,7 @@ var expect = chai.expect;
    
 var assert = chai.assert;       
     
-
+/*
 var FacebookStrategy = require('passport-facebook').Strategy;
 describe('Profile check', function() {
     var strategy = new FacebookStrategy({
@@ -76,33 +76,128 @@ describe("API test",function () {
         });
 });
 //});
+*/
 
-/*
 const request = require('supertest');
-describe('Login API', function() {
+describe('API Test', function() {
     it('Should success if credential is valid', function(done) {
         request('http://guessmydrawing.fun')
         //request(server)
-           .get('/users/login')
-           //.set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+           .get('/api/me')
+           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
            .set('Connection','keep-alive')
-           //.set('Cookie','connect.sid=s%3A3G9_Gdruq9XldPcG8bELAc2yGoDbrDNJ.lsygyYmyLE4rYK5FzeB%2BEsbT0Xey6LUkmZ%2FZHSFoyyg')
-           .set('Cookie',['connect.sid=s%3A3G9_Gdruq9XldPcG8bELAc2yGoDbrDNJ.lsygyYmyLE4rYK5FzeB%2BEsbT0Xey6LUkmZ%2FZHSFoyyg'])
+           .set('Cookie',['connect.sid=s%3AAXKapYaCrbxykzY5nHv1GnJVHjaTC68R.BbaqCwcU8cotZYX3fltLo%2Fl428SqL0z61cvm4GZl2Wo','io=SIUjZtp5ps9DAIzHAAAp'])
            .send({ fb_id: '123456', displayName: 'Mary White' })
-           //.expect(200)
-           //.expect('Content-Type', /json/)
+           .expect(200)
+           .expect('Content-Type', /json/)
            .expect(function(response) {
-            //console.log(response);
-              //expect(response.body).not.to.be.empty;
-              //expect(response.body).to.be.an('object');
+            //console.log(response.body);
+              expect(response.body).not.to.be.empty;
+              expect(response.body).to.be.an('object');
            })
            .end(done);
     }); 
+
+it('should get user info /api/me GET', function(done) {
+   request('http://guessmydrawing.fun')
+           .get('/api/me')
+           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+           .set('Content-Type', 'application/json')
+           .set('Accept-Encoding','gzip, deflate')
+           .set('Accept-Language','zh-CN,zh;q=0.8')
+           .set('Connection','keep-alive')
+           .set('Cookie',['connect.sid=s%3AAXKapYaCrbxykzY5nHv1GnJVHjaTC68R.BbaqCwcU8cotZYX3fltLo%2Fl428SqL0z61cvm4GZl2Wo','io=SIUjZtp5ps9DAIzHAAAp'])
+           .send({ fb_id: '123456', displayName: 'Mary White' })
+
+        .end(function(err,res) {
+            //console.log(res);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('nickname');
+            res.body.should.have.property('online');
+            res.body.online.should.equal(true);
+            done();
+
+        });
+
+    });
+
+it('should list all rooms /api/lounge GET', function(done) {
+    request('http://guessmydrawing.fun')
+           .get('/api/lounge')
+           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+           .set('Content-Type', 'application/json')
+           .set('Accept-Encoding','gzip, deflate')
+           .set('Accept-Language','zh-CN,zh;q=0.8')
+           .set('Connection','keep-alive')
+           .set('Cookie',['connect.sid=s%3AAXKapYaCrbxykzY5nHv1GnJVHjaTC68R.BbaqCwcU8cotZYX3fltLo%2Fl428SqL0z61cvm4GZl2Wo','io=SIUjZtp5ps9DAIzHAAAp'])
+           .send({ fb_id: '123456', displayName: 'Mary White' })
+        .end(function(err, res) {
+           //console.log(res.body);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.be.a('object');
+            res.body.should.have.property('code');
+            res.body.code.should.equal(0);
+            res.body.should.have.property('data');
+            res.body.data.should.be.a('array');
+            done();
+        });
 });
-*/
+
+it('should chagne nickname /api/me POST', function(done) {
+        request('http://guessmydrawing.fun')
+           .post('/api/me')
+           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+           .set('Content-Type', 'application/json')
+           .set('Accept-Encoding','gzip, deflate')
+           .set('Accept-Language','zh-CN,zh;q=0.8')
+           .set('Connection','keep-alive')
+           .set('Cookie',['connect.sid=s%3AAXKapYaCrbxykzY5nHv1GnJVHjaTC68R.BbaqCwcU8cotZYX3fltLo%2Fl428SqL0z61cvm4GZl2Wo','io=SIUjZtp5ps9DAIzHAAAp'])
+           .type('form')
+           .send({nickname:'Mary'})
+        .end(function(err, res) {
+          //console.log(res.body);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.be.a('object');
+            res.body.should.have.property('code');
+            res.body.code.should.equal(0);
+            res.body.should.have.property('data');
+            res.body.data.should.have.property('nickname');
+            res.body.data.nickname.should.equal('Mary');
+            done();
+        });
+});
+
+it('should list user\'s current room /api/room GET', function(done) {
+     request('http://guessmydrawing.fun')
+    .post('/api/me')
+    .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+    .set('Content-Type', 'application/json')
+    .set('Accept-Encoding','gzip, deflate')
+    .set('Accept-Language','zh-CN,zh;q=0.8')
+    .set('Connection','keep-alive')
+    .set('Cookie',['connect.sid=s%3AAXKapYaCrbxykzY5nHv1GnJVHjaTC68R.BbaqCwcU8cotZYX3fltLo%2Fl428SqL0z61cvm4GZl2Wo','io=SIUjZtp5ps9DAIzHAAAp'])
+
+    chai.request(server)
+        .get('/api/room')
+        .end(function(err,res) {
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('data');
+            res.body.data.should.have.property('id');
+            res.body.data.should.have.property('users');
+            done();
+        });
+});
+
+
+});
+
 /*
 
 describe('Draw_and_Guess', function() {
@@ -122,47 +217,6 @@ describe('Draw_and_Guess', function() {
     //POST | `/api/ready` | Set/clear the user's ready bit
     //POST | `/api/submit` | Submit the answer for a round
     //POST | `/api/draw` | Send the painter's drawing
-});
-
-it('should get user info /api/me GET', function(done) {
-   chai.request(server)
-        .get('/api/me')
-        .end(function(err,res) {
-            console.log(res);
-            //res.should.have.status(200);
-            //res.should.be.jason;
-            //res.body.should.have.property('nickname');
-            //res.body.should.have.property('online');
-            //res.body.online.should.equal('true');
-            done();
-
-        });
-
-    });
-
-
-it('should list all rooms /api/lounge GET', function(done) {
-    chai.request(server)
-        .get('/api/lounge')
-        .end(function(err, res) {
-            res.should.have.status(200);
-            res.should.be.jason;
-            res.body.should.be.a('array');
-            done();
-        });
-});
-
-it('should chagne nickname /api/me POST', function(done) {
-    chai.request(server)
-        .post('/api/me')
-        .send({'nickname':'Mary'})
-        .end(function(err, res) {
-            res.should.have.status(200);
-            res.should.be.json;
-            res.body.should.have.property('nickname');
-            res.body.nickname.should.equal('Mary');
-            done();
-        });
 });
 
 it('should list user\'s current room /api/room GET', function(done) {
