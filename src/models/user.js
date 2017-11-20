@@ -119,8 +119,10 @@ class User {
   }
 
   draw(image) {
-    io.room.to('room_' + this.room_id).emit('user_draw', {image: image});
-    return db.proc('user_draw', [this.id, image]);
+    return db.proc('user_draw', [this.id, image])
+      .then(function () {
+        io.room.to('room_' + this.room_id).emit('user_draw', {image: image});
+      });
   }
 
 }
