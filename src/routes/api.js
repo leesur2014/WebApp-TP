@@ -259,10 +259,10 @@ router.post('/draw', function(req, res) {
   }
   req.user.draw(req.body.image)
     .then(function () {
-      send_data(res, null);
+      return send_data(res, null);
     })
     .catch(function (err) {
-      send_error(res, err);
+      return send_error(res, err);
     });
 })
 
