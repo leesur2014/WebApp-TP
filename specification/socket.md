@@ -65,6 +65,13 @@ may GET `/api/user/id` for more information, such as nickname, observer state of
 
 Data has `user_id` and `ready` field.
 
+```json
+{
+  "user_id": 10,
+  "ready": true
+}
+```
+
 #### `user_guess`
 
 ```json
@@ -96,6 +103,12 @@ score of players and the correct answer.
 
 The event notifies the client how many seconds are left in this round. Data has a
 seconds field which contains the number of seconds left in this round.
+
+```json
+{
+  "seconds": 10
+}
+```
 
 ### References
 
