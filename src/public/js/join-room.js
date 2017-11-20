@@ -8,7 +8,7 @@ $('#join-room-form').submit(function(event) {
     };
     $.post("/api/enter", data, function(resp) {
       if (resp.code == 0) {
-        location.href = '/room';
+        location.reload();
       } else {
         alert('An error occurred: ' + resp.error);
       }

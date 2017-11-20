@@ -6,8 +6,8 @@ $('#create-room-form').submit(function(event) {
     console.log(data);
     $.post("/api/room", data, function(resp) {
         if (resp.code == 0) {
-            //room created, jump to room view
-            location.href = '/room';
+            //room created
+            location.reload();
         } else {
           alert('An error occurred: ' + resp.error);
         }

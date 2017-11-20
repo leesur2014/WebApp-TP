@@ -25,27 +25,30 @@ $(document).ready(function() {
             if (rooms[room_id])
             {
               // update only if the room id is in the rooms array
-              $.get('/api/room/' + room_id, function(resp) {
-                var new_element = generate_room(resp.data);
-                rooms[room_id].replaceWith(new_element);
-                rooms[room_id] = new_element;
-                console.log("updated room", room_id);
+              $.get('/api/room/' + room_id, function(resp)
+              {
+                  var new_element = generate_room(resp.data);
+                  rooms[room_id].replaceWith(new_element);
+                  rooms[room_id] = new_element;
+                  console.log("updated room", room_id);
               });
             }
         });
 
         socket.on('room_delete', function(msg) {
-          var room_id = msg.room_id;
-          if (rooms[room_id] != null)
-          {
-            rooms[room_id].remove();
-            delete rooms[room_id];
-            console.log("removed room", room_id);
-          }
+            var room_id = msg.room_id;
+            if (rooms[room_id] != null)
+            {
+                rooms[room_id].remove();
+                delete rooms[room_id];
+                console.log("removed room", room_id);
+            }
         });
 
+        // populate the rooms array
         $.get('/api/lounge', function(resp) {
-            for (var i = 0; i < resp.data.length; ++i) {
+            for (var i = 0; i < resp.data.length; ++i)
+            {
                 var room = rooms[resp.data[i].id] = generate_room(resp.data[i]);
                 $('#room-table').prepend(room);
             }
@@ -58,16 +61,16 @@ $(document).ready(function() {
 
 function enter_public_room(room_id, observer) {
   var data = {
-    room_id: room_id,
-    observer: observer,
-    passcode: ""
+      room_id: room_id,
+      observer: observer,
+      passcode: ""
   };
   $.post('/api/enter', data, function(resp) {
-    if (resp.code == 0) {
-      window.location.href = "/room";
-    } else {
-      alert("An error occurred:", resp.error);
-    }
+      if (resp.code == 0) {
+          location.reload()
+      } else {
+          alert("An error occurred: " + resp.error);
+      }
   });
 }
 
@@ -88,17 +91,17 @@ function generate_room(room) {
     join_as_observer.addClass("btn btn-default btn-sm");
 
     join_as_player.click(function () {
-      enter_public_room(room.id, false);
+        enter_public_room(room.id, false);
     });
 
     join_as_observer.click(function () {
-      enter_public_room(room.id, true);
+        enter_public_room(room.id, true);
     });
 
     if (room.round_id == null)
     {
-      // there is no round in this room
-      td_actions.append(join_as_player);
+        // there is no round in this room
+        td_actions.append(join_as_player);
     }
     td_actions.append(join_as_observer);
 
