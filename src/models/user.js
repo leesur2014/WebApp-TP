@@ -119,9 +119,10 @@ class User {
   }
 
   draw(image) {
+    var user = this;
     return db.proc('user_draw', [this.id, image])
       .then(function () {
-        io.room.to('room_' + this.room_id).emit('user_draw', {image: image});
+        io.room.to('room_' + user.room_id).emit('user_draw', {image: image});
       });
   }
 
