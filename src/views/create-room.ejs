@@ -1,35 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <% include head %>
-    <title>Game Center</title>
-    <link rel="stylesheet" href="/static/css/navBar.css">
-    <link rel="stylesheet" href="/static/css/game-center.css">
-</head>
-<body>
-
-<% include nav-bar %>
-
-<div class="container">
-    <div class = "row">
-        <div class = "col-0 col-md-3"></div>
-        <div class = "col-12 col-md-6">
-            <div id = "form_container">
-                <form id="create_room" action = "/api/enter">
-                    <div class="form-group">
-                        <label for="password">Pass Code (for Private Rooms)</label>
-                        <input type="text" name ="passcode" class="form-control" id="password" placeholder="Passcode">
-                    </div>
-                    <br>
-                    <button  id = "game_submit" type="submit" class = "btn btn-primary">Create</button>
-                </form>
-
-            </div>
+<div class="modal" tabindex="-1" role="dialog" id="create-room-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Create a room</h3>
+      </div>
+      <form id="create-room-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Passcode</label>
+            <input type="text" name ="passcode" class="form-control" placeholder="Keep empty if you want to create a public room">
+          </div>
         </div>
-        <div class = "col-0 col-md-3"></div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
-<% include scripts %>
-    <script src="/static/js/create-room.js"></script>
-</body>
-</html>
