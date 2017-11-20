@@ -76,6 +76,18 @@ $(function() {
             location.href = '/game-center';
         }
 
+        // get those initial strokes
+        $.get('/api/round', function(res_round) {
+            if(res_round.code == 0) {
+                var img = new Image;
+                console.log('[INFO] Initial canvas image: ' + res_round.data.image);
+                img.src = res_round.data.image;
+                ctx.beginPath();
+                ctx.drawImage(img, 0, 0);
+                ctx.stroke();
+            }
+        });
+
         // initialize the ready_bar to indicate whether I am ready
         console.log('Is observer? ' + (data.observer == false));
         console.log('Is ready? ' + (data.ready == false));
@@ -125,6 +137,11 @@ $(function() {
 
         socket.on('user_draw', function(msg) {
             console.log('[INFO] New stroke: ' + JSON.stringify(msg));
+            var img = new Image;
+            img.src = msg.image;
+            ctx.beginPath();
+            ctx.drawImage(img, 0, 0);
+            ctx.stroke();
         });
     });
 });
@@ -159,6 +176,11 @@ function is_gaming(round_id) {
                     });
                     $('#drawing').mouseup(function() {
                         mouse.click = false;
+                        var dataURL = document.getElementById('drawing').toDataURL();
+                        console.log('[INFO] dataURL: ' + dataURL);
+                        $.post('/api/draw', {image: dataURL}, function(draw_res) {
+                            console.log('[INFO] Response: ' + JSON.stringify(draw_res));
+                        })
 
                     });
                     mainLoop();
