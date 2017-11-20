@@ -29,20 +29,19 @@ Round.getInfoById = function (id) {
     });
 };
 
-Round.abort = function (round_id) {
-  return db.proc('round_abort', round_id)
+Round.tryToEnd(round_id)
+{
+  db.proc("try_round_end", round_id)
     .then(function (round) {
-      io.room.to('room_' + round.room_id)
-        .emit('round_end', {round_id: round_id});
-      return null;
+      console.log("round end: ", round.id);
+      io.lounge.emit('room_change', {room_id: round.room_id});
+      io.room.to("room_" + round.room_id).emit('round_end', {round_id: round.id});
     })
-    .catch(function (err) {
+    .catch(function (e)
+    {
+      console.log(e);
       // this is not an error
-      console.log(err);
-      return null;
     });
-};
-
-
+}
 
 module.exports = Round;
