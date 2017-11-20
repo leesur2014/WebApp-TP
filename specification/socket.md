@@ -54,6 +54,7 @@ Event name | Description
 `user_draw` | The painter updated his/her canvas
 `round_start` | A round has started
 `round_end` | A round has ended
+`count_down` | Notification on time left in a round
 
 #### `user_enter` and `user_exit`
 
@@ -89,6 +90,12 @@ this call will return code -1.
 
 When a round has ended, the client may GET `/api/round/{round_id}` to fetch the
 score of players and the correct answer.
+
+
+#### `count_down`
+
+The event notifies the client how many seconds are left in this round. Data has a
+seconds field which contains the number of seconds left in this round.
 
 ### References
 
