@@ -138,7 +138,7 @@ $(function() {
         });
 
         socket.on('user_draw', function(msg) {
-            console.log('[INFO] New stroke: ' + JSON.stringify(msg));
+//            console.log('[INFO] New stroke: ' + JSON.stringify(msg));
             var img = new Image;
             img.onload = function() {
                 ctx.drawImage(img, 0, 0);
@@ -149,13 +149,30 @@ $(function() {
         socket.on('user_guess', function(msg) {
             console.log('[INFO] New guess: ' + JSON.stringify(msg));
             $.get('/api/user/' + msg.user_id, function(user_data) {
-                $('#msg_container').prepend($('<li/>').addClass('list-group-item list-group-item-info').html('Player [' + user_data.data.nickname + '] guess - ' + msg.correct));
+                $('#msg_container ul').prepend($('<li/>').addClass('list-group-item list-group-item-info').html('Player [' + user_data.data.nickname + '] guess - ' + msg.correct));
             });
         });
 
         socket.on('count_down', function(msg) {
             $('#count_down_container').empty();
             $('#count_down_container').append($('<h2/>').html('Count down: ' + msg.seconds + ' s.'))
+        });
+
+        socket.on('round_end', function(msg) {
+            console.log('[INFO] Round end: ' + JSON.stringify(msg.round_id));
+            $('#canvas_container').empty();
+            $.get('/api/round/' + msg.round_id, function(round_info) {
+                var res_table = $('<table/>').addClass("table table-condensed");
+                res_table.append('<thead><tr><th>ID</th><th>Score </th></tr></thead>');
+                var tbody = $('<tbody/>');
+                for (var i = 0; i < round_info.data.users.length; ++i) {
+                    var this_user = round_info.data.users[i];
+                    tbody.append($('<tr/>').append($('<td/>').html(this_user.user_id)).append($('<td/>').html(this_user.score)));
+                }
+                res_table.append(tbody);
+
+                $('#canvas_container').append(res_table);
+            });
         });
     });
 });
