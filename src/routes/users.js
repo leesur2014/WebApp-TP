@@ -40,8 +40,8 @@ passport.deserializeUser(function(id, done) {
 router.get('/login', passport.authenticate('facebook'));
 
 router.get('/callback',
-  passport.authenticate('facebook', { successRedirect: '/game-center',
-                                      failureRedirect: '/users/login' }));
+  passport.authenticate('facebook', { successRedirect: '/',
+                                      failureRedirect: '/' }));
 
 
 router.get('/logout', function(req, res){
