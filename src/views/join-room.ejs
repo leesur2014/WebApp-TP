@@ -1,47 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <% include head %>
-    <title>Game Center</title>
-    <link rel="stylesheet" href="/static/css/navBar.css">
-    <link rel="stylesheet" href="/static/css/game-center.css">
-
-</head>
-<body>
-
-<% include nav-bar %>
-
-<div class="container">
-    <div class="row">
-        <div class="col-0 col-md-3"></div>
-        <div class="col-12 col-md-6">
-            <div id="form_container">
-                <form id="join_room" action="/api/enter">
-                    <div class="form-group">
-                        <label for="room_id">Room ID</label>
-                        <input type="text" name="room_id" class="form-control" id="room_id" aria-describedby="room_id_help" placeholder="Room Id" required>
-                        <small id="room_id_help" class="form-text text-muted">Have fun in our painting room! </small>
-                    </div>
-                    <div class="form-group">
-                        <label for="passcode">Optional Passcode</label>
-                        <input type="text" name ="passcode" class="form-control" id="passcode" placeholder="Passcode">
-                    </div>
-                    <div class="form-check">
-                        <label class="form-check-label">
-                          <input type="checkbox" id="observer" name="observer" class="form-check-input">
-                          Do you want to join as an observer?
-                        </label>
-                    </div>
-                    <button id="game_submit" type="submit" class="btn btn-primary">Join</button>
-                </form>
-
-            </div>
+<div class="modal" tabindex="-1" role="dialog" id="join-room-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Join a room</h3>
+      </div>
+      <form id="join-room-form">
+        <div class="modal-body">
+          <div class="form-group">
+              <label for="room_id">Room ID</label>
+              <input type="text" name="room_id" class="form-control" placeholder="requird" required>
+          </div>
+          <div class="form-group">
+              <label for="passcode">Passcode</label>
+              <input type="text" name ="passcode" class="form-control" placeholder="optional">
+          </div>
+          <div class="form-check">
+            <input type="checkbox" name="observer" id="observer" class="form-check-input">
+            <label class="form-check-label" for="observer">Join as an observer</label>
+          </div>
         </div>
-        <div class="col-0 col-md-3"></div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
     </div>
-
+  </div>
 </div>
-
-<script src="/static/js/join-room.js"></script>
-</body>
-</html>
