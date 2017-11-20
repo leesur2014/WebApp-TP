@@ -1,16 +1,14 @@
 $(function() {
     $.get("/api/me", function(data) {
-        console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
         var token = data.token;
         var nickname = data.nickname;
-        $('.name_container').html(nickname);
+        $('#nickname').text(nickname);
         // display: if the user is in a room
         if (data.room_id != null) {
-            console.log('[INFO] This user is in room' + data.room_id);
-            var link_to_room = 'You are in room ' + data.room_id + ', click <a href = "/room" > here </a> to go back to game room';
-            $('.room_id_container').html(link_to_room);
+            $('#current_room_id').text(data.room_id);
+            $('#room-alert').show();
         }
-        
+
         var socket = io('/lounge?token='+ token);
         socket.on('room_create', function(msg) {
             console.log('[INFO] Created - room Id: ' + msg.room_id);

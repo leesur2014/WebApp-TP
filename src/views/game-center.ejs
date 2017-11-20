@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include head %>
+    <title>Game Center</title>
+    <link rel="stylesheet" href="/static/css/navBar.css">
+    <link rel="stylesheet" href="/static/css/game-center.css">
+</head>
+<body>
+
+<% include nav-bar %>
+
+<div class="container">
+
+  <div class="alert alert-info" role="alert" id="room-alert" hidden="true">
+    <p>You are in <a href = "/room" >room <span id="current_room_id"></span></a></p>
+  </div>
+  <h3>Public Rooms</h3>
+  <div id="roomContainer"></div>
+
+</div>
+
+<% include scripts %>
+<script src="/static/js/game-center.js"></script>
+</body>
+</html>
