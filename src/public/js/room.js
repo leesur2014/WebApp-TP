@@ -290,7 +290,7 @@ function unready() {
 
 
 $('#logout').click(function() {
-    $.post("/api/exit", function(resp) {
+    $.post("/api/exit", {force: false}, function(resp) {
         if (resp.code == 0) {
             location.reload();
         } else {
