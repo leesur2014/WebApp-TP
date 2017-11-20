@@ -60,6 +60,15 @@ app.get('/',function(req,res) {
     }
 });
 
+app.get('/score-board',function(req,res) {
+    if (!req.isAuthenticated())
+    {
+        // if not authenticated, render login view
+        return res.render('index');
+    }
+    return res.render('score-board');
+});
+
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

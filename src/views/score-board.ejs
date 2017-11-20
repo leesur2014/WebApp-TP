@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include head %>
+    <title>Score Board</title>
+</head>
+<body>
+
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">Guess My Drawings</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li><a href="/">Game Center</a></li>
+        <li class="active"><a href="/score-board">Score board</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Nickname</th>
+          <th>Drawing Score</th>
+          <th>Guessing Score</th>
+          <th>Total Score</th>
+        </tr>
+      </thead>
+      <tbody id="rank-table">
+      </tbody>
+    </table>
+  </div>
+
+  <% include scripts %>
+  <script src="/static/js/score-board.js"></script>
+</body>
+</html>
