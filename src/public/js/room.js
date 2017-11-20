@@ -80,7 +80,7 @@ $(function() {
         $.get('/api/round', function(res_round) {
             if(res_round.code == 0) {
                 var img = new Image;
-                console.log('[INFO] Initial canvas image: ' + res_round.data.image);
+//                console.log('[INFO] Initial canvas image: ' + res_round.data.image);
 
                 var img = new Image;
                 img.onload = function() {
@@ -144,6 +144,18 @@ $(function() {
                 ctx.drawImage(img, 0, 0);
             }
             img.src = msg.image;
+        });
+
+        socket.on('user_guess', function(msg) {
+            console.log('[INFO] New guess: ' + JSON.stringify(msg));
+            $.get('/api/user/' + msg.user_id, function(user_data) {
+                $('#msg_container').prepend($('<li/>').addClass('list-group-item list-group-item-info').html('Player [' + user_data.data.nickname + '] guess - ' + msg.correct));
+            });
+        });
+
+        socket.on('count_down', function(msg) {
+            $('#count_down_container').empty();
+            $('#count_down_container').append($('<h2/>').html('Count down: ' + msg.seconds + ' s.'))
         });
     });
 });

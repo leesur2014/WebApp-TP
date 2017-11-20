@@ -5,3 +5,7 @@
 #canvas_container #drawing {
     border: 1px solid;
 }
+
+#msg_container {
+    margin-top: 1em;
+}

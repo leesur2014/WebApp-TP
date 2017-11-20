@@ -5,7 +5,7 @@ var passport = require('passport');
 router.get('/', function(req, res) {
     console.log('[INFO] Is authenticated? ' + req.isAuthenticated());
     if (req.isAuthenticated())
-        res.redirect('/game-center');
+        return res.redirect('/game-center');
     res.render('login');
 });
 
@@ -13,13 +13,13 @@ router.get('/', function(req, res) {
 router.get('/game-center',function(req,res) {
     // if not authenticated, redirect to login page
     if (!req.isAuthenticated())
-        res.redirect('/');
+        return res.redirect('/');
     res.render('gameCenter');
 });
 
 router.get('/change-nickname',function(req,res) {
     if (!req.isAuthenticated())
-        res.redirect('/');
+        return res.redirect('/');
     res.render('change-nickname');
 });
 
