@@ -172,6 +172,7 @@ $(function() {
                 res_table.append(tbody);
 
                 $('#canvas_container').append(res_table);
+                setTimeout(function(){location.href = 'room';}, 10000);
             });
         });
     });
@@ -210,7 +211,7 @@ function is_gaming(round_id) {
                     $('#drawing').mouseup(function() {
                         mouse.click = false;
                         var dataURL = document.getElementById('drawing').toDataURL();
-                        console.log('[INFO] dataURL: ' + dataURL);
+//                        console.log('[INFO] dataURL: ' + dataURL);
                         $.post('/api/draw', {image: dataURL}, function(draw_res) {
                             console.log('[INFO] Response: ' + JSON.stringify(draw_res));
                         })
