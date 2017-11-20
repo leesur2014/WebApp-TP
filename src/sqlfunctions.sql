@@ -84,12 +84,17 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION user_get_current_round(_user_id INT) RETURNS SETOF rounds AS $$
+CREATE OR REPLACE FUNCTION user_get_current_round(_user_id INT) RETURNS rounds AS $$
+DECLARE
+  _round rounds%ROWTYPE;
 BEGIN
-  -- NOTE: if the users.room_id is null, this function will return 0 rows
-  -- because rounds.room_id if not null
-  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = (SELECT id FROM user_get_current_room(_user_id)) LIMIT 1;
-  RETURN;
+  BEGIN
+  SELECT * INTO STRICT _round FROM open_rounds WHERE room_id = (SELECT room_id FROM user_get_by_id(_user_id)) LIMIT 1;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          RAISE EXCEPTION 'user % is not in a round', _user_id;
+  END;
+  RETURN _round;
 END;
 $$ LANGUAGE plpgsql;
 
