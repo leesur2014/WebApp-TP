@@ -110,10 +110,14 @@ function generate_room(room) {
 
 $('#create-room-form').submit(function(event) {
     event.preventDefault();
-    var data = {};
-    data.passcode = $('#passcode').val();
+    var form = event.target;
+    var data = {
+      passcode: form.passcode.value
+    };
+    console.log(data);
     $.post( "/api/room", data, function(resp) {
         if (resp.code == 0) {
+            //room created, jump to room view
             location.href = '/room';
         } else {
             alert('An error occurred: ' + resp.error);
@@ -123,28 +127,37 @@ $('#create-room-form').submit(function(event) {
 
 $('#change-nickname-form').submit(function(event) {
     event.preventDefault();
-    if ($('#nickname').val()) {
-        var parameters = {'nickname': $('#nickname').val()};
-        $.post( "/api/me", parameters, function( data ) {
-            if (data.code == 0) {
+    var form = event.target;
+    var data = {
+      nickname: form.nickname.value
+    };
+    console.log(data);
+    if (data.nickname == '')
+    {
+      alert("Nickname should not be empty");
+    }
+    else
+    {
+        $.post("/api/me", data, function(resp) {
+            if (resp.code == 0) {
                 alert("Success");
             } else {
-                alert('An error occurred: ' + data.error);
+                alert('An error occurred:', resp.error);
             }
         });
-    } else {
-      alert("Nickname should not be empty");
     }
 });
 
 
 $('#join-room-form').submit(function(event) {
     event.preventDefault();
+    var form = event.target;
     var data = {
-      room_id: $('#room_id').val(),
-      passcode: $('#password').val(),
-      observer: $('#observer').is(":checked")
+      room_id: form.room_id.value,
+      passcode: form.passcode.value,
+      observer: form.observer.value
     };
+    console.log(data);
     $.post("/api/enter", data, function(resp) {
       if (resp.code == 0) {
         console.log("redirect user to room page");
