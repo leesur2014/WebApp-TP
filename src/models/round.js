@@ -3,20 +3,6 @@ var io = require('../io');
 
 Round = {};
 
-Round.getInfoByUserId = function (user_id) {
-  return db.proc("user_get_current_round", [user_id])
-    .then(function (round) {
-      if (!round)
-      {
-        return null;
-      }
-      return db.any('SELECT user_id, score FROM round_user WHERE round_id = $1', round.id)
-        .then(function (data) {
-          round.users = data;
-          return round;
-        });
-    });
-};
 
 Round.getInfoById = function (id) {
   return db.proc("round_get_by_id", [id])
