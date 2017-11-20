@@ -9,12 +9,8 @@ $(function() {
             console.log('[INFO] This user is in room' + data.room_id);
             var link_to_room = 'You are in room ' + data.room_id + ', click <a href = "/room" > here </a> to go back to game room';
             $('.room_id_container').html(link_to_room);
-
         }
-        var d = new Date(data.joined_at);
-        console.log('[INFO] join date: ' + d);
-        $('.time_container').html(d);
-        console.log('[INFO]token: ' + token);
+        
         var socket = io('/lounge?token='+ token);
         socket.on('room_create', function(msg) {
             console.log('[INFO] Created - room Id: ' + msg.room_id);
