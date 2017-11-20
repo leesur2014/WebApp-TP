@@ -89,6 +89,7 @@ class User {
 
         if (state)
         {
+          // attempt to start a new round
           return Room.startNewRound(user.room_id);
         }
       })
