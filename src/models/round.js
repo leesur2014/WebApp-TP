@@ -29,8 +29,7 @@ Round.getInfoById = function (id) {
     });
 };
 
-Round.tryToEnd(round_id)
-{
+Round.tryToEnd = function (round_id) {
   db.proc("try_round_end", round_id)
     .then(function (round) {
       console.log("round end: ", round.id);
@@ -42,6 +41,6 @@ Round.tryToEnd(round_id)
       console.log(e);
       // this is not an error
     });
-}
+};
 
 module.exports = Round;
