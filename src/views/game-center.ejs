@@ -24,7 +24,7 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="#" data-toggle="modal" data-target="#change-nickname-modal">Change Nickname</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#profile-modal">Profile</a></li>
             <li><a href="/users/logout">Logout</a></li>
           </ul>
         </li>
@@ -36,10 +36,10 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Room ID</th>
+          <th>ID</th>
           <th># Players</th>
           <th># Observers</th>
-          <th>Actions</th>
+          <th>Enter room as</th>
         </tr>
       </thead>
       <tbody id="room-table">
@@ -48,7 +48,7 @@
   </div>
 
   <% include join-room %>
-  <% include change-nickname %>
+  <% include profile %>
   <% include create-room %>
 
   <% include scripts %>

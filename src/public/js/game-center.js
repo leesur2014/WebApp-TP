@@ -85,8 +85,8 @@ function generate_room(room) {
     td_players.text(room.player_count);
     td_observers.text(room.user_count - room.player_count);
 
-    var join_as_player = $('<button>Enter room as a player</button>');
-    var join_as_observer = $('<button>Enter room as a observer</button>');
+    var join_as_player = $('<button>Player</button>');
+    var join_as_observer = $('<button>Observer</button>');
     join_as_player.addClass("btn btn-primary btn-sm");
     join_as_observer.addClass("btn btn-default btn-sm");
 
