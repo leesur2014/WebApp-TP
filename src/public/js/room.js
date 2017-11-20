@@ -292,7 +292,7 @@ function unready() {
 $('#logout').click(function() {
     $.post("/api/exit", function(resp) {
         if (resp.code == 0) {
-            location.href = '/game-center';
+            location.reload();
         } else {
             var r = confirm("You are in a round. Do you still want to exit?");
             if (r) {
