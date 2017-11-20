@@ -162,6 +162,8 @@ function is_gaming(round_id) {
                     if (data.data.painter_id == my_id) {
                         // 'I' am the painter, am able to paint on Canvas
                         painter_display = $('<h3/>').html('You are the painter! - The answer of this round: <em>' + data.data.answer + '</em>');
+                        // The painter doesn't need a guess form
+                        $('#guess_form').remove();
                     } else {
                         // I could only see the canvas
                         painter_display = $('<h3/>').html('Gaming! - The painter of this round: ' + user_info.data.nickname);
@@ -198,18 +200,19 @@ function is_gaming(round_id) {
     });
 }
 
+$('$guess_form').submit(function(event) {
+    event.preventDefault();
+    // send a guessing request
+    $.post('/api/guess', {submission: $('#guess_input').val()}, function(data) {
+        if (data.code == 0) {
+
+        } else {
+            alert('[ERROR] You cannot guess answer now!');
+        }
+    });
+});
+
 function mainLoop(event) {
-//
-//    var x = event.clientX;
-//    var y = event.clientY;
-//    var coords = "X coords: " + x + ", Y coords: " + y;
-//    console.log('[INFO] Absolute position: ' + event.clientX + ', ' + event.clientY);
-//    console.log('[INFO] canvas position: ' + canvas.offset().left + ', ' + canvas.offset().top);
-//    var mouseX = event.pageX - canvas.offset().left;
-//    var mouseY = event.pageY - canvas.offset().top;
-//    ctx.fillStyle = "orange";
-//    ctx.fillRect(mouseX, mouseY, 30, 30);
-//    console.log('[INFO] The position of mouse: ' + mouseX + ', ' + mouseY);
     // check if the user is drawing
     if (mouse.click && mouse.move && mouse.pos_prev) {
         ctx.beginPath();
