@@ -298,9 +298,9 @@ $('#logout').click(function() {
             if (r) {
                 $.post("/api/exit", {force: true}, function(data) {
                     if (data.code == 0) {
-                        location.href = '/game-center';
+                        location.reload();
                     } else {
-                      alert('An error occurred:' + data.error);
+                      alert('Error:' + data.error);
                     }
                 });
             }
