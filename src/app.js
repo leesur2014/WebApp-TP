@@ -84,3 +84,4 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 http.listen(process.env.PORT || 3000);
+module.exports = app;
