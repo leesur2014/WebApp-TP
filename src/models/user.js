@@ -8,10 +8,18 @@ var io = require('../io');
 class User {
 
   static getById(user_id) {
-    return db.proc("user_get_by_id", [user_id])
+    return db.proc("user_get_by_id", user_id)
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
-        return user;
+        return db.proc('user_get_current_round', user_id)
+          .then(function (round) {
+            user.round_id = round.id
+            return user;
+          })
+          .catch(function(err) {
+            user.round_id = null;
+            return user;
+          });
       });
   }
 
@@ -58,14 +66,20 @@ class User {
     return db.proc('user_exit_room', [user.id, force])
       .then(function () {
         io.room.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
+        if (force)
+        {
+          //attempt to end current round
+          if (user.round_id)
+            Round.tryToEnd(user.round_id);
+        }
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
           .then(function () {
-            console.log("room delete: ", user.room_id);
+            console.log("room", user.room_id, "deleted");
             io.lounge.emit('room_delete', {room_id: user.room_id})
           })
           .catch(function () {
-            // this is not an error
+            // reach here if room cannot be deleted
             io.lounge.emit('room_change', {room_id: user.room_id});
           });
       });
@@ -80,19 +94,10 @@ class User {
 
         if (state)
         {
-          // attempt to start a round
-          db.proc("room_start_round", user.room_id)
-          .then(function (round) {
-            console.log("round start: ", round.id);
-            io.lounge.emit('room_change', {room_id: user.room_id});
-            io.room.to("room_" + user.room_id).emit('round_start', {round_id: round.id});
-          })
-          .catch(function (e) {
-            // this is not an error
-            console.log(e);
-          });
+          // attempt to start a new round
+          return Room.startNewRound(user.room_id);
         }
-      });
+      })
   }
 
   guess(submission) {
@@ -104,25 +109,8 @@ class User {
 
         if (correct)
         {
-            db.proc("user_get_current_round", user.id)
-              .then(function (round) {
-                if (round)
-                {
-                  db.proc("try_round_end", round.id)
-                    .then(function () {
-                      console.log("round end: ", round.id);
-                      io.lounge.emit('room_change', {room_id: user.room_id});
-                      io.room.to("room_" + user.room_id).emit('round_end', {round_id: round.id});
-                    })
-                    .catch(function (e)
-                    {
-                      console.log(e);
-                      // this is not an error
-                    });
-                }
-              })
+          Round.tryToEnd(user.round_id);
         }
-
         return correct;
       });
   }

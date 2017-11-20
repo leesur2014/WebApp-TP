@@ -69,27 +69,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION user_get_current_room(_user_id INT) RETURNS rooms AS $$
-DECLARE
-  _room rooms%ROWTYPE;
-BEGIN
-  BEGIN
-    SELECT * INTO STRICT _room FROM rooms WHERE id = (SELECT room_id FROM user_get_by_id(_user_id));
-  EXCEPTION
-      WHEN NO_DATA_FOUND THEN
-          RAISE EXCEPTION 'user % is not in a room', _user_id;
-  END;
-  RETURN _room;
-END;
-$$ LANGUAGE plpgsql;
-
 
 CREATE OR REPLACE FUNCTION user_get_current_round(_user_id INT) RETURNS SETOF rounds AS $$
 BEGIN
-  -- NOTE: if the users.room_id is null, this function will return 0 rows
-  -- because rounds.room_id if not null
-  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = (SELECT id FROM user_get_current_room(_user_id)) LIMIT 1;
-  RETURN;
+  RETURN QUERY SELECT * FROM open_rounds WHERE room_id = (SELECT room_id FROM user_get_by_id(_user_id)) LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -281,11 +264,19 @@ DECLARE
 BEGIN
   SELECT * INTO _round FROM rounds WHERE id = _round_id;
 
+  IF _round.painter_id NOT IN (SELECT id FROM room_get_players(_round.room_id)) THEN
+    -- painter is not in the room
+    SELECT * INTO STRICT _round FROM round_end(_round_id);
+    RETURN _round;
+  END IF;
+
+
   IF EXISTS ((SELECT id FROM room_get_players(_round.room_id))
     EXCEPT (SELECT painter_id FROM rounds WHERE id = _round_id)
     EXCEPT (SELECT user_id FROM round_user WHERE submission = _round.answer AND round_id = _round_id)) THEN
     RAISE EXCEPTION 'There is still someone who has not got the correct answer';
   ELSE
+    -- all guessers in the room got the correct answer
     SELECT * INTO STRICT _round FROM round_end(_round_id);
   END IF;
 
