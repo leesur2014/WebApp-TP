@@ -42,7 +42,7 @@ app.use('/users', users);
 app.use('/api', api);
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
-router.get('/',function(req,res) {
+app.get('/',function(req,res) {
     if (!req.isAuthenticated())
     {
         // if not authenticated, render login view
