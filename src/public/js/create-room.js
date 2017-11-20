@@ -9,7 +9,7 @@ $('#create-room-form').submit(function(event) {
             //room created, jump to room view
             location.href = '/room';
         } else {
-            alert('An error occurred:', resp.error);
+          alert('An error occurred: ' + resp.error);
         }
     });
 });

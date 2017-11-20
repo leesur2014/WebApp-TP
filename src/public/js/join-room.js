@@ -6,13 +6,11 @@ $('#join-room-form').submit(function(event) {
       passcode: form.passcode.value,
       observer: form.observer.checked
     };
-    // console.log(data);
     $.post("/api/enter", data, function(resp) {
       if (resp.code == 0) {
-        console.log("redirect user to room page");
         location.href = '/room';
       } else {
-        alert('An error occurred:', resp.error);
+        alert('An error occurred: ' + resp.error);
       }
     });
 });

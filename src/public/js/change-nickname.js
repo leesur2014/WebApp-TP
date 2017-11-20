@@ -8,7 +8,7 @@ $('#change-nickname-form').submit(function(event) {
         if (resp.code == 0) {
             location.reload();
         } else {
-            alert('An error occurred:', resp.error);
+            alert('An error occurred: ' + resp.error);
         }
     });
 });
