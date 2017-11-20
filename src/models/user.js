@@ -13,13 +13,12 @@ class User {
         Object.setPrototypeOf(user, User.prototype);
         return db.proc('user_get_current_round', user_id)
           .then(function (round) {
-            user.round_id = round.id
+            if (round == null)
+              user.round_id = null;
+            else
+              user.round_id = round.id;
             return user;
           })
-          .catch(function(err) {
-            user.round_id = null;
-            return user;
-          });
       });
   }
 
