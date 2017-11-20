@@ -298,7 +298,7 @@ $('#logOutButton').click(function() {
             console.log('[ERROR]' + data.error);
             var r = confirm("It seems that you can't exit the room normally for now. Do you still want to exit?");
             if (r == true) {
-                $.post("/api/exit", {force: "No"}, function(data) {
+                $.post("/api/exit", {force: true}, function(data) {
                     console.log('data: ' + JSON.stringify(data));
                     if (data.code == 0) {
                         location.href = '/game-center';
