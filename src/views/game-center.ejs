@@ -12,11 +12,18 @@
 
 <div class="container">
 
-  <div class="alert alert-info" role="alert" id="room-alert" hidden="true">
-    <p>You are in <a href = "/room" >room <span id="current_room_id"></span></a></p>
-  </div>
-  <h3>Public Rooms</h3>
-  <div id="roomContainer"></div>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Room ID</th>
+        <th># Players</th>
+        <th># Observers</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="room-table">
+    </tbody>
+  </table>
 
 </div>
 
