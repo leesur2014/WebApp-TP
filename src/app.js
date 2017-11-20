@@ -3,7 +3,6 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-var bodyParser = require('body-parser');
 var passport = require('passport');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
@@ -34,7 +33,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: false}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -63,8 +62,7 @@ app.get('/',function(req,res) {
 app.get('/score-board',function(req,res) {
     if (!req.isAuthenticated())
     {
-        // if not authenticated, render login view
-        return res.render('index');
+        return res.redirect('/');
     }
     return res.render('score-board');
 });
