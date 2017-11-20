@@ -1,12 +1,11 @@
-$(function() {
+$(document).ready(function() {
     $.get("/api/me", function(data) {
         var token = data.token;
-        var nickname = data.nickname;
-        $('#nickname').text(nickname);
+        $('#nickname').text(data.nickname);
         // display: if the user is in a room
         if (data.room_id != null) {
-            $('#current_room_id').text(data.room_id);
-            $('#room-alert').show();
+            console.log("redirect user to room page");
+            window.location.pathname = '/room';
         }
 
         var socket = io('/lounge?token='+ token);
