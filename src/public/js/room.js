@@ -289,24 +289,20 @@ function unready() {
 }
 
 
-$('#logOutButton').click(function() {
-    $.post( "/api/exit", function( data ) {
-        console.log('data: ' + JSON.stringify(data));
-        if (data.code == 0) {
+$('#logout').click(function() {
+    $.post("/api/exit", function(resp) {
+        if (resp.code == 0) {
             location.href = '/game-center';
         } else {
-            console.log('[ERROR]' + data.error);
-            var r = confirm("It seems that you can't exit the room normally for now. Do you still want to exit?");
-            if (r == true) {
+            var r = confirm("You are in a round. Do you still want to exit?");
+            if (r) {
                 $.post("/api/exit", {force: true}, function(data) {
-                    console.log('data: ' + JSON.stringify(data));
                     if (data.code == 0) {
                         location.href = '/game-center';
-                        alert('[ERROR]' + data.error);
+                    } else {
+                      alert('An error occurred:' + data.error);
                     }
                 });
-            } else {
-                // return to the room, no state change
             }
         }
     });
