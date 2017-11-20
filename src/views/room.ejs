@@ -32,9 +32,16 @@
                 <div id = 'ready_bar'></div>
                 <div id = 'game_ongoing_bar'></div>
                 <div id = 'canvas_container'>
-                    <canvas id = "drawing"></canvas>
+                    <canvas id = "drawing" width = "600" height = "400"></canvas>
                 </div>
+                <form id = 'guess_form'>
+                  <div class="guess_input">
 
+                    <input type="text" class="form-control" id="answer_input" aria-describedby="guess" placeholder="Enter Your Guess">
+                    <small id="answerHelp" class="form-text text-muted">Enter your answer here. We will never share it with other players.</small>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
         </div>
 

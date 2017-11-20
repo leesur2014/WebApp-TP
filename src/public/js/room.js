@@ -1,7 +1,25 @@
+var token;
+var my_id;
+var canvas, ctx;
+var mouse = {
+  click: false,
+  move: false,
+  pos: {x:0, y:0},
+  pos_prev: false
+};
 $(function() {
+    canvas = $('#drawing');
+    ctx = document.getElementById('drawing').getContext('2d');
     // Get an initial list of players & observers
     $.get('/api/room', function(data) {
+
         if (data.code == 0) {
+            // detect if a game is going on
+            if (data.data.round_id != null) {
+                console.log('[INFO] This room is in game.\n');
+                console.log('[INFO] Round ID: ' + data.data.round_id);
+                is_gaming(data.data.round_id);
+            }
              console.log('[INFO] Room info: ' + JSON.stringify(data));
              list_players = [];
              list_observers = [];
@@ -43,6 +61,9 @@ $(function() {
     $.get( "/api/me", function( data ) {
         console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
         console.log('[INFO]nickname: ' + data['nickname']);
+        // set my ID
+        my_id = data['id'];
+
         $('.name_container').html(data.nickname);
 
        // display: if the user is in a room
@@ -64,10 +85,12 @@ $(function() {
             } else {
                 ready();
             }
+        } else {
+            $('#guess_form').remove();
         }
 
 
-        var token = data.token;
+        token = data.token;
 
         console.log('[INFO]token: ' + token);
         var socket = io('/room?token='+ token);
@@ -94,20 +117,86 @@ $(function() {
             $('#' + msg.user_id).remove();
         });
 
+        // listen on 'round_start' event
+        socket.on('round_start', function(msg) {
+            console.log('[INFO] Game start: ' + JSON.stringify(msg));
+            is_gaming(msg.round_id);
+        });
 
+        socket.on('user_draw', function(msg) {
+            console.log('[INFO] New stroke: ' + JSON.stringify(msg));
+        });
     });
 });
 
 function is_gaming(round_id) {
+    // remove the 'ready bar' - as it won't be used in this round any more
+    $('#ready_bar').remove();
     // maintain invariants - display the game states while this round is ongoing
-    $('#game_ongoing_container').empty();
+    $('#game_ongoing_bar').empty();
     $.get('/api/round', function(data) {
         if (data.code == 0) {
-            var painter_display = $('<h2/>').html('Gaming! - The painter of this round: ' + '');
+            // get the name of user (for visualization)
+            $.get('/api/user/' + data.data.painter_id, function(user_info) {
+                if (user_info.code == 0) {
+                    var painter_display;
+                    if (data.data.painter_id == my_id) {
+                        // 'I' am the painter, am able to paint on Canvas
+                        painter_display = $('<h3/>').html('You are the painter! - The answer of this round: <em>' + data.data.answer + '</em>');
+                    } else {
+                        // I could only see the canvas
+                        painter_display = $('<h3/>').html('Gaming! - The painter of this round: ' + user_info.data.nickname);
+                    }
+                    $('#game_ongoing_bar').append(painter_display);
+
+                    $('#drawing').mousemove(function(event) {
+                        mouse.pos.x = event.pageX - canvas.offset().left;
+                        mouse.pos.y = event.pageY - canvas.offset().top;
+                        mouse.move = true;
+                    });
+                    $('#drawing').mousedown(function() {
+                        mouse.click = true;
+                    });
+                    $('#drawing').mouseup(function() {
+                        mouse.click = false;
+
+                    });
+                    mainLoop();
+
+                } else {
+                    alert('[ERROR] Cannot get the painter information');
+                }
+            });
+
         } else {
-            alert('[ERROR] Cannot get the painter information');
+            alert('[ERROR] Cannot get the round information');
         }
     });
+}
+
+function mainLoop(event) {
+//
+//    var x = event.clientX;
+//    var y = event.clientY;
+//    var coords = "X coords: " + x + ", Y coords: " + y;
+//    console.log('[INFO] Absolute position: ' + event.clientX + ', ' + event.clientY);
+//    console.log('[INFO] canvas position: ' + canvas.offset().left + ', ' + canvas.offset().top);
+//    var mouseX = event.pageX - canvas.offset().left;
+//    var mouseY = event.pageY - canvas.offset().top;
+//    ctx.fillStyle = "orange";
+//    ctx.fillRect(mouseX, mouseY, 30, 30);
+//    console.log('[INFO] The position of mouse: ' + mouseX + ', ' + mouseY);
+    // check if the user is drawing
+    if (mouse.click && mouse.move && mouse.pos_prev) {
+        ctx.beginPath();
+        ctx.moveTo(mouse.pos_prev.x, mouse.pos_prev.y);
+        ctx.lineTo(mouse.pos.x, mouse.pos.y);
+        ctx.stroke();
+//        console.log('[INFO] Mouse info: ' + JSON.stringify(mouse));
+        mouse.move = false;
+    }
+    mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
+    setTimeout(mainLoop, 25);
 }
 
 // set the button to 'ready' state
