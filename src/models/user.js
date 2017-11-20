@@ -10,15 +10,14 @@ class User {
   static getById(user_id) {
     return db.proc("user_get_by_id", user_id)
       .then(function (user) {
+        Object.setPrototypeOf(user, User.prototype);
         return db.proc('user_get_current_round', user_id)
           .then(function (round) {
-            if (round)
-            {
-              user.round_id = round.id
-            } else {
-              user.round_id = null;
-            }
-            Object.setPrototypeOf(user, User.prototype);
+            user.round_id = round.id
+            return user;
+          })
+          .catch(function(err) {
+            user.round_id = null;
             return user;
           });
       });
