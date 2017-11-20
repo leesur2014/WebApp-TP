@@ -6,7 +6,7 @@ $('#change-nickname-form').submit(function(event) {
     console.log(data);
     $.post("/api/me", data, function(resp) {
         if (resp.code == 0) {
-            alert("Success");
+            location.reload();
         } else {
             alert('An error occurred:', resp.error);
         }
