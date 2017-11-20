@@ -9,7 +9,7 @@ $(document).ready(function() {
         }
 
         var socket = io('/lounge?token=' + user.token);
-        var rooms = [];
+        var rooms = []; // map room id to jquery elements
 
         socket.on('room_create', function(msg) {
             var room_id = msg.room_id;
