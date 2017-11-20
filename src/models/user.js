@@ -8,10 +8,19 @@ var io = require('../io');
 class User {
 
   static getById(user_id) {
-    return db.proc("user_get_by_id", [user_id])
+    return db.proc("user_get_by_id", user_id)
       .then(function (user) {
-        Object.setPrototypeOf(user, User.prototype);
-        return user;
+        return db.proc('user_get_current_round', user_id)
+          .then(function (round) {
+            if (round)
+            {
+              user.round_id = round.id
+            } else {
+              user.round_id = null;
+            }
+            Object.setPrototypeOf(user, User.prototype);
+            return user;
+          });
       });
   }
 
@@ -61,11 +70,8 @@ class User {
         if (force)
         {
           //attempt to end current round
-          db.proc("user_get_current_round", user.id)
-            .then(function (round) {
-              if (round)
-                Round.tryToEnd(round.id);
-            });
+          if (user.round_id)
+            Round.tryToEnd(user.round_id);
         }
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
@@ -104,15 +110,8 @@ class User {
 
         if (correct)
         {
-            db.proc("user_get_current_round", user.id)
-              .then(function (round) {
-                if (round)
-                {
-                  Round.tryToEnd(round.id);
-                }
-              });
+          Round.tryToEnd(user.round_id);
         }
-
         return correct;
       });
   }
