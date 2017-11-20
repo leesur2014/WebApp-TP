@@ -81,16 +81,13 @@ router.get('/user/:id(\\d+)', function(req, res) {
 router.get('/round/:id(\\d+)', function(req, res) {
   Round.getInfoById(req.params.id)
     .then(function (round) {
-      if (round.painter_id == req.user.id)
-      {
-        send_data(res, round);
-        return;
-      }
-
       if (round.ended_at === null)
       {
-        // do not display answer for ongoing rounds
-        round.answer = '******';
+        return send_error(res, "round has not ended");
+      }
+      if (round.painter_id == req.user.id)
+      {
+        return send_data(res, round);
       }
       for (var i = 0; i < round.users.length; i++)
       {
@@ -108,22 +105,24 @@ router.get('/round/:id(\\d+)', function(req, res) {
 });
 
 router.get('/round', function(req, res) {
-  Round.getInfoByUserId(req.user.id)
-    .then(function (round) {
-      if (round == null)
+  if (req.user.round_id)
+  {
+    Round.getInfoById(req.user.round_id)
+      .then(function (round) {
+        if (round.painter_id != req.user.id)
+        {
+          delete round.answer;
+        }
+        return send_data(res, round);
+      })
+      .catch(function (err)
       {
-        send_error(res, "You are not in a round");
-      }
-      if (round.painter_id != req.user.id)
-      {
-        round.answer = "********"
-      }
-      return send_data(res, round);
-    })
-    .catch(function (err)
-    {
-      return send_error(res, err);
-    });
+        return send_error(res, err);
+      });
+  } else {
+    return send_error(res, "You are not in a round");
+  }
+
 });
 
 
