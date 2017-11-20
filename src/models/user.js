@@ -1,3 +1,4 @@
+var debug = require('debug')('user');
 var db = require('../db');
 var Room = require('./room');
 var randomstring = require('randomstring');
@@ -27,6 +28,7 @@ class User {
     return db.proc("user_login", [fb_id, displayName, token])
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
+        debug("user", user.id, "logged in");
         io.lounge.emit('user_login', {user_id: user.id});
         return user;
       });
@@ -34,6 +36,7 @@ class User {
 
   logout() {
     io.lounge.emit('user_logout', {user_id: this.id});
+    debug("user", user.id, "logging out");
     return db.proc('user_logout', this.id);
   }
 
@@ -44,6 +47,7 @@ class User {
   createRoom(passcode = '') {
     return db.proc('user_create_room', [this.id, passcode])
       .then(function (room) {
+        debug("room", room.id, "created");
         io.lounge.emit('room_create', {room_id: room.id});
         return room;
       });
@@ -52,8 +56,13 @@ class User {
 
   enterRoom(room_id, passcode = '', observer = false) {
     var user = this;
+    if (user.room_id != null)
+    {
+      throw Error("You are in room " + user.room_id);
+    }
     return db.proc('user_enter_room', [this.id, room_id, passcode, observer])
       .then(function () {
+        debug("user", user.id, "entered room", room_id);
         io.room.to('room_' + room_id).emit('user_enter', {user_id: user.id});
         io.lounge.emit('room_change', {room_id: room_id});
       });
@@ -62,9 +71,14 @@ class User {
 
   exitRoom(force = false) {
     var user = this;
+    if (user.room_id == null)
+    {
+      throw Error("You are not in a room");
+    }
     return db.proc('user_exit_room', [user.id, force])
       .then(function () {
         io.room.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
+        debug("user", user.id, "exited room", user.room_id);
         if (user.round_id)
         {
           //attempt to end current round
@@ -73,7 +87,7 @@ class User {
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
           .then(function () {
-            console.log("room", user.room_id, "deleted");
+            debug("room", user.room_id, "deleted");
             io.lounge.emit('room_delete', {room_id: user.room_id})
           })
           .catch(function () {

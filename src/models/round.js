@@ -1,3 +1,4 @@
+var debug = require('debug')('round');
 var db = require('../db');
 var io = require('../io');
 
@@ -18,13 +19,13 @@ Round.getInfoById = function (id) {
 Round.tryToEnd = function (round_id) {
   db.proc("try_round_end", round_id)
     .then(function (round) {
-      console.log("round end: ", round.id);
+      debug("round end: ", round.id);
       io.lounge.emit('room_change', {room_id: round.room_id});
       io.room.to("room_" + round.room_id).emit('round_end', {round_id: round.id});
     })
     .catch(function (e)
     {
-      console.log(e);
+      debug(e);
       // this is not an error
     });
 };
@@ -45,7 +46,7 @@ Round.tryToStart = function (room_id) {
             if (seconds <= 0)
             {
               // timeout, end this round
-              console.log("round", round.id, "timed out");
+              debug("round", round.id, "timed out");
               clearInterval(timer);
               db.proc('round_end', round.id)
                 .then(function() {
@@ -56,14 +57,14 @@ Round.tryToStart = function (room_id) {
                   // this is not an error
                 });
             } else {
-              console.log("round", round.id, "has", seconds, "left");
+              debug("round", round.id, "has", seconds, "left");
               io.room.to('room_' + room_id).emit('count_down', {seconds: seconds});
             }
           })
           .catch(function(e) {
             // reach here if the round is already ended
             // or an error happens
-            console.log(e);
+            debug(e);
             clearInterval(timer);
           });
       }, 1000);
