@@ -200,7 +200,7 @@ function is_gaming(round_id) {
     });
 }
 
-$('$guess_form').submit(function(event) {
+$('#guess_form').submit(function(event) {
     event.preventDefault();
     // send a guessing request
     $.post('/api/guess', {submission: $('#guess_input').val()}, function(data) {
