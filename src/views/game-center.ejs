@@ -7,26 +7,29 @@
 </head>
 <body>
 
-<% include nav-bar %>
+  <% include nav-bar %>
 
-<div class="container">
+  <div class="container">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Room ID</th>
+          <th># Players</th>
+          <th># Observers</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="room-table">
+      </tbody>
+    </table>
+  </div>
 
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Room ID</th>
-        <th># Players</th>
-        <th># Observers</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="room-table">
-    </tbody>
-  </table>
+  <% include join-room %>
 
-</div>
-
-<% include scripts %>
-<script src="/static/js/game-center.js"></script>
+  <% include scripts %>
+  <script src="/static/js/game-center.js"></script>
+  <script src="/static/js/join-room.js"></script>
+  <script src="/static/js/create-room.js"></script>
+  <script src="/static/js/change-nickname.js"></script>
 </body>
 </html>
