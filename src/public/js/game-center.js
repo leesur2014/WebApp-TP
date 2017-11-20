@@ -54,33 +54,57 @@ $(document).ready(function() {
     });
 });
 
-function generate_room(entry) {
-    var room = $('<tr>');
+function enter_public_room(room_id, observer) {
+  var data = {
+    room_id: room_id,
+    observer: observer,
+    passcode: ""
+  };
+  $.post('/api/enter', data, function(resp) {
+    if (resp.code == 0) {
+      window.location.href = "/room";
+    } else {
+      alert("An error occurred:", resp.error);
+    }
+  });
+}
+
+function generate_room(room) {
+    var row = $('<tr>');
     var td_id = $('<td>');
     var td_players = $('<td>');
     var td_observers = $('<td>');
     var td_actions = $('<td>');
 
-    td_id.text(entry.id);
-    td_players.text(entry.player_count);
-    td_observers.text(entry.user_count - entry.player_count);
+    td_id.text(room.id);
+    td_players.text(room.player_count);
+    td_observers.text(room.user_count - room.player_count);
 
     var join_as_player = $('<button>Join as player</button>');
     var join_as_observer = $('<button>Join as observer</button>');
     join_as_player.addClass("btn btn-primary btn-sm");
     join_as_observer.addClass("btn btn-success btn-sm");
 
-    if (entry.round_id == null)
+    join_as_player.click(function () {
+      enter_public_room(room.id, false);
+    });
+
+    join_as_observer.click(function () {
+      enter_public_room(room.id, true);
+    });
+
+    if (room.round_id == null)
     {
+      // there is no round in this room
       td_actions.append(join_as_player);
     }
     td_actions.append(join_as_observer);
 
-    room.append(td_id);
-    room.append(td_players);
-    room.append(td_observers);
-    room.append(td_actions);
-    return room;
+    row.append(td_id);
+    row.append(td_players);
+    row.append(td_observers);
+    row.append(td_actions);
+    return row;
 }
 
 
