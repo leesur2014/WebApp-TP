@@ -38,11 +38,11 @@ router.use('/', function (req, res, next) {
 router.get('/lounge', function(req, res) {
   db.any("SELECT * FROM public_rooms")
     .then(function (data) {
-      send_data(res, data);
+      return send_data(res, data);
     })
     .catch(function (err)
     {
-      send_error(res, err);
+      return send_error(res, err);
     });
 });
 
@@ -56,7 +56,7 @@ router.post('/me', function(req, res) {
   {
     req.user.setNickname(validator.escape(req.body.nickname))
       .then(function (user) {
-        send_data(res, user);
+        return send_data(res, user);
       });
   }
   else {
@@ -70,11 +70,11 @@ router.get('/user/:id(\\d+)', function(req, res) {
       delete user.fb_id;
       delete user.token;
       delete user.room_id;
-      send_data(res, user);
+      return send_data(res, user);
     })
     .catch(function (err)
     {
-      send_error(res, err);
+      return send_error(res, err);
     });
 });
 
@@ -96,15 +96,14 @@ router.get('/round/:id(\\d+)', function(req, res) {
       {
         if(round.users[i].user_id == req.user.id)
         {
-          send_data(res, round);
-          return;
+          return send_data(res, round);
         }
       }
-      send_error(res, "Access denied");
+      return send_error(res, "Access denied");
     })
     .catch(function (err)
     {
-      send_error(res, err);
+      return send_error(res, err);
     });
 });
 
@@ -119,11 +118,11 @@ router.get('/round', function(req, res) {
       {
         round.answer = "********"
       }
-      send_data(res, round);
+      return send_data(res, round);
     })
     .catch(function (err)
     {
-      send_error(res, err);
+      return send_error(res, err);
     });
 });
 
@@ -131,10 +130,10 @@ router.get('/round', function(req, res) {
 router.get('/room/:id(\\d+)', function (req, res) {
   Room.getPublicRoomById(req.params.id)
     .then(function (data) {
-      send_data(res, data);
+      return send_data(res, data);
     })
     .catch(function (err) {
-      send_error(res, err);
+      return send_error(res, err);
     });
 });
 
@@ -143,15 +142,15 @@ router.get('/room', function(req, res) {
   {
     Room.getInfoById(req.user.room_id)
       .then(function (data) {
-        send_data(res, data);
+        return send_data(res, data);
       })
       .catch(function (err)
       {
-        send_error(res, err);
+        return send_error(res, err);
       });
   }
   else {
-    send_error(res, "You are not in a room");
+    return send_error(res, "You are not in a room");
   }
 });
 
@@ -160,10 +159,10 @@ router.get('/room', function(req, res) {
 router.post('/room', function(req, res) {
   req.user.createRoom(req.body.passcode || '')
     .then(function (room) {
-      send_data(res, room);
+      return send_data(res, room);
     })
     .catch(function (err) {
-      send_error(res, err);
+      return send_error(res, err);
     });
 });
 
@@ -221,10 +220,10 @@ router.post('/ready', function(req, res) {
   }
   req.user.setReady(req.body.ready == 'true')
     .then(function () {
-      send_data(res, req.body.ready == 'true');
+      return send_data(res, req.body.ready == 'true');
     })
     .catch(function (err) {
-      send_error(res, err);
+      return send_error(res, err);
     });
 })
 
