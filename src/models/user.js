@@ -58,6 +58,15 @@ class User {
     return db.proc('user_exit_room', [user.id, force])
       .then(function () {
         io.room.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
+        if (force)
+        {
+          //attempt to end current round
+          db.proc("user_get_current_round", user.id)
+            .then(function (round) {
+              if (round)
+                Round.tryToEnd(round.id);
+            });
+        }
         // attempt to delete this room
         db.proc('room_delete', user.room_id)
           .then(function () {
@@ -98,19 +107,9 @@ class User {
               .then(function (round) {
                 if (round)
                 {
-                  db.proc("try_round_end", round.id)
-                    .then(function () {
-                      console.log("round end: ", round.id);
-                      io.lounge.emit('room_change', {room_id: user.room_id});
-                      io.room.to("room_" + user.room_id).emit('round_end', {round_id: round.id});
-                    })
-                    .catch(function (e)
-                    {
-                      console.log(e);
-                      // this is not an error
-                    });
+                  Round.tryToEnd(round.id);
                 }
-              })
+              });
         }
 
         return correct;
