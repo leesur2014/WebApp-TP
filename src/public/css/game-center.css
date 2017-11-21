@@ -1,8 +1,5 @@
-body {
-  padding-top: 70px;
-}
-
-.container {
+.rooms_container {
+    position: relative;
     margin-top: 1em;
 }
 

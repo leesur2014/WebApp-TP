@@ -6,34 +6,9 @@
     <title>Game Center</title>
 </head>
 <body>
+    <% include nav-bar %>
 
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="/">Guess My Drawings</a>
-      </div>
-      <ul class="nav navbar-nav">
-        <li><a href="#" data-toggle="modal" data-target="#create-room-modal">Create Room</a></li>
-        <li><a href="#" data-toggle="modal" data-target="#join-room-modal">Join Room</a></li>
-        <li><a href="/score-board">Scoreboard</a></li>
-      </ul>
-
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            <span id='nickname'></span>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="#" data-toggle="modal" data-target="#profile-modal">Profile</a></li>
-            <li><a href="/users/logout">Logout</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </nav>
-
-  <div class="container">
+  <div class="rooms_container">
     <table class="table table-hover">
       <thead>
         <tr>
