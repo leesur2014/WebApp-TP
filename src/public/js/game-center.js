@@ -4,7 +4,7 @@ $(function() {
         $('#nickname').text(user.nickname);
 
         if (user.room_id != null) {
-            console.log("redirect user to room page");
+            console.log("[INFO]redirect user to room page");
             window.location.pathname = '/room';
         }
 
