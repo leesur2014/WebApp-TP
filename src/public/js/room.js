@@ -64,17 +64,6 @@ $(function() {
 
         $('.name_container').html(data.nickname);
 
-       // display: if the user is in a room
-        if (data.room_id) {
-            console.log('[INFO] This user is in room' + data.room_id);
-            var room_display = 'This is room ' + data.room_id;
-            $('.room_id_container').html(room_display);
-        } else {
-            alert("Your are not in any room!\n Now you will be redirected to game center");
-            location.href = '/';
-        }
-
-
         // initialize the ready_bar to indicate whether I am ready
         console.log('Is observer? ' + (data.observer == false));
         console.log('Is ready? ' + (data.ready == false));
