@@ -15,7 +15,7 @@ $(function() {
             var room_id = msg.room_id;
             $.get('/api/room/' + room_id, function(resp) {
                 rooms[room_id] = generate_room(resp.data);
-                $('#room-table').prepend(rooms[room_id]);
+                $('#room-container').prepend(rooms[room_id]);
                 console.log("added room", room_id);
             });
         });
@@ -49,8 +49,10 @@ $(function() {
         $.get('/api/lounge', function(resp) {
             for (var i = 0; i < resp.data.length; ++i)
             {
+                console.log('[INFO]room: ' + JSON.stringify(resp.data[i]));
                 var room = rooms[resp.data[i].id] = generate_room(resp.data[i]);
-                $('#room-table').prepend(room);
+                console.log('[INFO]room: ' + JSON.stringify(room));
+                $('#room-container').prepend(room);
             }
         })
         .fail(function() {
@@ -67,7 +69,7 @@ function enter_public_room(room_id, observer) {
   };
   $.post('/api/enter', data, function(resp) {
       if (resp.code == 0) {
-          location.reload()
+          location.reload();
       } else {
           alert("An error occurred: " + resp.error);
       }
@@ -75,20 +77,17 @@ function enter_public_room(room_id, observer) {
 }
 
 function generate_room(room) {
-    var row = $('<tr>');
-    var td_id = $('<td>');
-    var td_players = $('<td>');
-    var td_observers = $('<td>');
-    var td_actions = $('<td>');
-
+    var row = $('<div/>');
+    var td_id = $('<div/>').addClass('panel-heading');
+    var panel_body = $('<div/>').addClass('panel-body');
     td_id.text(room.id);
-    td_players.text(room.player_count);
-    td_observers.text(room.user_count - room.player_count);
 
-    var join_as_player = $('<button>Player</button>');
-    var join_as_observer = $('<button>Observer</button>');
-    join_as_player.addClass("btn btn-primary btn-sm");
-    join_as_observer.addClass("btn btn-default btn-sm");
+    var btn_player = $('<div/>').text(room.player_count);
+    var btn_observer = $('<div/>').text(room.user_count - room.player_count);
+
+    var join_as_player = $('<button/>').html('player').addClass('btn btn-success btn-sm');
+    var join_as_observer = $('<button/>').html('observer').addClass('btn btn-default btn-sm');
+    var join_actions = $('<div/>').addClass('btn-group btn-group-sm');
 
     join_as_player.click(function () {
         enter_public_room(room.id, false);
@@ -100,14 +99,19 @@ function generate_room(room) {
 
     if (room.round_id == null)
     {
-        // there is no round in this room
-        td_actions.append(join_as_player);
+        // there is no round in this room, you can join as a player OR observer
+        row.addClass('panel panel-success');
+        join_actions.append(join_as_player);
+    } else {
+        // You can only join as an observer
+        row.addClass('panel panel-default');
     }
-    td_actions.append(join_as_observer);
+    join_actions.append(join_as_observer);
 
     row.append(td_id);
-    row.append(td_players);
-    row.append(td_observers);
-    row.append(td_actions);
+    panel_body.append(btn_player);
+    panel_body.append(btn_observer);
+    panel_body.append(join_actions);
+    row.append(panel_body);
     return row;
 }
