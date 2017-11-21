@@ -7,7 +7,7 @@ def main():
         for row in reader:
             # print('Number of elements:', len(row))
             # append all nouns
-            if 'n' in row[1] and row[0] not in my_words:
+            if 'n.' in row[1] and not 'pron.' in row[1] and row[0] not in my_words:
                 my_words.append((row[0]))
 
     print("'), ('".join(my_words))
