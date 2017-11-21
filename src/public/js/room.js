@@ -11,7 +11,9 @@ var mouse = {
 $(function() {
     canvas = $('#drawing');
     ctx = document.getElementById('drawing').getContext('2d');
-    // Get an initial list of players & observers
+    // map user id to jquery elements
+    var players = [];
+    var observers = [];
     $.get('/api/room', function(data) {
 
         if (data.code == 0) {
@@ -22,8 +24,7 @@ $(function() {
                 is_gaming(data.data.round_id);
             }
              console.log('[INFO] Room info: ' + JSON.stringify(data));
-             list_players = [];
-             list_observers = [];
+
              var users = data.data.users;
              /* list all players and observers in this room */
              for (var i = 0; i < users.length; ++i) {
