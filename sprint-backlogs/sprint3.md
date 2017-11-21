@@ -1,4 +1,4 @@
-Sprint 2 Backlog
+Sprint 3 Backlog
 ==================
 
 #### Current Product Owner: Peipei Li
@@ -26,7 +26,7 @@ Related Feature No. | Title | Est. Hours | Assignment
 all | complete API for score board | 1 | Hancheng
 all | deal with offline users in back end | 4 | Hancheng
 all | Slides | 4 | Hancheng
-1 | Expand guessing words dictionary | 2 | Peipei
+1 | Cleaning nouns data and update testdata| 2 | Xuhui
 2 | UI Improvements | 3 | Peipei
 3 | Add canvas features | 4 | Xuhui
 4 | Scoreboard display | 3 | Peipei Li
