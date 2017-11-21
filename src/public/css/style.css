@@ -1,4 +1,10 @@
+body {
+  min-height: 2000px;
+  padding-top: 70px;
+}
+
 .modal-backdrop
 {
     opacity:0.6 !important;
 }
+
