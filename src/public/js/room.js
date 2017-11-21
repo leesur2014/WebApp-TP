@@ -8,12 +8,16 @@ var mouse = {
   pos_prev: false
 };
 
+// map user id to jquery elements
+var players = [];
+var observers = [];
+var players_container = $('#side_bar #players_container ul');
+var observers_container = $('#side_bar #observers_container ul');
+
 $(function() {
     canvas = $('#drawing');
     ctx = document.getElementById('drawing').getContext('2d');
-    // map user id to jquery elements
-    var players = [];
-    var observers = [];
+
     $.get('/api/room', function(data) {
 
         if (data.code == 0) {
@@ -28,33 +32,16 @@ $(function() {
              var users = data.data.users;
              /* list all players and observers in this room */
              for (var i = 0; i < users.length; ++i) {
-                if (users[i].observer == false) {
-                    list_players.push(users[i]);
+                var this_element = generate_gamer(users[i]);
+                console.log('[INFO] Gamer info: ' + JSON.stringify(this_element));
+                if (users[i].observer) {
+                    players[i] = this_element;
+                    observers_container.append(this_element);
                 } else {
-                    list_observers.push(users[i]);
+                    observers[i] = this_element;
+                    players_container.append(this_element);
                 }
              }
-
-             if (list_players.length > 0) {
-
-                var dom_players = $('<ul/>').addClass('list-group');
-                for (var i in list_players) {
-                    var this_player_entry = $('<li/>').html(list_players[i].nickname).attr('id', list_players[i].id).addClass("list-group-item list-group-item-action list-group-item-success");
-                    dom_players.append(this_player_entry);
-                }
-
-                $('#side_bar .players_container').append(dom_players);
-             }
-
-              if (list_observers.length > 0) {
-
-                 var dom_obs= $('<ul/>').addClass('list-group');
-                 for (var i in list_observers) {
-                    var this_observer_entry = $('<li/>').html(list_observers[i].nickname).attr('id', list_observers[i].id).addClass("list-group-item list-group-item-action");
-                     dom_obs.append(this_observer_entry);
-                 }
-                 $('#side_bar .observers_container').append(dom_obs);
-              }
         } else {
             alert('[ERROR] Cannot get this room information');
         }
@@ -243,6 +230,18 @@ $('#guess_form').submit(function(event) {
         }
     });
 });
+
+function generate_gamer(gamer_info) {
+    var res = $('<li/>').html(gamer_info.nickname).attr('id', gamer_info.id);
+    // display different layouts for observer OR player
+    if (gamer_info.observer) {
+        res.addClass("list-group-item list-group-item-action");
+    } else {
+        res.addClass("list-group-item list-group-item-action list-group-item-success");
+    }
+
+    return res;
+}
 
 function mainLoop(event) {
     // check if the user is drawing
