@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
     $.get("/api/me", function(user) {
 
         $('#nickname').text(user.nickname);
