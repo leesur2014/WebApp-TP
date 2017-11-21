@@ -7,6 +7,7 @@ var mouse = {
   pos: {x:0, y:0},
   pos_prev: false
 };
+
 $(function() {
     canvas = $('#drawing');
     ctx = document.getElementById('drawing').getContext('2d');
@@ -253,7 +254,7 @@ function mainLoop(event) {
         mouse.move = false;
     }
     mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
-    setTimeout(mainLoop, 100);
+    setTimeout(mainLoop, 25);
 }
 
 // set the button to 'ready' state
