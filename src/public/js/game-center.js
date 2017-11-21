@@ -88,6 +88,7 @@ function generate_room(room) {
     var join_as_player = $('<button/>').html('player').addClass('btn btn-success btn-sm');
     var join_as_observer = $('<button/>').html('observer').addClass('btn btn-default btn-sm');
     var join_actions = $('<div/>').addClass('btn-group btn-group-sm');
+    var panel_foot = $('<div/>').addClass('panel-footer').html('Join as a: &nbsp;');
 
     join_as_player.click(function () {
         enter_public_room(room.id, false);
@@ -111,7 +112,8 @@ function generate_room(room) {
     row.append(panel_head);
     panel_body.append(btn_player);
     panel_body.append(btn_observer);
-    panel_body.append(join_actions);
     row.append(panel_body);
+    panel_foot.append(join_actions);
+    row.append(panel_foot);
     return row;
 }

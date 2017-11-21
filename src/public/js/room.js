@@ -172,7 +172,7 @@ $(function() {
                 res_table.append(tbody);
 
                 $('#canvas_container').append(res_table);
-                setTimeout(function(){location.href = 'room';}, 10000);
+                setTimeout(function(){location.href = '/';}, 10000);
             });
         });
     });

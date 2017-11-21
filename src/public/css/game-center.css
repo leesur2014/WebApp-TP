@@ -3,6 +3,10 @@ body {
     padding: 70px;
 }
 
+.panel {
+    max-width: 300px;
+}
+
 .modal-backdrop
 {
     opacity:0.6 !important;
