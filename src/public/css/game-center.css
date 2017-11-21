@@ -1,6 +1,6 @@
-.rooms_container {
-    position: relative;
-    margin-top: 1em;
+body {
+    min-height: 1000px;
+    padding: 70px;
 }
 
 .modal-backdrop
