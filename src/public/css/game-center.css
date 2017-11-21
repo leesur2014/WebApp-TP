@@ -1,0 +1,13 @@
+body {
+  padding-top: 70px;
+}
+
+.container {
+    margin-top: 1em;
+}
+
+.modal-backdrop
+{
+    opacity:0.6 !important;
+}
+
