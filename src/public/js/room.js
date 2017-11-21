@@ -45,6 +45,17 @@ $(function() {
         }
     });
 
+    // get those initial strokes
+    $.get('/api/round', function(res_round) {
+        if(res_round.code == 0) {
+            var img = new Image;
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            }
+            img.src = res_round.data.image;
+        }
+    });
+
     $.get( "/api/me", function( data ) {
         console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
         console.log('[INFO]nickname: ' + data['nickname']);
@@ -63,48 +74,37 @@ $(function() {
             location.href = '/';
         }
 
-        // get those initial strokes
-        $.get('/api/round', function(res_round) {
-            if(res_round.code == 0) {
-                var img = new Image;
-//                console.log('[INFO] Initial canvas image: ' + res_round.data.image);
-
-                var img = new Image;
-                img.onload = function() {
-                    ctx.drawImage(img, 0, 0);
-                }
-                img.src = res_round.data.image;
-            }
-        });
 
         // initialize the ready_bar to indicate whether I am ready
         console.log('Is observer? ' + (data.observer == false));
         console.log('Is ready? ' + (data.ready == false));
-        if (data.observer == false) {
-            if (data.ready == false) {
+        if (!data.observer) {
+            if (!data.ready) {
                 unready();
             } else {
                 ready();
             }
         } else {
+            // an observer doesn't need an guess input
             $('#guess_form').remove();
         }
 
 
         token = data.token;
-
-        console.log('[INFO]token: ' + token);
         var socket = io('/room?token='+ token);
+
         // Listen events: If a user enter or exit this room, update the page in real-time
         socket.on('user_enter', function(msg) {
-
             console.log('[INFO] User enter: ' + JSON.stringify(msg));
             $.get('/api/user/' + msg.user_id, function(data) {
                 if (data.code == 0) {
-                    if (data.data.observer == false) {
-                        $('#side_bar .players_container ul').append($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action list-group-item-success"));
+                    var this_element = generate_gamer(data.data);
+                    console.log('[INFO] User enter: ' + JSON.stringify(this_element));
+                    people[data.data.id] = this_element;
+                    if (!data.data.observer) {
+                        players_container.append(this_element);
                     } else {
-                        $('#side_bar .observers_container ul').append($('<li/>').html(data.data.nickname).attr('id', data.data.id).addClass("list-group-item list-group-item-action"));
+                        observers_container.append(this_element);
                     }
                 } else {
                     alert('[ERROR] Cannot get the user info');
