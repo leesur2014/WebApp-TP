@@ -4,8 +4,11 @@ body {
 }
 
 .panel {
-    max-width: 300px;
+    max-width: 40em;
+    margin: 2em;
     text-align: center;
+    display: inline-block;
+
 }
 
 .modal-backdrop
