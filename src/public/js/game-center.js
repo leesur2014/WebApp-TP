@@ -78,12 +78,12 @@ function enter_public_room(room_id, observer) {
 
 function generate_room(room) {
     var row = $('<div/>');
-    var td_id = $('<div/>').addClass('panel-heading');
+    var panel_head = $('<div/>').addClass('panel-heading');
     var panel_body = $('<div/>').addClass('panel-body');
-    td_id.text(room.id);
+    panel_head.html('Room ' + room.id);
 
-    var btn_player = $('<div/>').text(room.player_count);
-    var btn_observer = $('<div/>').text(room.user_count - room.player_count);
+    var btn_player = $('<div/>').html('Players: ' + room.player_count);
+    var btn_observer = $('<div/>').html('Observers: ' + (room.user_count - room.player_count));
 
     var join_as_player = $('<button/>').html('player').addClass('btn btn-success btn-sm');
     var join_as_observer = $('<button/>').html('observer').addClass('btn btn-default btn-sm');
@@ -108,7 +108,7 @@ function generate_room(room) {
     }
     join_actions.append(join_as_observer);
 
-    row.append(td_id);
+    row.append(panel_head);
     panel_body.append(btn_player);
     panel_body.append(btn_observer);
     panel_body.append(join_actions);
