@@ -9,8 +9,7 @@ var mouse = {
 };
 
 // map user id to jquery elements
-var players = [];
-var observers = [];
+var people = [];
 var players_container = $('#side_bar #players_container ul');
 var observers_container = $('#side_bar #observers_container ul');
 
@@ -33,12 +32,11 @@ $(function() {
              /* list all players and observers in this room */
              for (var i = 0; i < users.length; ++i) {
                 var this_element = generate_gamer(users[i]);
+                people[i] = this_element;
                 console.log('[INFO] Gamer info: ' + JSON.stringify(this_element));
                 if (users[i].observer) {
-                    players[i] = this_element;
                     observers_container.append(this_element);
                 } else {
-                    observers[i] = this_element;
                     players_container.append(this_element);
                 }
              }
@@ -62,7 +60,7 @@ $(function() {
             $('.room_id_container').html(room_display);
         } else {
             alert("Your are not in any room!\n Now you will be redirected to game center");
-            location.href = '/game-center';
+            location.href = '/';
         }
 
         // get those initial strokes
