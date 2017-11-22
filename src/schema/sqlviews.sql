@@ -8,4 +8,4 @@ CREATE VIEW open_rounds AS SELECT * FROM rounds WHERE ended_at IS NULL ORDER BY 
 CREATE VIEW top_guessers AS SELECT id, nickname, score_guess FROM users ORDER BY score_guess;
 CREATE VIEW top_painters AS SELECT id, nickname, score_draw FROM users ORDER BY score_draw;
 CREATE VIEW top_users AS SELECT id, nickname, score_draw, score_guess, (score_guess + score_draw)
-  AS score FROM users ORDER BY score;
+  AS score FROM users ORDER BY score DESC;
