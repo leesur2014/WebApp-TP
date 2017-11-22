@@ -211,7 +211,7 @@ function is_gaming(round_id) {
                         painter_display = $('<h3/>').html('You are the painter! - The answer of this round: <em>' + data.data.answer + '</em>');
 
                         // show color selector for painter
-                        $('#color_selector').show();
+                        $('#canvas_selector').show();
                         // The painter doesn't need a guess form
                         $('#guess_form').remove();
                     } else {

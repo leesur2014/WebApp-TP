@@ -1,13 +1,10 @@
-#color_selector {
+#canvas_selector {
     margin: 2em;
 }
 
 #canvas_container {
     margin: 2em 0 2em 0;
-}
-
-#canvas_container #drawing {
-    border: 1px solid;
+    border: 1em outset;
 }
 
 #msg_container {
