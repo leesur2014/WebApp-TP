@@ -87,8 +87,9 @@ $(function() {
             console.log('[INFO] User enter: ' + JSON.stringify(msg));
             $.get('/api/user/' + msg.user_id, function(data) {
                 if (data.code == 0) {
+                    console.log('[INFO] User enter data: ' + JSON.stringify(data.data));
                     var this_element = generate_gamer(data.data);
-                    console.log('[INFO] User enter: ' + JSON.stringify(this_element));
+                    console.log('[INFO] User enter + element: ' + JSON.stringify(this_element));
                     people[data.data.id] = this_element;
                     if (!data.data.observer) {
                         players_container.append(this_element);
@@ -104,7 +105,20 @@ $(function() {
 
         socket.on('user_exit', function(msg) {
             console.log('[INFO] User exit: ' + JSON.stringify(msg));
-            $('#' + msg.user_id).remove();
+            var user_id = msg.user_id;
+            if (people[user_id]) {
+                people[user_id].remove();
+                delete people[user_id];
+            }
+        });
+
+        socket.on('user_change', function(msg) {
+            console.log('[INFO] User change: ' + JSON.stringify(msg));
+//            var user_id = msg.user_id;
+//            if (people[user_id]) {
+//                people[user_id].remove();
+//                delete people[user_id];
+//            }
         });
 
         // listen on 'round_start' event
@@ -219,11 +233,12 @@ $('#guess_form').submit(function(event) {
 });
 
 function generate_gamer(gamer_info) {
-    var res = $('<li/>').html(gamer_info.nickname).attr('id', gamer_info.id);
+    var res = $('<li/>').append($('<span/>').html(gamer_info.nickname).addClass('nickname_container')).attr('id', gamer_info.id);
     // display different layouts for observer OR player
     if (gamer_info.observer) {
         res.addClass("list-group-item list-group-item-action");
     } else {
+
         res.addClass("list-group-item list-group-item-action list-group-item-success");
     }
 

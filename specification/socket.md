@@ -63,11 +63,12 @@ may GET `/api/user/id` for more information, such as nickname, observer state of
 
 #### `user_change`
 
-Data has `user_id` and `ready` field.
+Data has `user_id`, `nickname` and `ready` field.
 
 ```json
 {
   "user_id": 10,
+  "nickname": "Shelly Zhang",
   "ready": true
 }
 ```
