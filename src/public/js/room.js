@@ -32,7 +32,7 @@ $(function() {
              /* list all players and observers in this room */
              for (var i = 0; i < users.length; ++i) {
                 var this_element = generate_gamer(users[i]);
-                people[i] = this_element;
+                people[users[i].id] = this_element;
                 console.log('[INFO] Gamer info: ' + JSON.stringify(this_element));
                 if (users[i].observer) {
                     observers_container.append(this_element);
@@ -64,6 +64,16 @@ $(function() {
 
         $('.name_container').html(data.nickname);
 
+        // display: if the user is in a room (sidebar)
+        if (data.room_id) {
+            console.log('[INFO] This user is in room' + data.room_id);
+            var room_display = 'This is room ' + data.room_id;
+            $('.room_id_container').html(room_display);
+        } else {
+            alert("Your are not in any room!\n Now you will be redirected to game center");
+            location.href = '/';
+        }
+        
         // initialize the ready_bar to indicate whether I am ready
         console.log('Is observer? ' + (data.observer == false));
         console.log('Is ready? ' + (data.ready == false));
@@ -114,11 +124,12 @@ $(function() {
 
         socket.on('user_change', function(msg) {
             console.log('[INFO] User change: ' + JSON.stringify(msg));
-//            var user_id = msg.user_id;
-//            if (people[user_id]) {
-//                people[user_id].remove();
-//                delete people[user_id];
-//            }
+            var new_element = generate_gamer(msg);
+            for (var idx in people) {
+                console.log('[INFO] index: ' + idx);
+            }
+            people[msg.user_id].replaceWith(new_element);
+            people[msg.user_id] = new_element;
         });
 
         // listen on 'round_start' event
@@ -235,23 +246,12 @@ $('#guess_form').submit(function(event) {
 function generate_gamer(gamer_info) {
     var res = $('<li/>').append($('<span/>').html(gamer_info.nickname + '&nbsp;&nbsp;&nbsp;&nbsp;').addClass('nickname_container')).attr('id', gamer_info.id);
     // display different layouts for observer OR player
-    var ready_btn = $('<button/>');
-
     if (gamer_info.observer) {
         res.addClass("list-group-item list-group-item-action");
     } else {
         if (gamer_info.ready) {
             res.append('<span class="badge">Ready</span>');
-            ready_btn.attr('type', 'button').attr('class', 'btn btn-info');
-            ready_btn.append($('<span/>').addClass('glyphicon glyphicon-ok'));
-            ready_btn.append($('<span/>').html('READY'));
-        } else {
-            ready_btn.attr('type', 'button').attr('class', 'btn btn-default');
-            ready_btn.append($('<span/>').addClass('glyphicon glyphicon-remove'));
-            ready_btn.append($('<span/>').html('NOT READY'));
         }
-//        res.append(ready_btn);
-
 
         res.addClass("list-group-item list-group-item-action list-group-item-success");
     }
