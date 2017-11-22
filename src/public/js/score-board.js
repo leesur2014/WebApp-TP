@@ -1,11 +1,29 @@
-$(function () {
-    $.get('/api/top-users', function(data) {
-        console.log('[INFO] Top user data: ' + JSON.stringify(data));
-        for (var i in data.data) {
-            var this_score = data.data[i];
-            console.log('[INFO] This user: ' + JSON.stringify(this_score));
-            var this_entry = $('<tr/>');
-//            this_entry
-        }
-    });
+$(document).ready(function () {
+
+  // TODO: load score board from server
+  $.get('/api/top-users', function(res) {   
+    for(var i=0; i<res.data.length;i++) {
+        var row = $('<tr/>');
+
+        var node1 = $('<th/>');
+        node1.html(res.data[i].nickname);
+        row.append(node1);
+
+        var node2 = $('<th/>');
+        node2.html(res.data[i].score_draw);
+        row.append(node2);
+
+        var node3 = $('<th/>');
+        node3.html(res.data[i].score_guess);
+        row.append(node3);
+
+        var node4 = $('<th/>');
+        node4.html(res.data[i].score);
+        row.append(node4);
+        
+        $('#rank-table').append(row);
+    }   
+  });
+  
+
 });
