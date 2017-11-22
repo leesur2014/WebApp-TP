@@ -18,11 +18,12 @@ var colorWell;
 
 function updateColor(event) {
     console.log('[INFO] Changed color: ' + event.target.value);
-    ctx.fillStyle = event.target.value;
+//    ctx.fillStyle = event.target.value;
     ctx.strokeStyle = event.target.value;
 }
 
 $(function() {
+
     canvas = $('#drawing');
     ctx = document.getElementById('drawing').getContext('2d');
 
@@ -90,8 +91,8 @@ $(function() {
         }
 
         // initialize the ready_bar to indicate whether I am ready
-        console.log('Is observer? ' + (data.observer == false));
-        console.log('Is ready? ' + (data.ready == false));
+        console.log('Is observer? ' + (data.observer));
+        console.log('Is ready? ' + (data.ready));
         if (!data.observer) {
             if (!data.ready) {
                 unready();
@@ -196,7 +197,11 @@ $(function() {
 
 // function: clear your drawing
 $('#clearCanvas').click(function() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    var this_canvas = document.getElementById('drawing');
+    console.log('[INFO]width: ' + this_canvas.width);
+    console.log('[INFO]height: ' + this_canvas.height);
+
+    ctx.clearRect(0, 0, this_canvas.width, this_canvas.height);
 });
 
 function is_gaming(round_id) {
