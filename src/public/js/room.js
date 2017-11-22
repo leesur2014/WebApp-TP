@@ -10,12 +10,27 @@ var mouse = {
 
 // map user id to jquery elements
 var people = [];
-var players_container = $('#side_bar #players_container ul');
-var observers_container = $('#side_bar #observers_container ul');
+var players_container;
+var observers_container;
+
+// colorWell
+var colorWell;
+
+function updateColor(event) {
+    console.log('[INFO] Changed color: ' + event.target.value);
+    ctx.fillStyle = event.target.value;
+    ctx.strokeStyle = event.target.value;
+}
 
 $(function() {
     canvas = $('#drawing');
     ctx = document.getElementById('drawing').getContext('2d');
+
+    players_container = $('#side_bar #players_container ul');
+    observers_container = $('#side_bar #observers_container ul');
+
+    colorWell = document.querySelector('#colorWell');
+    colorWell.addEventListener("change", updateColor, false);
 
     $.get('/api/room', function(data) {
 
@@ -73,7 +88,7 @@ $(function() {
             alert("Your are not in any room!\n Now you will be redirected to game center");
             location.href = '/';
         }
-        
+
         // initialize the ready_bar to indicate whether I am ready
         console.log('Is observer? ' + (data.observer == false));
         console.log('Is ready? ' + (data.ready == false));
@@ -161,7 +176,7 @@ $(function() {
 
         socket.on('round_end', function(msg) {
             console.log('[INFO] Round end: ' + JSON.stringify(msg.round_id));
-            $('#canvas_container').empty();
+            $('#game_container').empty();
             $.get('/api/round/' + msg.round_id, function(round_info) {
                 var res_table = $('<table/>').addClass("table table-condensed");
                 res_table.append('<thead><tr><th>ID</th><th>Score </th></tr></thead>');
@@ -171,8 +186,8 @@ $(function() {
                     tbody.append($('<tr/>').append($('<td/>').html(this_user.user_id)).append($('<td/>').html(this_user.score)));
                 }
                 res_table.append(tbody);
-
-                $('#canvas_container').append(res_table);
+                $('#game_container').append($('<h1/>').html('Game results of this round'));
+                $('#game_container').append(res_table);
                 setTimeout(function(){location.href = '/';}, 10000);
             });
         });
@@ -323,4 +338,4 @@ $('#logout').click(function() {
             }
         }
     });
-})
+});
