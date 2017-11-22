@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(function () {
 
   $.get('/api/top-users', function(res) {
     for(var i = 0; i < res.data.length; i++) {
