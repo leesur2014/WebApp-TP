@@ -228,7 +228,6 @@ function is_gaming(round_id) {
                         $('#canvas_selector').show();
                         // The painter doesn't need a guess form
                         $('#guess_form').remove();
-                        $('#game_ongoing_bar').append(painter_display);
 
                         $('#drawing').mousemove(function(event) {
                             mouse.pos.x = event.pageX - canvas.offset().left;
@@ -252,6 +251,7 @@ function is_gaming(round_id) {
                         // I could only see the canvas
                         painter_display = $('<h3/>').html('Gaming! - The painter of this round: ' + user_info.data.nickname);
                     }
+                    $('#game_ongoing_bar').append(painter_display);
 
                 } else {
                     alert('[ERROR] Cannot get the painter information');
