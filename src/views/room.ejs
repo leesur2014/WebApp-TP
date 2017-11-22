@@ -13,30 +13,30 @@
         <div class="row">
             <div class="col-12 col-md-4">
                 <div class="jumbotron" id="side_bar">
-                    <h2 class="display-3">Hello, <span class='name_container'>Anonymous</span></h2>
-                    <p class='room_id_container'>You are not in any room now.</p>
+                    <h2 class="display-3">Hello, <span class="name_container">Anonymous</span></h2>
+                    <p class="room_id_container">You are not in any room now.</p>
                     <hr class="my-4">
-                    <div id ='players_container'>
+                    <div id ="players_container">
                         <h2>Players</h2>
-                        <ul class = 'list-group'>
+                        <ul class = "list-group">
                         </ul>
                     </div>
 
                     <hr class="my-4">
-                    <div id ='observers_container'>
+                    <div id ="observers_container">
                         <h2>Observers</h2>
-                        <ul class = 'list-group'>
+                        <ul class = "list-group">
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-8">
-                <div id = 'game_container'>
-                    <div id='is_painter' hidden>No</div>
-                    <div id='ready_bar'></div>
-                    <div id='game_ongoing_bar'></div>
-                    <div id='count_down_container'></div>
-                    <div id = 'canvas_selector' hidden>
+                <div id="game_container">
+                    <div id="is_painter" hidden>No</div>
+                    <div id="ready_bar"></div>
+                    <div id="game_ongoing_bar"></div>
+                    <div id="count_down_container"></div>
+                    <div id = "canvas_selector" hidden>
                         <div id = "color_selector">
                             <label for="colorWell">Select color: </label>
                             <input type="color" value="#ff0000" id = "colorWell">
@@ -51,17 +51,17 @@
                     </div>
 
 
-                    <div id='canvas_container'>
+                    <div id="canvas_container">
                         <canvas id="drawing" width="650" height="450"></canvas>
                     </div>
-                    <form id='guess_form'>
+                    <form id="guess_form">
                       <input type="text" class="form-control" id="guess_input" aria-describedby="guess" placeholder="Enter your answer here">
                       <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
 
-                    <div id='msg_container'>
+                    <div id="msg_container">
                         <h2>Recent guessing results</h2>
-                        <ul class='list-group'>
+                        <ul class="list-group">
                         </ul>
                     </div>
                 </div>
