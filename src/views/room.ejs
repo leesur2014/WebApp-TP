@@ -11,18 +11,17 @@
     <% include nav-bar-room %>
     <div class="container" >
         <div class="row">
-            <div class="col-12 col-md-4">
+            <div class="col-sm-12 col-md-4">
                 <div class="jumbotron" id="side_bar">
-                    <h2 class="display-3">Hello, <span class="name_container">Anonymous</span></h2>
                     <p class="room_id_container">You are not in any room now.</p>
-                    <hr class="my-4">
+                    <hr>
                     <div id ="players_container">
                         <h2>Players</h2>
                         <ul class = "list-group">
                         </ul>
                     </div>
 
-                    <hr class="my-4">
+                    <hr>
                     <div id ="observers_container">
                         <h2>Observers</h2>
                         <ul class = "list-group">
@@ -54,7 +53,7 @@
                     <div id="canvas_container">
                         <canvas id="drawing" width="650" height="450"></canvas>
                     </div>
-                    <form id="guess_form">
+                    <form id="guess_form" class="form-inline">
                       <input type="text" class="form-control" id="guess_input" aria-describedby="guess" placeholder="Enter your answer here">
                       <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
