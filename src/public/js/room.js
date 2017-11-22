@@ -194,6 +194,11 @@ $(function() {
     });
 });
 
+// function: clear your drawing
+$('#clearCanvas').click(function() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+});
+
 function is_gaming(round_id) {
     // remove the 'ready bar' - as it won't be used in this round any more
     $('#ready_bar').remove();
@@ -281,11 +286,17 @@ function generate_gamer(gamer_info) {
 function mainLoop(event) {
     // check if the user is drawing
     if (mouse.click && mouse.move && mouse.pos_prev) {
-        ctx.beginPath();
-        ctx.moveTo(mouse.pos_prev.x, mouse.pos_prev.y);
-        ctx.lineTo(mouse.pos.x, mouse.pos.y);
-        ctx.stroke();
-//        console.log('[INFO] Mouse info: ' + JSON.stringify(mouse));
+        var use_eraser = document.getElementById('useEraser');
+        if (use_eraser.checked) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(mouse.pos.x-25, mouse.pos.y-25, 50, 50);
+        } else {
+            // regard as a pen.
+            ctx.beginPath();
+            ctx.moveTo(mouse.pos_prev.x, mouse.pos_prev.y);
+            ctx.lineTo(mouse.pos.x, mouse.pos.y);
+            ctx.stroke();
+        }
         mouse.move = false;
     }
     mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};

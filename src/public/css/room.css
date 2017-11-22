@@ -2,6 +2,11 @@
     margin: 2em;
 }
 
+#canvas_selector div {
+    margin: 1em;
+}
+
+
 #canvas_container {
     margin: 2em 0 2em 0;
     border: 1em outset;
