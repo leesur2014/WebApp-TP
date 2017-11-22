@@ -233,11 +233,25 @@ $('#guess_form').submit(function(event) {
 });
 
 function generate_gamer(gamer_info) {
-    var res = $('<li/>').append($('<span/>').html(gamer_info.nickname).addClass('nickname_container')).attr('id', gamer_info.id);
+    var res = $('<li/>').append($('<span/>').html(gamer_info.nickname + '&nbsp;&nbsp;&nbsp;&nbsp;').addClass('nickname_container')).attr('id', gamer_info.id);
     // display different layouts for observer OR player
+    var ready_btn = $('<button/>');
+
     if (gamer_info.observer) {
         res.addClass("list-group-item list-group-item-action");
     } else {
+        if (gamer_info.ready) {
+            res.append('<span class="badge">Ready</span>');
+            ready_btn.attr('type', 'button').attr('class', 'btn btn-info');
+            ready_btn.append($('<span/>').addClass('glyphicon glyphicon-ok'));
+            ready_btn.append($('<span/>').html('READY'));
+        } else {
+            ready_btn.attr('type', 'button').attr('class', 'btn btn-default');
+            ready_btn.append($('<span/>').addClass('glyphicon glyphicon-remove'));
+            ready_btn.append($('<span/>').html('NOT READY'));
+        }
+//        res.append(ready_btn);
+
 
         res.addClass("list-group-item list-group-item-action list-group-item-success");
     }
