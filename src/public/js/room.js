@@ -186,7 +186,7 @@ $(function() {
                     tbody.append($('<tr/>').append($('<td/>').html(this_user.user_id)).append($('<td/>').html(this_user.score)));
                 }
                 res_table.append(tbody);
-                $('#game_container').append($('<h1/>').html('Game results of this round'));
+                $('#game_container').append($('<h1/>').html("Game Over! This round's result: "));
                 $('#game_container').append(res_table);
                 setTimeout(function(){location.href = '/';}, 10000);
             });
@@ -199,6 +199,7 @@ function is_gaming(round_id) {
     $('#ready_bar').remove();
     // maintain invariants - display the game states while this round is ongoing
     $('#game_ongoing_bar').empty();
+
     $.get('/api/round', function(data) {
         if (data.code == 0) {
             // get the name of user (for visualization)
@@ -208,6 +209,9 @@ function is_gaming(round_id) {
                     if (data.data.painter_id == my_id) {
                         // 'I' am the painter, am able to paint on Canvas
                         painter_display = $('<h3/>').html('You are the painter! - The answer of this round: <em>' + data.data.answer + '</em>');
+
+                        // show color selector for painter
+                        $('#color_selector').show();
                         // The painter doesn't need a guess form
                         $('#guess_form').remove();
                     } else {
