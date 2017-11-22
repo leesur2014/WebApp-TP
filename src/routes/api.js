@@ -35,6 +35,17 @@ router.use('/', function (req, res, next) {
 });
 
 
+router.get('/top-users', function (req, res) {
+  db.any('SELECT * FROM top_users LIMIT 100')
+    .then(function (rows) {
+      return send_data(res, rows);
+    })
+    .catch(function (err)
+    {
+      return send_error(res, err);
+    });
+});
+
 router.get('/lounge', function(req, res) {
   db.any("SELECT * FROM public_rooms")
     .then(function (data) {

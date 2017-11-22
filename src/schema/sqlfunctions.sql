@@ -216,20 +216,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION room_delete(_room_id INT) RETURNS VOID AS $$
-BEGIN
-  PERFORM room_get_by_id(_room_id);
-	IF NOT EXISTS (SELECT id FROM room_get_users(_room_id)) THEN
-    RAISE INFO 'deleting room %', _room_id;
-    -- Delete the room when there is no one it
-		UPDATE rooms SET deleted_at = now_utc() WHERE id = _room_id;
-	ELSE
-		RAISE EXCEPTION 'room % is not empty', _room_id;
-	END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-
 CREATE OR REPLACE FUNCTION room_start_round(_room_id INT) RETURNS rounds AS $$
 DECLARE
 	_round rounds%ROWTYPE;
@@ -338,9 +324,6 @@ BEGIN
 		RAISE EXCEPTION 'you are in room %', _user.room_id;
 	END IF;
 	SELECT * INTO _room FROM room_get_by_id(_room_id);
-	IF _room.deleted_at IS NOT NULL THEN
-	  RAISE EXCEPTION 'room % has been deleted', _room_id;
-	END IF;
   IF _room.passcode <> _passcode THEN
     RAISE EXCEPTION 'incorrect passcode';
   END IF;
@@ -462,29 +445,5 @@ BEGIN
   ELSE
     RAISE EXCEPTION 'you are not the painter';
   END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION update_score_draw() RETURNS trigger AS
-$$
-BEGIN
-  ASSERT NEW.painter_id = OLD.painter_id;
-  IF NEW.painter_score <> OLD.painter_score THEN
-    UPDATE users SET score_draw = score_draw + NEW.painter_score - OLD.painter_score
-    WHERE id = NEW.painter_id;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION update_score_guess() RETURNS trigger AS
-$$
-BEGIN
-  ASSERT NEW.user_id = OLD.user_id;
-  IF NEW.score <> OLD.score THEN
-    UPDATE users SET score_guess = score_guess + NEW.score - OLD.score
-    WHERE id = NEW.user_id;
-  END IF;
-  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

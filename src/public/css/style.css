@@ -1,7 +1,11 @@
-
 body {
     min-height: 1000px;
     padding: 70px;
+}
+
+.modal-backdrop
+{
+    opacity:0.6 !important;
 }
 
 
@@ -23,7 +27,10 @@ body {
     margin-top: 1em;
 }
 
-.modal-backdrop
-{
-    opacity:0.6 !important;
+
+.room-panel {
+    max-width: 40em;
+    margin: 2em;
+    text-align: center;
+    display: inline-block;
 }

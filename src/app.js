@@ -50,12 +50,12 @@ app.get('/',function(req,res) {
     if (req.user.room_id != null)
     {
         // render room view if the user is in a room
-        return res.render('room');
+        return res.render('room', {user: req.user});
     }
     else
     {
         // render the game-center view if not in a room
-        return res.render('game-center');
+        return res.render('game-center', {user: req.user});
     }
 });
 
@@ -64,7 +64,7 @@ app.get('/score-board',function(req,res) {
     {
         return res.redirect('/');
     }
-    return res.render('score-board');
+    return res.render('score-board', {user: req.user});
 });
 
 /// catch 404 and forwarding to error handler

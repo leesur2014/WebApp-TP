@@ -25,21 +25,19 @@ CREATE TABLE "users" (
 
 CREATE TABLE "rooms" (
 	"id" SERIAL NOT NULL,
-	"passcode" CHAR(10) NOT NULL DEFAULT '',
+	"passcode" VARCHAR(15) NOT NULL DEFAULT '',
 	"created_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
-	"deleted_at" TIMESTAMP WITHOUT TIME ZONE NULL,
 	PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
 
 
-
 CREATE TABLE "rounds" (
 	"id" SERIAL NOT NULL,
 	"painter_id" INTEGER NOT NULL,
 	"painter_score" INTEGER NOT NULL DEFAULT 0,
-	"room_id" INTEGER NOT NULL,
+	"room_id" INTEGER NULL,
 	"started_at" TIMESTAMP WITHOUT TIME ZONE NOT NULL default now_utc(),
 	"ended_at" TIMESTAMP WITHOUT TIME ZONE NULL,
 	"answer" VARCHAR(64) NOT NULL,
@@ -69,23 +67,11 @@ CREATE TABLE "dictionary" (
   OIDS=FALSE
 );
 
-CREATE TABLE "painter_score_map" (
-	"correct_guesses" INTEGER PRIMARY KEY,
-	"score" INTEGER NOT NULL
-) WITH (
-  OIDS=FALSE
-);
-
 
 ALTER TABLE "users" ADD CONSTRAINT "user_fk0" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
 
-
 ALTER TABLE "rounds" ADD CONSTRAINT "round_fk0" FOREIGN KEY ("painter_id") REFERENCES "users"("id");
-ALTER TABLE "rounds" ADD CONSTRAINT "round_fk1" FOREIGN KEY ("room_id") REFERENCES "rooms"("id");
+ALTER TABLE "rounds" ADD CONSTRAINT "round_fk1" FOREIGN KEY ("room_id") REFERENCES "rooms"("id") ON DELETE SET NULL;
 
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
 ALTER TABLE "round_user" ADD CONSTRAINT "guesser_fk1" FOREIGN KEY ("round_id") REFERENCES "rounds"("id");
-
-
--- TODO
--- Implement the constraint that users cannot be in a room whose deleted_at is not null

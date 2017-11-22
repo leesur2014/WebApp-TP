@@ -84,20 +84,19 @@ class User {
           //attempt to end current round
           Round.tryToEnd(user.round_id);
         }
-        // attempt to delete this room
-        db.proc('room_delete', user.room_id)
-          .then(function () {
-            debug("room", user.room_id, "deleted");
-            io.lounge.emit('room_delete', {room_id: user.room_id})
-          })
-          .catch(function () {
-            // reach here if room cannot be deleted
+        db.one('SELECT id FROM rooms WHERE id = $1', user.room_id)
+          .then(function (room) {
+            // the room still exists
             io.lounge.emit('room_change', {room_id: user.room_id});
             if (user.round_id === null)
             {
               // attempt to start a round
               Round.tryToStart(user.room_id);
             }
+          })
+          .catch(function (err) {
+            debug("room", user.room_id, "deleted");
+            io.lounge.emit('room_delete', {room_id: user.room_id})
           });
       });
   }

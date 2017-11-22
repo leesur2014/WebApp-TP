@@ -25,6 +25,7 @@ POST | `/api/exit` | Quit a room
 POST | `/api/ready` | Set/clear the user's ready bit
 POST | `/api/guess` | Submit the answer for a round
 POST | `/api/draw` | Send the painter's drawing
+GET | `/api/top-users` | Get a list of top users
 
 All POST requests body is an URLencoded string.
 
@@ -459,5 +460,23 @@ failure response
 {
   "code": -1,
   "error": "user 1 is not the painter in round 10"
+}
+```
+
+
+### Get a list of top users
+
+
+```
+GET /api/top-users
+```
+
+
+```JSON
+{
+  "code":0,
+  "data":[
+    {"id":1,"nickname":"Jim Zhong","score_draw":0,"score_guess":0,"score":0}
+  ]
 }
 ```

@@ -10,7 +10,7 @@ $('#join-room-form').submit(function(event) {
       if (resp.code == 0) {
         location.reload();
       } else {
-        alert('An error occurred: ' + resp.error);
+        alert('Error: ' + resp.error);
       }
     });
 });
