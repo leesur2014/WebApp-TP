@@ -26,7 +26,7 @@ all | complete API for score board | 1 | Hancheng
 all | deal with offline users in back end | 4 | Hancheng
 all | Slides | 4 | Hancheng
 1 | Cleaning nouns data and update test data| 2 | Xuhui
-2 | Add color/stroke selector to canvas | 3 | Xuhui
+2 | Add color selector to canvas | 3 | Xuhui
 2 | Add eraser and 'clear' function to canvas | 3 | Xuhui
 3 | Add scoreboard to canvas | 4 | Xuhui
 4 | User off-line notification and redirection | 2 | Hancheng
