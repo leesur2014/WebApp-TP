@@ -1,29 +1,27 @@
 $(document).ready(function () {
 
-  // TODO: load score board from server
-  $.get('/api/top-users', function(res) {   
-    for(var i=0; i<res.data.length;i++) {
-        var row = $('<tr/>');
+  $.get('/api/top-users', function(res) {
+    for(var i = 0; i < res.data.length; i++) {
+        var row = $('<tr>');
 
-        var node1 = $('<th/>');
-        node1.html(res.data[i].nickname);
-        row.append(node1);
+        var nickname = $('<td>');
+        nickname.text(res.data[i].nickname);
+        row.append(nickname);
 
-        var node2 = $('<th/>');
-        node2.html(res.data[i].score_draw);
-        row.append(node2);
+        var score_draw = $('<td>');
+        score_draw.text(res.data[i].score_draw);
+        row.append(score_draw);
 
-        var node3 = $('<th/>');
-        node3.html(res.data[i].score_guess);
-        row.append(node3);
+        var score_guess = $('<td>');
+        score_guess.text(res.data[i].score_guess);
+        row.append(score_guess);
 
-        var node4 = $('<th/>');
-        node4.html(res.data[i].score);
-        row.append(node4);
-        
+        var score_total = $('<td>');
+        score_total.text(res.data[i].score);
+        row.append(score_total);
+
         $('#rank-table').append(row);
-    }   
+    }
   });
-  
 
 });
