@@ -202,6 +202,10 @@ $('#clearCanvas').click(function() {
     console.log('[INFO]height: ' + this_canvas.height);
 
     ctx.clearRect(0, 0, this_canvas.width, this_canvas.height);
+    var dataURL = document.getElementById('drawing').toDataURL();
+    $.post('/api/draw', {image: dataURL}, function(draw_res) {
+        console.log('[INFO] Response: ' + JSON.stringify(draw_res));
+    });
 });
 
 function is_gaming(round_id) {
@@ -244,7 +248,7 @@ function is_gaming(round_id) {
 //                        console.log('[INFO] dataURL: ' + dataURL);
                         $.post('/api/draw', {image: dataURL}, function(draw_res) {
                             console.log('[INFO] Response: ' + JSON.stringify(draw_res));
-                        })
+                        });
 
                     });
                     mainLoop();
