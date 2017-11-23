@@ -1,36 +1,23 @@
-body {
-    min-height: 1000px;
-    padding: 70px;
-}
-
 .modal-backdrop
 {
     opacity:0.6 !important;
 }
-
-
-#canvas_selector {
-    margin: 2em;
-}
-
-#canvas_selector div {
-    margin: 1em;
-}
-
-
-#canvas_container {
-    margin: 2em 0 2em 0;
-    border: 1em outset;
-}
-
-#msg_container {
-    margin-top: 1em;
-}
-
 
 .room-panel {
     max-width: 40em;
     margin: 2em;
     text-align: center;
     display: inline-block;
+}
+
+
+canvas {
+   display: block;
+   margin: 10px 0px 10px 0px;
+   border-width: 1px;
+   border: solid #000000;
+}
+
+#ready-btn {
+  margin: 100px 200px 0px 200px;
 }
