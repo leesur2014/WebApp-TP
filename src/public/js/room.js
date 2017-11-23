@@ -141,9 +141,6 @@ $(function() {
         socket.on('user_change', function(msg) {
             console.log('[INFO] User change: ' + JSON.stringify(msg));
             var new_element = generate_gamer(msg);
-            for (var idx in people) {
-                console.log('[INFO] index: ' + idx);
-            }
             people[msg.user_id].replaceWith(new_element);
             people[msg.user_id] = new_element;
         });
@@ -151,6 +148,9 @@ $(function() {
         // listen on 'round_start' event
         socket.on('round_start', function(msg) {
             console.log('[INFO] Game start: ' + JSON.stringify(msg));
+            // clear 'ready' state on users
+            var new_element = generate_gamer(msg);
+            $('span.badge').remove();
             is_gaming(msg.round_id);
         });
 
@@ -331,7 +331,7 @@ function ready() {
 // set the button to 'unready' state
 function unready() {
     $('#ready_bar').empty();
-    var ready_btn = $('<button/>').attr('type', 'button').addClass('btn btn-default').html('Your are not ready! Click here to get ready for a game');
+    var ready_btn = $('<button/>').attr('type', 'button').addClass('btn btn-info').html('Click me to get ready for a game!');
     $(ready_btn).click(function() {
         $.post('/api/ready', {ready: true}, function(data) {
             if (data.code == 0) {
