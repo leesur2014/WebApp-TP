@@ -29,8 +29,9 @@ lounge.on('connection', function(socket) {
           pingUser(user.id);
       });
 
-      socket.on('disconnecting', function(reason) {
-        debug("socket", socket.id, "disconnecting");
+      socket.on('disconnect', function(reason) {
+        debug("socket", socket.id, "disconnected. reason:", reason);
+        pingUser(user.id);
       });
 
       socket.on('error', function(reason) {
@@ -67,8 +68,9 @@ room.on('connection', function(socket) {
           pingUser(user.id);
       });
 
-      socket.on('disconnecting', function(reason) {
-        debug("socket", socket.id, "disconnecting");
+      socket.on('disconnect', function(reason) {
+        debug("socket", socket.id, "disconnected. reason:", reason);
+        pingUser(user.id);
       });
 
       socket.on('error', function(reason) {
