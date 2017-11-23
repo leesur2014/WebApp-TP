@@ -58,7 +58,7 @@ class User {
     var user = this;
     if (user.room_id != null)
     {
-      throw Error("You are in room " + user.room_id);
+      return Promise.reject(new Error("You are in room " + user.room_id));
     }
     return db.proc('user_enter_room', [this.id, room_id, passcode, observer])
       .then(function () {
@@ -73,7 +73,7 @@ class User {
     var user = this;
     if (user.room_id == null)
     {
-      throw Error("You are not in a room");
+      return Promise.reject(new Error("You are not in a room"));
     }
     return db.proc('user_exit_room', [user.id, force])
       .then(function () {
