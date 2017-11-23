@@ -203,6 +203,7 @@ $('#clearCanvas').click(function() {
 
     ctx.clearRect(0, 0, this_canvas.width, this_canvas.height);
     var dataURL = document.getElementById('drawing').toDataURL();
+    console.log('[INFO] After clear: dataURL: ' + dataURL);
     $.post('/api/draw', {image: dataURL}, function(draw_res) {
         console.log('[INFO] Response: ' + JSON.stringify(draw_res));
     });
