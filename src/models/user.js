@@ -106,7 +106,7 @@ class User {
     return db.proc('user_change_state', [this.id, state])
       .then(function () {
         io.room.to('room_' + user.room_id)
-          .emit('user_change', {user_id: user.id, nickname: user.nickname, ready: state});
+          .emit('user_change', {user_id: user.id, ready: state});
 
         if (state)
         {
