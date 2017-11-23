@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "mocha tests",
+    "test": "mocha tests/profileTest.js tests/loginTest.js tests/apiTest.js",
     "start": "nodemon app.js"
   },
   "dependencies": {
