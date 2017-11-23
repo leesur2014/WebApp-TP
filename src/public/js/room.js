@@ -155,7 +155,7 @@ $(function() {
         });
 
         socket.on('user_draw', function(msg) {
-//            console.log('[INFO] New stroke: ' + JSON.stringify(msg));
+            console.log('[INFO] New stroke: ' + JSON.stringify(msg));
             var img = new Image;
             img.onload = function() {
                 ctx.drawImage(img, 0, 0);
@@ -203,9 +203,9 @@ $('#clearCanvas').click(function() {
 
     ctx.clearRect(0, 0, this_canvas.width, this_canvas.height);
     var dataURL = document.getElementById('drawing').toDataURL();
-    console.log('[INFO] After clear: dataURL: ' + dataURL);
+//    console.log('[INFO] After clear: dataURL: ' + dataURL);
     $.post('/api/draw', {image: dataURL}, function(draw_res) {
-        console.log('[INFO] Response: ' + JSON.stringify(draw_res));
+        console.log('[INFO] After clear - response: ' + JSON.stringify(draw_res));
     });
 });
 
