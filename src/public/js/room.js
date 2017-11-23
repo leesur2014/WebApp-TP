@@ -1,365 +1,361 @@
-var token;
-var my_id;
-var canvas, ctx;
-var mouse = {
-  click: false,
-  move: false,
-  pos: {x:0, y:0},
-  pos_prev: false
-};
+$(document).ready(function () {
 
-// map user id to jquery elements
-var people = [];
-var players_container;
-var observers_container;
+  var round;
+  var room;
+  var me;
+  var userRows = [];
+  var users = [];
 
-// colorWell
-var colorWell;
+  var canvas;
+  var context;
 
-function updateColor(event) {
-    console.log('[INFO] Changed color: ' + event.target.value);
-//    ctx.fillStyle = event.target.value;
-    ctx.strokeStyle = event.target.value;
-}
+  $.when($.getJSON('/api/me'), $.getJSON('/api/room'), $.getJSON('/api/round'))
+    .done(function (_me, _room, _round) {
+      if (_me[0].code != 0)
+      {
+        // fatal error
+        alert("Error: " + _me[0].error);
+        return;
+      }
 
-$(function() {
+      if (_room[0].code != 0) {
+        // fatal error
+        alert("Error: " + _room[0].error);
+        return;
+      }
 
-    canvas = $('#drawing');
-    ctx = document.getElementById('drawing').getContext('2d');
+      me = _me[0].data;
+      room = _room[0].data;
 
-    players_container = $('#side_bar #players_container ul');
-    observers_container = $('#side_bar #observers_container ul');
+      if (room.passcode) {
+        $("#room-passcode").text("Passcode: " + room.passcode);
+      } else {
+        $("#room-passcode").text("Public Room");
+      }
 
-    colorWell = document.querySelector('#colorWell');
-    colorWell.addEventListener("change", updateColor, false);
+      // load and display each user's information
+      for (var i in room.users) {
+        $.getJSON('/api/user/' + room.users[i].id, function (resp) {
+          if (resp.code != 0) {
+            alert("Error: " + resp.error);
+          } else {
+            var row = generate_user_row(resp.data);
+            $("#users-tbody").append(row);
+            userRows[resp.data.id] = row;
+            users[resp.data.id] = resp.data;
+          }
+        });
+      }
 
-    $.get('/api/room', function(data) {
+      if (_round[0].code == 0) {
+        // when there is a round
+        round = _round[0].data;
+        init_round();
+      } else {
+        round = null;
+        init_idle();
+      }
 
-        if (data.code == 0) {
-            // detect if a game is going on
-            if (data.data.round_id != null) {
-                console.log('[INFO] This room is in game.\n');
-                console.log('[INFO] Round ID: ' + data.data.round_id);
-                is_gaming(data.data.round_id);
-            }
-             console.log('[INFO] Room info: ' + JSON.stringify(data));
+      init_socket();
 
-             var users = data.data.users;
-             /* list all players and observers in this room */
-             for (var i = 0; i < users.length; ++i) {
-                var this_element = generate_gamer(users[i]);
-                people[users[i].id] = this_element;
-                console.log('[INFO] Gamer info: ' + JSON.stringify(this_element));
-                if (users[i].observer) {
-                    observers_container.append(this_element);
-                } else {
-                    players_container.append(this_element);
-                }
-             }
+    });
+
+
+  $('#logout-btn').click(function() {
+    if (round != null)
+    {
+      var r = confirm("You are in a round. Do you still want to exit?");
+      if (r === false)  return;
+    }
+
+    $.post("/api/exit", {force: (round != null)}, function(resp) {
+      if (resp.code != 0)
+      {
+        alert('Error: ' + resp.error);
+      }
+      location.reload();
+    });
+  });
+
+  $("#ready-btn").click(function (e) {
+    $(e.target).addClass("active");
+    $(e.target).prop("disabled", true);
+    $.post("/api/ready", {ready: true});
+  });
+
+  $("#guess-form").submit(function(e) {
+    e.preventDefault();
+    $.post("/api/guess", $(e.target).serialize(), function (resp) {
+      if (resp.code != 0) {
+        alert("Error: " + resp.error);
+      }
+      else if (resp.correct) {
+        $("#guess-result").text("Correct guess!");
+      } else {
+        $("#guess-result").text("Wrong guess, try again. :)");
+      }
+    });
+    e.target.reset();
+  })
+
+
+  function init_socket() {
+    var socket = io('/room?token=' + me.token);
+
+    socket.on('user_enter', function(msg) {
+      $.getJSON('/api/user/' + msg.user_id, function (resp) {
+        if (resp.code != 0) {
+          alert("Error: " + resp.error);
         } else {
-            alert('[ERROR] Cannot get this room information');
+          var row = userRows[resp.data.id] = generate_user_row(resp.data);
+          $("#users-tbody").append(row);
+          users[resp.data.id] = resp.data;
+          add_message(resp.data.nickname + " entered the room.");
         }
+      });
     });
 
-    // get those initial strokes
-    $.get('/api/round', function(res_round) {
-        if(res_round.code == 0) {
-            var img = new Image;
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0);
-            }
-            img.src = res_round.data.image;
-        }
+    socket.on('user_exit', function(msg) {
+      if (userRows[msg.user_id]) {
+        userRows[msg.user_id].remove();
+        add_message(users[msg.user_id].nickname + " left the room.");
+        delete userRows[msg.user_id];
+        delete users[msg.user_id];
+      }
     });
 
-    $.get( "/api/me", function( data ) {
-        console.log('[INFO] "/api/me" responses: ' + JSON.stringify(data));
-        console.log('[INFO]nickname: ' + data['nickname']);
-        // set my ID
-        my_id = data['id'];
-
-        $('.name_container').html(data.nickname);
-
-        // display: if the user is in a room (sidebar)
-        if (data.room_id) {
-            console.log('[INFO] This user is in room' + data.room_id);
-            var room_display = 'This is room ' + data.room_id;
-            $('.room_id_container').html(room_display);
+    socket.on('user_change', function(msg) {
+      if (userRows[msg.user_id]) {
+        var user = users[msg.user_id];
+        user.ready = msg.ready;
+        var row = generate_user_row(user);
+        userRows[msg.user_id].replaceWith(row);
+        userRows[msg.user_id] = row;
+        if (user.ready) {
+          add_message(user.nickname + " is ready.");
         } else {
-            alert("Your are not in any room!\n Now you will be redirected to game center");
-            location.href = '/';
+          add_message(user.nickname + " is not ready.");
         }
+      }
+    });
 
-        // initialize the ready_bar to indicate whether I am ready
-        console.log('Is observer? ' + (data.observer));
-        console.log('Is ready? ' + (data.ready));
-        if (!data.observer) {
-            if (!data.ready) {
-                unready();
-            } else {
-                ready();
-            }
-        } else {
-            // an observer doesn't need an guess input
-            $('#guess_form').remove();
+    socket.on('user_guess', function(msg) {
+      add_message(users[msg.user_id].nickname + " made a " + (msg.correct ? "correct" : "wrong") + " guess");
+    });
+
+    socket.on('user_draw', function(msg) {
+      if ((round.painter_id != me.id) && canvas && context) {
+        // if I am not the painter
+        var image = new Image();
+        image.src = msg.image;
+        image.onload = function() {
+          // redraw everything
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, 0);
+        };
+      }
+    });
+
+
+    socket.on('round_start', function(msg) {
+      $.getJSON('/api/round', function (resp) {
+        if (resp.code != 0) {
+          alert("Error: " + resp.error);
+          return;
         }
-
-
-        token = data.token;
-        var socket = io('/room?token='+ token);
-
-        // Listen events: If a user enter or exit this room, update the page in real-time
-        socket.on('user_enter', function(msg) {
-            console.log('[INFO] User enter: ' + JSON.stringify(msg));
-            $.get('/api/user/' + msg.user_id, function(data) {
-                if (data.code == 0) {
-                    console.log('[INFO] User enter data: ' + JSON.stringify(data.data));
-                    var this_element = generate_gamer(data.data);
-                    console.log('[INFO] User enter + element: ' + JSON.stringify(this_element));
-                    people[data.data.id] = this_element;
-                    if (!data.data.observer) {
-                        players_container.append(this_element);
-                    } else {
-                        observers_container.append(this_element);
-                    }
-                } else {
-                    alert('[ERROR] Cannot get the user info');
-                }
-            });
-
-        });
-
-        socket.on('user_exit', function(msg) {
-            console.log('[INFO] User exit: ' + JSON.stringify(msg));
-            var user_id = msg.user_id;
-            if (people[user_id]) {
-                people[user_id].remove();
-                delete people[user_id];
-            }
-        });
-
-        socket.on('user_change', function(msg) {
-            console.log('[INFO] User change: ' + JSON.stringify(msg));
-            var new_element = generate_gamer(msg);
-            for (var idx in people) {
-                console.log('[INFO] index: ' + idx);
-            }
-            people[msg.user_id].replaceWith(new_element);
-            people[msg.user_id] = new_element;
-        });
-
-        // listen on 'round_start' event
-        socket.on('round_start', function(msg) {
-            console.log('[INFO] Game start: ' + JSON.stringify(msg));
-            is_gaming(msg.round_id);
-        });
-
-        socket.on('user_draw', function(msg) {
-//            console.log('[INFO] New stroke: ' + JSON.stringify(msg));
-            var img = new Image;
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0);
-            }
-            img.src = msg.image;
-        });
-
-        socket.on('user_guess', function(msg) {
-            console.log('[INFO] New guess: ' + JSON.stringify(msg));
-            $.get('/api/user/' + msg.user_id, function(user_data) {
-                $('#msg_container ul').prepend($('<li/>').addClass('list-group-item list-group-item-info').html('Player [' + user_data.data.nickname + '] guess - ' + msg.correct));
-            });
-        });
-
-        socket.on('count_down', function(msg) {
-            $('#count_down_container').empty();
-            $('#count_down_container').append($('<h2/>').html('Count down: ' + msg.seconds + ' s.'))
-        });
-
-        socket.on('round_end', function(msg) {
-            console.log('[INFO] Round end: ' + JSON.stringify(msg.round_id));
-            $('#game_container').empty();
-            $.get('/api/round/' + msg.round_id, function(round_info) {
-                var res_table = $('<table/>').addClass("table table-condensed");
-                res_table.append('<thead><tr><th>ID</th><th>Score </th></tr></thead>');
-                var tbody = $('<tbody/>');
-                for (var i = 0; i < round_info.data.users.length; ++i) {
-                    var this_user = round_info.data.users[i];
-                    tbody.append($('<tr/>').append($('<td/>').html(this_user.user_id)).append($('<td/>').html(this_user.score)));
-                }
-                res_table.append(tbody);
-                $('#game_container').append($('<h1/>').html("Game Over! This round's result: "));
-                $('#game_container').append(res_table);
-                setTimeout(function(){location.href = '/';}, 10000);
-            });
-        });
+        round = resp.data;
+        add_message("Round started. " + users[round.painter_id].nickname + " is the painter.");
+        init_round();
+      });
     });
-});
 
-// function: clear your drawing
-$('#clearCanvas').click(function() {
-    var this_canvas = document.getElementById('drawing');
-    console.log('[INFO]width: ' + this_canvas.width);
-    console.log('[INFO]height: ' + this_canvas.height);
 
-    ctx.clearRect(0, 0, this_canvas.width, this_canvas.height);
-    var dataURL = document.getElementById('drawing').toDataURL();
-    $.post('/api/draw', {image: dataURL}, function(draw_res) {
-        console.log('[INFO] Response: ' + JSON.stringify(draw_res));
+    socket.on('round_end', function(msg) {
+      round = null;
+      add_message("Round ended.");
+      init_idle();
+      // TODO: display score of the ended round
+      // TODO: update users' score in the list
     });
-});
 
-function is_gaming(round_id) {
-    // remove the 'ready bar' - as it won't be used in this round any more
-    $('#ready_bar').remove();
-    // maintain invariants - display the game states while this round is ongoing
-    $('#game_ongoing_bar').empty();
-
-    $.get('/api/round', function(data) {
-        if (data.code == 0) {
-            // get the name of user (for visualization)
-            $.get('/api/user/' + data.data.painter_id, function(user_info) {
-                if (user_info.code == 0) {
-                    var painter_display;
-                    if (data.data.painter_id == my_id) {
-                        // 'I' am the painter, am able to paint on Canvas
-                        painter_display = $('<h3/>').html('You are the painter! - The answer of this round: <em>' + data.data.answer + '</em>');
-
-                        // show color selector for painter
-                        $('#canvas_selector').show();
-                        // The painter doesn't need a guess form
-                        $('#guess_form').remove();
-
-                        $('#drawing').mousemove(function(event) {
-                            mouse.pos.x = event.pageX - canvas.offset().left;
-                            mouse.pos.y = event.pageY - canvas.offset().top;
-                            mouse.move = true;
-                        });
-                        $('#drawing').mousedown(function() {
-                            mouse.click = true;
-                        });
-                        $('#drawing').mouseup(function() {
-                            mouse.click = false;
-                            var dataURL = document.getElementById('drawing').toDataURL();
-    //                        console.log('[INFO] dataURL: ' + dataURL);
-                            $.post('/api/draw', {image: dataURL}, function(draw_res) {
-                                console.log('[INFO] Response: ' + JSON.stringify(draw_res));
-                            });
-
-                        });
-                        mainLoop();
-                    } else {
-                        // I could only see the canvas
-                        painter_display = $('<h3/>').html('Gaming! - The painter of this round: ' + user_info.data.nickname);
-                    }
-                    $('#game_ongoing_bar').append(painter_display);
-
-                } else {
-                    alert('[ERROR] Cannot get the painter information');
-                }
-            });
-
-        } else {
-            alert('[ERROR] Cannot get the round information');
-        }
+    socket.on('count_down', function(msg) {
+      if (round) {
+        $("#count-down").text(msg.seconds + " seconds left");
+      } else {
+        // should not reach here
+        $("#count-down").hide();
+      }
     });
-}
+  }
 
-$('#guess_form').submit(function(event) {
-    event.preventDefault();
-    // send a guessing request
-    $.post('/api/guess', {submission: $('#guess_input').val()}, function(data) {
-        if (data.code == 0) {
 
-        } else {
-            alert('[ERROR] You cannot guess answer now!');
-        }
+  function init_painter() {
+
+    $("#word").text(round.answer);
+
+    // prepare painter's canvas
+    // ref: https://github.com/socketio/socket.io/blob/master/examples/whiteboard/public/main.js
+    canvas = $("#painter-canvas")[0];
+    context = canvas.getContext('2d');
+
+    var drawing = false;
+
+    var current = {
+      color: 'black',
+      width: 2,
+      eraser: false
+    }
+
+    canvas.addEventListener('mousedown', onMouseDown, false);
+    canvas.addEventListener('mouseup', onMouseUp, false);
+    canvas.addEventListener('mouseout', onMouseUp, false);
+    canvas.addEventListener('mousemove', onMouseMove, false);
+
+    function drawLine(x0, y0, x1, y1, color, width) {
+      // console.log("drawline", x0, y0, x1, y1, color, width)
+      context.beginPath();
+      context.moveTo(x0, y0);
+      context.lineTo(x1, y1);
+      context.strokeStyle = color;
+      context.lineWidth = width;
+      context.stroke();
+      context.closePath();
+    }
+
+
+    function onMouseDown(e){
+      drawing = true;
+      var offset = $(canvas).offset();
+      current.x = e.clientX - offset.left;
+      current.y = e.clientY - offset.top;
+    }
+
+    function onMouseUp(e){
+      if (!drawing)  return;
+      drawing = false;
+      var offset = $(canvas).offset();
+      if (current.eraser) {
+        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, 'white', 40);
+      } else {
+        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, current.color, current.width);
+      }
+      $.post('/api/draw', {image: canvas.toDataURL()}, function (resp) {
+        console.log(resp);
+      });
+    }
+
+    function onMouseMove(e){
+      if (!drawing) return;
+      var offset = $(canvas).offset();
+      if (current.eraser) {
+        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, 'white', 40);
+      } else {
+        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, current.color, current.width);
+      }
+
+      current.x = e.clientX - offset.left;
+      current.y = e.clientY - offset.top;
+    }
+
+    $("#pencil-btn").click(function (e) {
+      current.width = 2;
+      current.eraser = false;
+      $("#style-div button").removeClass("active");
+      $(e.target).addClass("active");
     });
-});
 
-function generate_gamer(gamer_info) {
-    var res = $('<li/>').append($('<span/>').html(gamer_info.nickname + '&nbsp;&nbsp;&nbsp;&nbsp;').addClass('nickname_container')).attr('id', gamer_info.id);
-    // display different layouts for observer OR player
-    if (gamer_info.observer) {
-        res.addClass("list-group-item list-group-item-action");
+    $("#brush-btn").click(function (e) {
+      current.width = 6;
+      current.eraser = false;
+      $("#style-div button").removeClass("active");
+      $(e.target).addClass("active");
+    });
+
+    $("#eraser-btn").click(function (e) {
+      current.eraser = true;
+      $("#style-div button").removeClass("active");
+      $(e.target).addClass("active");
+    });
+
+    $("#color-div button").click(function (e) {
+      current.color = $(e.target).text();
+      $("#color-div button").removeClass("active");
+      $(e.target).addClass("active");
+    });
+
+    $("#clear-btn").click(function () {
+      console.log("clear");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      $.post('/api/draw', {image: canvas.toDataURL()});
+    });
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (round.image) {
+      // in case the painter refreshes the page during a round
+      var image = new Image();
+      image.src = round.image;
+      image.onload = function() {
+        context.drawImage(image, 0, 0);
+      };
+    }
+
+    $("#painter-div").show();
+  }
+
+
+  function init_guesser() {
+    canvas = $("#guesser-canvas")[0];
+    context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    $("#guess-result").text("");
+    $("#guesser-div").show();
+
+    if (round.image) {
+      // in case the user refreshes the page during a round
+      var image = new Image();
+      image.src = round.image;
+      image.onload = function() {
+        context.drawImage(image, 0, 0);
+      };
+    }
+  }
+
+  function init_idle() {
+    $("#count-down").hide();
+    $("#painter-div").hide();
+    $("#guesser-div").hide();
+    $("#ready-btn").removeClass("active").prop("disabled", false);
+    $("#idle-div").show();
+  }
+
+
+  function init_round() {
+    console.assert(round);
+    $("#messages").empty();
+    $("#idle-div").hide();
+    $("#count-down").show();
+    if (me.id == round.painter_id) {
+      init_painter();
     } else {
-        if (gamer_info.ready) {
-            res.append('<span class="badge">Ready</span>');
-        }
-
-        res.addClass("list-group-item list-group-item-action list-group-item-success");
+      init_guesser();
     }
-
-    return res;
-}
-
-function mainLoop(event) {
-    // check if the user is drawing
-    if (mouse.click && mouse.move && mouse.pos_prev) {
-        var use_eraser = document.getElementById('useEraser');
-        if (use_eraser.checked) {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(mouse.pos.x-25, mouse.pos.y-25, 50, 50);
-        } else {
-            // regard as a pen.
-            ctx.beginPath();
-            ctx.moveTo(mouse.pos_prev.x, mouse.pos_prev.y);
-            ctx.lineTo(mouse.pos.x, mouse.pos.y);
-            ctx.stroke();
-        }
-        mouse.move = false;
-    }
-    mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
-    setTimeout(mainLoop, 25);
-}
-
-// set the button to 'ready' state
-function ready() {
-    $('#ready_bar').empty();
-    var unready_btn = $('<button/>').attr('type', 'button').addClass('btn btn-success').html('You are ready! Click here to cancel');
-    $(unready_btn).click(function() {
-        $.post('/api/ready', {ready: false}, function(data) {
-            if (data.code == 0) {
-                unready();
-            } else {
-                alert('[ERROR] Cannot unready!');
-            }
-        });
-    });
-    $('#ready_bar').append(unready_btn);
-}
-
-// set the button to 'unready' state
-function unready() {
-    $('#ready_bar').empty();
-    var ready_btn = $('<button/>').attr('type', 'button').addClass('btn btn-default').html('Your are not ready! Click here to get ready for a game');
-    $(ready_btn).click(function() {
-        $.post('/api/ready', {ready: true}, function(data) {
-            if (data.code == 0) {
-                ready();
-            } else {
-                alert('[ERROR] Cannot get ready!');
-            }
-        });
-    });
-    $('#ready_bar').append(ready_btn);
-}
-
-
-$('#logout').click(function() {
-    $.post("/api/exit", {force: false}, function(resp) {
-        if (resp.code == 0) {
-            location.reload();
-        } else {
-            var r = confirm("You are in a round. Do you still want to exit?");
-            if (r) {
-                $.post("/api/exit", {force: true}, function(data) {
-                    if (data.code == 0) {
-                        location.reload();
-                    } else {
-                      alert('Error:' + data.error);
-                    }
-                });
-            }
-        }
-    });
+  }
 });
+
+function add_message(msg) {
+  var el = $("<li>").text(msg);
+  el.addClass("list-group-item");
+  $("#messages").prepend(el);
+}
+
+function generate_user_row(user) {
+  var row = $("<tr>");
+
+  row.append($("<td>").text(user.nickname));
+  row.append($("<td>").text(user.score_draw + user.score_guess));
+  row.append($("<td>").text(user.observer ? "Observer" : "Player"));
+  row.append($("<td>").text(user.ready ? "Yes" : "No"));
+
+  return row;
+}
