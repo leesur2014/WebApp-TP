@@ -64,6 +64,7 @@ Round.tryToStart = function (room_id) {
           .catch(function(e) {
             // reach here if the round is already ended
             // or an error happens
+            debug(e);
             clearInterval(timer);
           });
       }, 1000);

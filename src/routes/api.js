@@ -59,7 +59,7 @@ router.get('/lounge', function(req, res) {
 
 
 router.get('/me', function(req, res) {
-  return send_data(res, req.user);
+  res.send(req.user);
 });
 
 router.post('/me', function(req, res) {
@@ -81,7 +81,6 @@ router.get('/user/:id(\\d+)', function(req, res) {
       delete user.fb_id;
       delete user.token;
       delete user.room_id;
-      delete user.round_id;
       return send_data(res, user);
     })
     .catch(function (err)

@@ -1,5 +1,5 @@
 $(function() {
-    var token = $('#user-token').val();
+    var token = $('#input-token').val();
     var socket = io('/lounge?token=' + token);
     var rooms = []; // map room id to jquery elements
 

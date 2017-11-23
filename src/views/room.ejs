@@ -7,81 +7,64 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/">Guess My Drawings</a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li class="navbar-text">Room #<%= user.room_id %></li>
-            <li class="navbar-text" id="room-passcode"></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a id="logout-btn" href="#"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Exit Room</a></li>
-        </ul>
-      </div>
-    </nav>
+    <% include nav-bar-room %>
+    <div class="container" >
+        <div class="row">
+            <div class="col-sm-12 col-md-4">
+                <div class="jumbotron" id="side_bar">
+                    <p class="room_id_container">You are not in any room now.</p>
+                    <hr>
+                    <div id="players_container">
+                        <h2>Players</h2>
+                        <ul class = "list-group">
+                        </ul>
+                    </div>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-sx-12 col-md-4">
-          <h4 class="text-center">Users</h4>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nickname</th>
-                <th>Score</th>
-                <th>Role</th>
-                <th>Ready</th>
-              </tr>
-            </thead>
-            <tbody id="users-tbody">
-            </tbody>
-          </table>
-
-          <h4 class="text-center">Events</h4>
-          <ul id="messages" class="list-group">
-
-          </ul>
-        </div>
-
-        <div class="col-sx-12 col-md-8">
-          <h4 id="count-down"></h4>
-          <div id="painter-div" hidden="true">
-            <h4>Please draw <span id="word"></span>:</h4>
-            <canvas id="painter-canvas" width="600" height="400"></canvas>
-            <div class="btn-group" role="group" id="style-div">
-              <button type="button" id="pencil-btn" class="btn btn-default active">Pencil</button>
-              <button type="button" id="brush-btn" class="btn btn-default">Brush</button>
-              <button type="button" id="eraser-btn" class="btn btn-default">Eraser</button>
+                    <hr>
+                    <div id="observers_container">
+                        <h2>Observers</h2>
+                        <ul class = "list-group">
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="btn-group" role="group" id="color-div">
-              <button type="button" class="btn btn-default">Red</button>
-              <button type="button" class="btn btn-default">Yellow</button>
-              <button type="button" class="btn btn-default">Green</button>
-              <button type="button" class="btn btn-default">Blue</button>
-              <button type="button" class="btn btn-default active">Black</button>
+            <div class="col-12 col-md-8">
+                <div id="game_container">
+                    <div id="ready_bar"></div>
+                    <div id="game_ongoing_bar"></div>
+                    <div id="count_down_container"></div>
+                    <div id="canvas_selector" hidden>
+                        <div id="color_selector">
+                            <label for="colorWell">Select color: </label>
+                            <input type="color" value="#ff0000" id="colorWell">
+                        </div>
+                        <div>
+                            Use Eraser: <input type="checkbox" id="useEraser">
+                        </div>
+                        <div>
+                            <button id="clearCanvas" type="button" class="btn btn-warning">Clear Painting</button>
+                        </div>
+                    </div>
+
+                    <div id="canvas_container">
+                        <canvas id="drawing" width="650" height="450"></canvas>
+                    </div>
+
+                    <form id="guess_form" class="form-inline">
+                      <input type="text" class="form-control" id="guess_input" aria-describedby="guess" placeholder="Enter your answer here">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+
+                    <div id="msg_container">
+                        <h2>Activities</h2>
+                        <ul class="list-group">
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <button type="button" class="btn btn-default" id="clear-btn">Clear</button>
-          </div>
-
-          <div id="guesser-div" hidden="true">
-            <canvas id="guesser-canvas" width="600" height="400"></canvas>
-            <form class="form-inline" id="guess-form">
-              <input class="form-control" type="text" name="submission" placeholder="Enter your answer here" required>
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <span id="guess-result"></span>
-            </form>
-          </div>
-
-          <div id="idle-div" hidden="true">
-            <button type="button" class="btn btn-lg btn-primary" id="ready-btn">I am ready</button>
-          </div>
-
         </div>
-      </div>
+
     </div>
-
     <% include scripts %>
     <script src="/static/js/room.js"></script>
   </body>
