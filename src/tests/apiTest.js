@@ -3,10 +3,9 @@ var chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 var should = chai.should();
 var app = require('../app');
-var server = app.server;
 var expect = chai.expect;
-   
-var assert = chai.assert;       
+var server = require('../app').server;   
+var assert = chai.assert;      
 var Url = 'http://localhost:3000';
 //var Url = 'http://guessmydrawing.fun';
 
@@ -16,10 +15,19 @@ var cookie3 = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii'
 
 const request = require('supertest');
 describe('API Test', function() {
-    //after(function (done) {
-    //  server.close();
-    //  done();
-    //});
+
+  before(function (done) {
+    server.close();
+    done();
+  });
+
+    after(function (done) {
+      server.close(function() {
+        //console.log("close server");
+        server.shutdown;
+      });
+      done();
+    });
 
 it('should get user info /api/me GET', function(done) {
    request(Url)
@@ -28,7 +36,7 @@ it('should get user info /api/me GET', function(done) {
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           .set('Connection','keep-alive')
+           //.set('Connection','keep-alive')
            .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
            .send({ fb_id: '123456', displayName: 'Mary White' })
 
@@ -46,13 +54,13 @@ it('should get user info /api/me GET', function(done) {
     });
 
 it('should list all rooms /api/lounge GET', function(done) {
-    request(Url)
+   request(Url)
            .get('/api/lounge')
            .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           .set('Connection','keep-alive')
+           //.set('Connection','keep-alive')
            .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
            .send({ fb_id: '123456', displayName: 'Mary White' })
         .end(function(err, res) {
@@ -69,13 +77,13 @@ it('should list all rooms /api/lounge GET', function(done) {
 });
 
 it('should chagne nickname /api/me POST', function(done) {
-        request(Url)
+   request(Url)
            .post('/api/me')
            .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           .set('Connection','keep-alive')
+           //.set('Connection','keep-alive')
            .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
            .type('form')
            .send({nickname:'Mary'})
@@ -94,13 +102,13 @@ it('should chagne nickname /api/me POST', function(done) {
 });
 
 it('should back to game center / GET', function(done) {
-  request(Url)
+   request(Url)
   .get('/')
   .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  .set('Connection','keep-alive')
+  //.set('Connection','keep-alive')
   .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
   .end(function(err, res) {
     res.should.have.status(200);
@@ -108,14 +116,15 @@ it('should back to game center / GET', function(done) {
   });
 });
 
+
 it('should create room /api/room POST', function(done) {
-  request(Url)
+   request(Url)
   .post('/api/room')
   .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  .set('Connection','keep-alive')
+  //.set('Connection','keep-alive')
   .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
   .end(function(err, res) {
     res.should.have.status(200);
@@ -129,13 +138,13 @@ it('should create room /api/room POST', function(done) {
 });
 
 it('should list user\'s current room /api/room GET', function(done) {
-     request(Url)
+   request(Url)
     .get('/api/room')
     .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
     .set('Content-Type', 'application/json')
     .set('Accept-Encoding','gzip, deflate')
     .set('Accept-Language','zh-CN,zh;q=0.8')
-    .set('Connection','keep-alive')
+    //.set('Connection','keep-alive')
     .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
         .end(function(err,res) {
             res.should.have.status(200);
@@ -148,13 +157,13 @@ it('should list user\'s current room /api/room GET', function(done) {
 });
 
 it('should exit current room /api/exit POST', function(done) {
-  request(Url)
+   request(Url)
   .post('/api/exit')
   .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  .set('Connection','keep-alive')
+  //.set('Connection','close')
   .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
   .end(function(err,res) {
               res.should.have.status(200);

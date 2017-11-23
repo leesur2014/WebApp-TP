@@ -3,12 +3,21 @@ var chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 var should = chai.should();
 var app = require('../app');
-var server = app.server;
+var server = require('../app').server;   
 var expect = chai.expect;
    
 var assert = chai.assert;
 var FacebookStrategy = require('passport-facebook').Strategy;
 describe('Profile Test', function() {
+  before(function (done) {
+    server.close();
+    done();
+  });
+  
+    after(function (done) {
+      server.close();
+      done();
+    });
     var strategy = new FacebookStrategy({
         clientID: 'ABC123',
         clientSecret: 'secret'

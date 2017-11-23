@@ -90,4 +90,11 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-http.listen(process.env.PORT || 3000);
+if(!module.parent) {
+    http.listen(process.env.PORT || 3000);
+}
+
+
+module.exports = {
+    server: http
+};
