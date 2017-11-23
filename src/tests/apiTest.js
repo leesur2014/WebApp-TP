@@ -147,6 +147,25 @@ it('should list user\'s current room /api/room GET', function(done) {
         });
 });
 
+it('should exit current room /api/exit POST', function(done) {
+  request(Url)
+  .post('/api/exit')
+  .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+  .set('Content-Type', 'application/json')
+  .set('Accept-Encoding','gzip, deflate')
+  .set('Accept-Language','zh-CN,zh;q=0.8')
+  .set('Connection','keep-alive')
+  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+  .end(function(err,res) {
+              res.should.have.status(200);
+              res.should.be.json;
+              res.body.should.have.property('code');
+              res.body.code.should.equal(0);
+              done();
+          });
+
+});
+
 
 });
 
