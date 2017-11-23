@@ -3,6 +3,7 @@ $(document).ready(function () {
   var round;
   var room;
   var me;
+  var users = [];
 
   $.when($.getJSON('/api/me'), $.getJSON('/api/room'), $.getJSON('/api/round'))
     .done(function (_me, _room, _round) {
@@ -20,6 +21,8 @@ $(document).ready(function () {
         $("#room-passcode").text("Public Room");
       }
 
+      init_users();
+
       if (_round[0].code == 0) {
         round = _round[0].data;
         init_round();
@@ -29,6 +32,7 @@ $(document).ready(function () {
       }
 
       init_socket();
+
     });
 
 
@@ -72,7 +76,9 @@ $(document).ready(function () {
 
 
     socket.on('user_draw', function(msg) {
+      if (round.painter_id != me.id) {
 
+      }
     });
 
 
@@ -92,6 +98,9 @@ $(document).ready(function () {
 
 
   function init_painter() {
+
+    $("#word").text(round.answer);
+
     // prepare painter's canvas
     var canvas = $("#painter-canvas")[0];
     var context = canvas.getContext('2d');
@@ -209,4 +218,31 @@ $(document).ready(function () {
   function init_round() {
 
   }
+
+
+  function init_users() {
+    for (var i in room.users) {
+      $.getJSON('/api/user/' + room.users[i].id, function (resp) {
+        if (resp.code != 0) {
+          alert("Error: " + resp.error);
+        } else {
+          var row = users[room.users[i].id] = generate_user_row(resp.data);
+          $("#users-tbody").append(row);
+        }
+      });
+    }
+  }
 });
+
+
+
+function generate_user_row(user, role) {
+  var row = $("<tr>");
+
+  row.append($("<td>").text(user.nickname));
+  row.append($("<td>").text(user.score_draw + user.score_guess));
+  row.append($("<td>").text(role || (user.observer ? "Observer" : "Player")));
+  row.append($("<td>").text(user.ready ? "Yes" : "No"));
+
+  return row;
+}
