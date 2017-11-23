@@ -21,7 +21,7 @@ function pingUser(userId) {
 lounge.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
-      debug("user", user.id, "connected to /lounge");
+      debug("user", user.id, "connected to /lounge via", socket.id);
 
       socket.conn.on('packet', function (packet) {
         debug("received", packet.type, "packet from user", user.id);
@@ -50,7 +50,7 @@ lounge.on('connection', function(socket) {
 room.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
-      debug("user", user.id, "connected to /room");
+      debug("user", user.id, "connected to /room via", socket.id);
 
       if (user.room_id == null)
       {
