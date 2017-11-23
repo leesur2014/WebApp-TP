@@ -11,9 +11,7 @@ var assert = chai.assert;
 var Browser = require('zombie');
 describe("Login Test",function () {
     this.timeout(40000);
-    //beforeEach(function () {
-      //browser = new Browser({ site: 'https://guessmydrawing.fun' });       
-      it("should login with facebook",function (done) {   
+    it("should login with facebook",function (done) {   
             Browser.visit('https://www.facebook.com/login.php?skip_api_login=1&api_key=1454215388009966&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.10%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Fguessmydrawing.fun%252Fusers%252Fcallback%26response_type%3Dcode%26client_id%3D1454215388009966%26ret%3Dlogin%26logger_id%3Db0bfbd0a-64a2-543e-6484-c8c69d9861f0&cancel_url=http%3A%2F%2Fguessmydrawing.fun%2Fusers%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%23_%3D_&display=page&locale=zh_CN&logger_id=b0bfbd0a-64a2-543e-6484-c8c69d9861f0', function(err, brw) {  
               if(err){
                   throw err;
@@ -31,4 +29,3 @@ describe("Login Test",function () {
     
         });
 });
-//});
