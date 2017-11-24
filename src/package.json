@@ -17,7 +17,6 @@
     "express": "^4.15.2",
     "express-session": "^1.15.6",
     "express-ws": "^3.0.0",
-    "koa": "^2.4.1",
     "mocha": "^4.0.1",
     "morgan": "~1.0.0",
     "nodemon": "^1.12.1",
