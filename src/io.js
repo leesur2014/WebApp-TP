@@ -21,7 +21,7 @@ function pingUser(userId) {
 lounge.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
-      debug("user", user.id, "connected to /lounge");
+      debug("user", user.id, "connected to /lounge via", socket.id);
 
       socket.conn.on('packet', function (packet) {
         debug("received", packet.type, "packet from user", user.id);
@@ -29,8 +29,9 @@ lounge.on('connection', function(socket) {
           pingUser(user.id);
       });
 
-      socket.on('disconnecting', function(reason) {
-        debug("socket", socket.id, "disconnecting");
+      socket.on('disconnect', function(reason) {
+        debug("socket", socket.id, "disconnected. reason:", reason);
+        pingUser(user.id);
       });
 
       socket.on('error', function(reason) {
@@ -49,7 +50,7 @@ lounge.on('connection', function(socket) {
 room.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
-      debug("user", user.id, "connected to /room");
+      debug("user", user.id, "connected to /room via", socket.id);
 
       if (user.room_id == null)
       {
@@ -67,8 +68,9 @@ room.on('connection', function(socket) {
           pingUser(user.id);
       });
 
-      socket.on('disconnecting', function(reason) {
-        debug("socket", socket.id, "disconnecting");
+      socket.on('disconnect', function(reason) {
+        debug("socket", socket.id, "disconnected. reason:", reason);
+        pingUser(user.id);
       });
 
       socket.on('error', function(reason) {
