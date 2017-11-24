@@ -59,7 +59,7 @@ router.get('/lounge', function(req, res) {
 
 
 router.get('/me', function(req, res) {
-  res.send(req.user);
+  return send_data(res, req.user);
 });
 
 router.post('/me', function(req, res) {
