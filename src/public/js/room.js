@@ -321,12 +321,33 @@ $(document).ready(function () {
     }
   }
 
+  function init_observer() {
+    canvas = $("#guesser-canvas")[0];
+    context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    $("#guess-form").hide();
+    $("#guesser-div").show();
+
+    if (round.image) {
+      // in case the user refreshes the page during a round
+      var image = new Image();
+      image.src = round.image;
+      image.onload = function() {
+        context.drawImage(image, 0, 0);
+      };
+    }
+  }
+
   function init_idle() {
     $("#count-down").hide();
     $("#painter-div").hide();
     $("#guesser-div").hide();
     $("#ready-btn").removeClass("active").prop("disabled", false);
-    $("#idle-div").show();
+    if (me.observer) {
+      $("#idle-div").hide();
+    } else {
+      $("#idle-div").show();
+    }
   }
 
 
@@ -337,8 +358,10 @@ $(document).ready(function () {
     $("#count-down").show();
     if (me.id == round.painter_id) {
       init_painter();
-    } else {
+    } else if (!me.observer) {
       init_guesser();
+    } else {
+      init_observer();
     }
   }
 });
