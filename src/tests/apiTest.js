@@ -10,7 +10,7 @@ var Url = 'http://localhost:3000';
 //var Url = 'http://guessmydrawing.fun';
 
 var cookie1 = 's%3AmyD-BmD_RJDWxkgrA9d24aX3Mg8fFZRc.ttOLfgJcTWrIwNDQkTVpBDMNngC%2BqKqYIVTl%2BmpU7M0';
-var cookie2 = 'nTI74_krwdk6jJ-TAAAA';
+var cookie2 = 'itGe7oJkVctogc5VAAAA';
 var cookie3 = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 
 const request = require('supertest');
@@ -41,12 +41,13 @@ it('should get user info /api/me GET', function(done) {
            .send({ fb_id: '123456', displayName: 'Mary White' })
 
         .end(function(err,res) {
-            //console.log(res);
+            //console.log(res.body);
             res.should.have.status(200);
             res.should.be.json;
-            res.body.should.have.property('nickname');
-            res.body.should.have.property('online');
-            res.body.online.should.equal(true);
+            res.body.should.have.property('code');
+            res.body.should.have.property('data');
+            res.body.data.should.have.property('nickname');
+            res.body.data.should.have.property('online');
             done();
         });
 });
