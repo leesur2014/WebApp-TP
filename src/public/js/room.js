@@ -58,6 +58,9 @@ $(function () {
 
       init_socket();
 
+    })
+    .fail(function() {
+        alert('[ERROR]Cannot connect to APIs successfully!');
     });
 
 
@@ -196,7 +199,7 @@ $(function () {
     // prepare painter's canvas
     // ref: https://github.com/socketio/socket.io/blob/master/examples/whiteboard/public/main.js
     canvas = $("#painter-canvas")[0];
-    context = canvas.getContext('2d');
+    context = document.getElementById('painter-canvas').getContext('2d');
 
     var drawing = false;
 
@@ -306,7 +309,7 @@ $(function () {
 
   function init_guesser() {
     canvas = $("#guesser-canvas")[0];
-    context = canvas.getContext('2d');
+    context = document.getElementById('guesser-canvas').getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     $("#guess-result").text("");
     $("#guesser-div").show();
@@ -323,7 +326,7 @@ $(function () {
 
   function init_observer() {
     canvas = $("#guesser-canvas")[0];
-    context = canvas.getContext('2d');
+    context = document.getElementById('guesser-canvas').getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     $("#guess-form").hide();
     $("#guesser-div").show();
