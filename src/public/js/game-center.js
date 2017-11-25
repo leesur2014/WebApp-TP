@@ -92,11 +92,12 @@ function generate_room(room) {
     {
         // there is no round in this room, you can join as a player OR observer
         row.addClass('panel panel-success room-panel');
-        join_actions.append(join_as_player);
     } else {
         // You can only join as an observer
+        join_as_player.prop("disabled", true);
         row.addClass('panel panel-default room-panel');
     }
+    join_actions.append(join_as_player);
     join_actions.append(join_as_observer);
 
     row.append(panel_head);
