@@ -345,7 +345,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT, _force BOOLEAN DEFAULT FALSE, _penalty INTEGER DEFAULT 5) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION user_exit_room (_user_id INT) RETURNS VOID AS $$
 DECLARE
 	_user users%ROWTYPE;
   _round rounds%ROWTYPE;
@@ -354,28 +354,7 @@ BEGIN
   IF _user.room_id IS NULL THEN
     RAISE EXCEPTION 'you are not in a room';
   END IF;
-
-  IF _user.observer THEN
-    UPDATE users SET room_id = NULL WHERE id = _user.id;
-  ELSE
-    SELECT * INTO _round FROM user_get_current_round(_user.id);
-
-    IF FOUND THEN
-      IF _force THEN
-        IF _user.id = _round.painter_id THEN
-          -- the painter exits
-          UPDATE rounds SET painter_score = painter_score - _penalty WHERE id = _round.id;
-        ELSE
-          -- a guesser exits
-          UPDATE round_user SET score = score - _penalty WHERE round_id = _round.id AND user_id = _user.id;
-        END IF;
-      ELSE
-        RAISE EXCEPTION 'cannot exit room % normally because you are in a round', _user.room_id;
-      END IF;
-    END IF;
-
-    UPDATE users SET room_id = NULL WHERE id = _user.id;
-  END IF;
+  UPDATE users SET room_id = NULL WHERE id = _user.id;
 END;
 $$ LANGUAGE plpgsql;
 
