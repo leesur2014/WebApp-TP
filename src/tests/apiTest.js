@@ -220,30 +220,30 @@ it('should get a certain user info /api/user/{user_id} GET', function(done) {
         });
 });
 
-//it('should get info of past round /api/round/{round_id} GET', function(done) {
-//   request(Url)
-//           .get('/api/round/1')
-//           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-//           .set('Content-Type', 'application/json')
-//           .set('Accept-Encoding','gzip, deflate')
-//           .set('Accept-Language','zh-CN,zh;q=0.8')
-//           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
-//        .end(function(err,res) {
-//            //console.log(res);
-//            res.should.have.status(200);
-//            res.should.be.json;
-//            res.body.should.have.property('code');
-//            res.body.should.have.property('data');
-//            res.body.data.should.have.property('id');
-//            res.body.data.id.should.equal(1);
-//            res.body.data.should.have.property('painter_id');
-//            res.body.data.should.have.property('room_id');
-//            res.body.data.should.have.property('started_at');
-//            res.body.data.should.have.property('ended_at');
-//            res.body.data.should.have.property('answer');
-//            done();
-//        });
-//});
+it('should get info of past round /api/round/{round_id} GET', function(done) {
+   request(Url)
+           .get('/api/round/2')
+           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+           .set('Content-Type', 'application/json')
+           .set('Accept-Encoding','gzip, deflate')
+           .set('Accept-Language','zh-CN,zh;q=0.8')
+           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+        .end(function(err,res) {
+            //console.log(res);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('code');
+            res.body.should.have.property('data');
+            res.body.data.should.have.property('id');
+            res.body.data.id.should.equal(2);
+            res.body.data.should.have.property('painter_id');
+            res.body.data.should.have.property('room_id');
+            res.body.data.should.have.property('started_at');
+            res.body.data.should.have.property('ended_at');
+            res.body.data.should.have.property('answer');
+            done();
+        });
+});
 
 //it('should join a room /api/enter POST', function(done) {
 //  request(Url)
