@@ -181,6 +181,7 @@ $(function () {
     socket.on('count_down', function(msg) {
       if (round) {
         $("#count-down").text(msg.seconds + " seconds left");
+        $("#count-down").show();
       } else {
         // should not reach here
         $("#count-down").hide();
@@ -355,7 +356,6 @@ $(function () {
     console.assert(round);
     $("#messages").empty();
     $("#idle-div").hide();
-    $("#count-down").show();
     if (me.id == round.painter_id) {
       init_painter();
     } else if (!me.observer) {
