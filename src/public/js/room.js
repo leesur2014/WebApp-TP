@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(function () {
 
   var round;
   var room;
@@ -65,7 +65,7 @@ $(document).ready(function () {
     if (round != null)
     {
       var r = confirm("You are in a round. Do you still want to exit?");
-      if (r === false)  return;
+      if (!r)  return;
     }
 
     $.post("/api/exit", {force: (round != null)}, function(resp) {
