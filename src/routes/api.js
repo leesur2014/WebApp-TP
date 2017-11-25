@@ -203,13 +203,7 @@ router.post('/enter', function(req, res) {
 })
 
 router.post('/exit', function(req, res) {
-  let force = req.body.force || "false";
-  if (!validator.isBoolean(force))
-  {
-    send_error(res, "force should be boolean");
-    return;
-  }
-  req.user.exitRoom(req.body.force === 'true')
+  req.user.exitRoom()
     .then(function () {
       send_data(res, null);
     })
