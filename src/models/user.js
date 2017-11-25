@@ -69,13 +69,13 @@ class User {
   }
 
 
-  exitRoom(force = false) {
+  exitRoom() {
     var user = this;
     if (user.room_id == null)
     {
       return Promise.reject(new Error("You are not in a room"));
     }
-    return db.proc('user_exit_room', [user.id, force])
+    return db.proc('user_exit_room', user.id)
       .then(function () {
         io.room.to('room_' + user.room_id).emit('user_exit', {user_id: user.id});
         debug("user", user.id, "exited room", user.room_id);
