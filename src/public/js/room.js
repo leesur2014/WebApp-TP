@@ -226,7 +226,7 @@ $(function () {
 
     function onMouseDown(e){
       drawing = true;
-      var offset = $(canvas).offset();
+      var offset = $('#painter-canvas').offset();
       current.x = e.clientX - offset.left;
       current.y = e.clientY - offset.top;
     }
