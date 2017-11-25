@@ -271,22 +271,41 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- round_end() should be called by the application when it is time to end a round
-CREATE OR REPLACE FUNCTION round_end(_round_id INT) RETURNS rounds AS $$
+CREATE OR REPLACE FUNCTION round_end(_round_id INT, _penalty INT DEFAULT 5) RETURNS rounds AS $$
 DECLARE
   _round RECORD;
+  _row RECORD;
   _correct_guesses INT;
   _total_guesser_count INT;
 BEGIN
-  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL
+  -- raise exception if the round is already ended
+  UPDATE rounds SET ended_at = now_utc() WHERE id = _round_id AND ended_at IS NULL RETURNING * INTO STRICT _round;
+
+  IF NOT EXISTS (SELECT id FROM users WHERE id = _round.painter_id AND room_id = _round.room_id AND observer = FALSE) THEN
+    -- penalize the painter if he is not in the room
+    UPDATE rounds SET painter_score = painter_score - _penalty WHERE id = _round.id;
+  END IF;
+
+  FOR _row IN SELECT * FROM round_user WHERE round_id = _round.id LOOP
+    IF NOT EXISTS (SELECT id FROM users WHERE id = _row.user_id AND room_id = _round.room_id AND observer = FALSE) THEN
+      -- penalize the guesser if he is not in the room
+      UPDATE round_user SET score = score - _penalty WHERE round_id = _row.round_id AND user_id = _row.user_id;
+    END IF;
+  END LOOP;
+
+  SELECT count(*) INTO _correct_guesses
+  FROM round_user
+  WHERE round_id = _round.id AND submission = _round.answer;
+
+  SELECT count(*) INTO _total_guesser_count
+  FROM round_user
+  WHERE round_id = _round.id;
+
+  UPDATE rounds
+  SET painter_score = painter_score + calc_painter_score(_correct_guesses, _total_guesser_count)
+  WHERE id = _round.id
   RETURNING * INTO STRICT _round;
 
-  SELECT count(*) INTO _correct_guesses FROM round_user WHERE round_id = _round_id
-    AND submission = _round.answer;
-
-  SELECT count(*) INTO _total_guesser_count FROM round_user WHERE round_id = _round_id;
-
-  UPDATE rounds SET painter_score = calc_painter_score(_correct_guesses, _total_guesser_count)
-    WHERE id = _round_id RETURNING * INTO STRICT _round;
   RETURN _round;
 END;
 $$ LANGUAGE plpgsql;
