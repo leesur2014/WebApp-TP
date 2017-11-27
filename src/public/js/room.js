@@ -120,7 +120,6 @@ $(function () {
         userRows[msg.user_id].remove();
         add_message(users[msg.user_id].nickname + " left the room.");
         delete userRows[msg.user_id];
-        delete users[msg.user_id];
       }
     });
 
@@ -164,18 +163,38 @@ $(function () {
           return;
         }
         round = resp.data;
-        add_message("Round started. " + users[round.painter_id].nickname + " is the painter.");
+        if (round.painter_id == me.id) {
+          add_message("Round started. You are the painter.");
+        } else {
+          add_message("Round started. " + users[round.painter_id].nickname + " is the painter.");
+        }
+
         init_round();
       });
     });
 
 
     socket.on('round_end', function(msg) {
-      round = null;
-      add_message("Round ended.");
-      init_idle();
-      // TODO: display score of the ended round
-      // TODO: update users' score in the list
+      $.getJSON('/api/round/' + round.id, function (resp) {
+        if (resp.code != 0) {
+          alert("Error: " + resp.error);
+          location.reload();
+        }
+
+        var tbody = $("#round-result-tbody");
+
+        tbody.append(generate_result_row(users[resp.data.painter_id].nickname, resp.data.painter_score));
+
+        for (var i in resp.data.users) {
+          var user_id = resp.data.users[i].user_id;
+          tbody.append(generate_result_row(users[user_id].nickname, resp.data.users[i].score));
+        }
+
+        $('#round-result-modal').modal('show');
+        $('#round-result-modal').on('hide.bs.modal', function () {
+          location.reload();
+        });
+      })
     });
 
     socket.on('count_down', function(msg) {
@@ -354,7 +373,6 @@ $(function () {
 
   function init_round() {
     console.assert(round);
-    $("#messages").empty();
     $("#idle-div").hide();
     if (me.id == round.painter_id) {
       init_painter();
@@ -379,6 +397,16 @@ function generate_user_row(user) {
   row.append($("<td>").text(user.score_draw + user.score_guess));
   row.append($("<td>").text(user.observer ? "Observer" : "Player"));
   row.append($("<td>").text(user.ready ? "Yes" : "No"));
+
+  return row;
+}
+
+
+function generate_result_row(nickname, score) {
+  var row = $("<tr>");
+
+  row.append($("<td>").text(nickname));
+  row.append($("<td>").text(score));
 
   return row;
 }
