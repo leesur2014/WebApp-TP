@@ -78,8 +78,7 @@ $(function () {
   });
 
   $("#ready-btn").click(function (e) {
-    $(e.target).addClass("active");
-    $(e.target).prop("disabled", true);
+    $("#idle-div").hide();
     $.post("/api/ready", {ready: true});
   });
 
@@ -199,11 +198,11 @@ $(function () {
 
     socket.on('count_down', function(msg) {
       if (round) {
-        $("#count-down").text(msg.seconds + " seconds left");
-        $("#count-down").show();
+        $(".count-down").text(msg.seconds + " seconds left");
+        $(".count-down").show();
       } else {
         // should not reach here
-        $("#count-down").hide();
+        $(".count-down").hide();
       }
     });
   }
@@ -359,10 +358,10 @@ $(function () {
   }
 
   function init_idle() {
-    $("#count-down").hide();
+    $(".count-down").hide();
     $("#painter-div").hide();
     $("#guesser-div").hide();
-    $("#ready-btn").removeClass("active").prop("disabled", false);
+    $("#users-div").show();
     if (me.observer) {
       $("#idle-div").hide();
     } else {
@@ -374,6 +373,7 @@ $(function () {
   function init_round() {
     console.assert(round);
     $("#idle-div").hide();
+    $("#users-div").hide();
     if (me.id == round.painter_id) {
       init_painter();
     } else if (!me.observer) {

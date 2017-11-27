@@ -24,7 +24,8 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-sx-12 col-md-4">
+
+        <div class="col-sx-12 col-md-8" id="users-div" hidden="true">
           <h4 class="text-center">Users</h4>
           <table class="table">
             <thead>
@@ -38,46 +39,46 @@
             <tbody id="users-tbody">
             </tbody>
           </table>
-
-          <h4 class="text-center">Events</h4>
-          <ul id="messages" class="list-group">
-
-          </ul>
         </div>
 
-        <div class="col-sx-12 col-md-8">
-          <h4 id="count-down"></h4>
-          <div id="painter-div" hidden="true">
-            <h4>Please draw <span id="word"></span>:</h4>
-            <canvas id="painter-canvas" width="600" height="400"></canvas>
-            <div class="btn-group" role="group" id="style-div">
-              <button type="button" id="pencil-btn" class="btn btn-default active">Pencil</button>
-              <button type="button" id="brush-btn" class="btn btn-default">Brush</button>
-              <button type="button" id="eraser-btn" class="btn btn-default">Eraser</button>
-            </div>
-            <div class="btn-group" role="group" id="color-div">
-              <button type="button" class="btn btn-default">Red</button>
-              <button type="button" class="btn btn-default">Yellow</button>
-              <button type="button" class="btn btn-default">Green</button>
-              <button type="button" class="btn btn-default">Blue</button>
-              <button type="button" class="btn btn-default active">Black</button>
-            </div>
-            <button type="button" class="btn btn-default" id="clear-btn">Clear</button>
+        <div id="painter-div" class="col-sx-12 col-md-8" hidden="true">
+          <h4>Please draw <span id="word"></span>, <span class="count-down"></span></h4>
+          <canvas id="painter-canvas" width="600" height="400"></canvas>
+          <div class="btn-group" role="group" id="style-div">
+            <button type="button" id="pencil-btn" class="btn btn-default active">Pencil</button>
+            <button type="button" id="brush-btn" class="btn btn-default">Brush</button>
+            <button type="button" id="eraser-btn" class="btn btn-default">Eraser</button>
           </div>
-
-          <div id="guesser-div" hidden="true">
-            <canvas id="guesser-canvas" width="600" height="400"></canvas>
-            <form class="form-inline" id="guess-form">
-              <input class="form-control" type="text" name="submission" placeholder="Enter your answer here" required>
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <span id="guess-result"></span>
-            </form>
+          <div class="btn-group" role="group" id="color-div">
+            <button type="button" class="btn btn-default">Red</button>
+            <button type="button" class="btn btn-default">Yellow</button>
+            <button type="button" class="btn btn-default">Green</button>
+            <button type="button" class="btn btn-default">Blue</button>
+            <button type="button" class="btn btn-default active">Black</button>
           </div>
+          <button type="button" class="btn btn-default" id="clear-btn">Clear</button>
+        </div>
 
-          <div id="idle-div" hidden="true">
+        <div id="guesser-div" class="col-sx-12 col-md-8" hidden="true">
+          <h4 class="count-down"></h4>
+          <canvas id="guesser-canvas" width="600" height="400"></canvas>
+          <form class="form-inline" id="guess-form">
+            <input class="form-control" type="text" name="submission" placeholder="Enter your answer here" required>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <span id="guess-result"></span>
+          </form>
+        </div>
+
+        <div class="col-sx-12 col-md-4">
+          <h4 class="text-center">Events</h4>
+          <ul id="messages" class="list-group">
+          </ul>
+          <hr>
+          <div id="idle-div" hidden="true" class="text-center">
             <button type="button" class="btn btn-lg btn-primary" id="ready-btn">I am ready</button>
           </div>
         </div>
+      </div>
     </div>
 
 
@@ -85,7 +86,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title">Round Result</h4>
+            <h3 class="modal-title">Round Ended</h3>
           </div>
           <div class="modal-body">
             <table class="table">
@@ -102,6 +103,8 @@
         </div>
       </div>
     </div>
+
+
 
     <% include scripts %>
     <script src="/static/js/room.js"></script>

@@ -13,11 +13,7 @@
 
 canvas {
    display: block;
-   margin: 10px 0px 10px 0px;
    border-width: 1px;
+   margin-bottom: 10px;
    border: solid #000000;
-}
-
-#ready-btn {
-  margin: 100px 200px 0px 200px;
 }
