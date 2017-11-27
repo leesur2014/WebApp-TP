@@ -227,8 +227,8 @@ $(function () {
     function onMouseDown(e){
       drawing = true;
       var offset = $(canvas).offset();
-      current.x = e.clientX - offset.left;
-      current.y = e.clientY - offset.top;
+      current.x = e.pageX - offset.left;
+      current.y = e.pageY - offset.top;
     }
 
     function onMouseUp(e){
@@ -236,9 +236,9 @@ $(function () {
       drawing = false;
       var offset = $(canvas).offset();
       if (current.eraser) {
-        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, 'white', 40);
+        drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, 'white', 40);
       } else {
-        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, current.color, current.width);
+        drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
       $.post('/api/draw', {image: canvas.toDataURL()}, function (resp) {
         console.log(resp);
@@ -249,13 +249,13 @@ $(function () {
       if (!drawing) return;
       var offset = $(canvas).offset();
       if (current.eraser) {
-        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, 'white', 40);
+        drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, 'white', 40);
       } else {
-        drawLine(current.x, current.y, e.clientX - offset.left, e.clientY - offset.top, current.color, current.width);
+        drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
 
-      current.x = e.clientX - offset.left;
-      current.y = e.clientY - offset.top;
+      current.x = e.pageX - offset.left;
+      current.y = e.pageY - offset.top;
     }
 
     $("#pencil-btn").click(function (e) {
