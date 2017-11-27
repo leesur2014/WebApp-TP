@@ -306,6 +306,7 @@ $(function () {
 
 
   function init_guesser() {
+    console.log('[INFO] I am a guesser!');
     canvas = $("#guesser-canvas")[0];
     context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);

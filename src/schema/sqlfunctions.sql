@@ -2,6 +2,8 @@
 
 -- start read-only functions
 
+-- First: drop function user_exit_room(integer, boolean, integer);
+
 CREATE OR REPLACE FUNCTION calc_painter_score(_correct_guesses INT, _total_guesser_count INT) RETURNS INT AS $$
 BEGIN
     IF _correct_guesses = 0 THEN
