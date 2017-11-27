@@ -9,8 +9,8 @@ var assert = chai.assert;
 var Url = 'http://localhost:3000';
 //var Url = 'http://guessmydrawing.fun';
 
-var cookie1 = 's%3AmyD-BmD_RJDWxkgrA9d24aX3Mg8fFZRc.ttOLfgJcTWrIwNDQkTVpBDMNngC%2BqKqYIVTl%2BmpU7M0';
-var cookie2 = 'itGe7oJkVctogc5VAAAA';
+var cookie1 = 's%3AtYaiIsTqfRsCuDFamx4C2FmRi24XWT_p.cQZ4Az9BzSGsgVf0gKMzbOQbtAFO32PzpKI5rdIala8';
+var cookie2 = 'ENzkGyTrwVDrpF1MAAAA';
 var cookie3 = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 
 const request = require('supertest');
@@ -145,12 +145,12 @@ it('should get user ready /api/ready POST', function(done) {
   .set('Accept-Language','zh-CN,zh;q=0.8')
   //.set('Connection','keep-alive')
   .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+  .send({ready:true})
   .end(function(err, res) {
     res.should.have.status(200);
     res.should.be.json;
     res.body.should.have.property('code');
     done();
-
   });
 
 });
@@ -194,8 +194,6 @@ it('should exit current room /api/exit POST', function(done) {
 });
 
 
-var cookie4 = 'nXV_-CsOG8PkCFosAAAA';
-var cookie5 = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 it('should get info about a public room /api/room/{room_id} GET', function(done) {
   request(Url)
   .get('/api/room/3')
