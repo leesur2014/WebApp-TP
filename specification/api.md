@@ -252,11 +252,13 @@ GET /api/round/100
     "users": [
         {
       "user_id": 1,
-      "score": 0
+      "score": 0,
+      "nickname": "Jenny"
       },
         {
       "user_id": 4,
-      "score": 0
+      "score": 0,
+      "nickname": "Zhang"
       }
     ]
   }
