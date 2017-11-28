@@ -201,7 +201,7 @@ it('should get info about a public room /api/room/{room_id} GET', function(done)
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  .set('Cookie',['connect.sid='+cookie1,'io='+cookie4,'csrftoken='+cookie5]) 
+  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
   .end(function(err,res) {
     res.should.have.status(200);
     res.should.be.json;
@@ -221,7 +221,7 @@ it('should get a certain user info /api/user/{user_id} GET', function(done) {
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           .set('Cookie',['connect.sid='+cookie1,'io='+cookie4,'csrftoken='+cookie5])
+           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
         .end(function(err,res) {
             //console.log(res);
             res.should.have.status(200);
