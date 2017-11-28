@@ -33,7 +33,10 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({
+  extended: false,
+  limit: 1200000  // 1.2MB
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
