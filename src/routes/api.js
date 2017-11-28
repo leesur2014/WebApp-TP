@@ -97,6 +97,11 @@ router.get('/round/:id(\\d+)', function(req, res) {
       {
         return send_error(res, "round has not ended");
       }
+      if (round.room_id === req.user.room_id)
+      {
+        // allow observers
+        return send_data(res, round);
+      }
       if (round.painter_id == req.user.id)
       {
         return send_data(res, round);
