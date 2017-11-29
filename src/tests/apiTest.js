@@ -6,12 +6,12 @@ var app = require('../app');
 var expect = chai.expect;
 var server = require('../app').server;   
 var assert = chai.assert;      
-var Url = 'http://localhost:3000';
-//var Url = 'http://guessmydrawing.fun';
+//var Url = 'http://localhost:3000';
+var Url = 'http://guessmydrawing.fun';
 
-var cookie1 = 's%3AtYaiIsTqfRsCuDFamx4C2FmRi24XWT_p.cQZ4Az9BzSGsgVf0gKMzbOQbtAFO32PzpKI5rdIala8';
-var cookie2 = 'ENzkGyTrwVDrpF1MAAAA';
-var cookie3 = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
+var cookie_sid = 's%3AeqMdq2znEBkBU9kra5-GFg69wcUaUBoF.zWmAE3%2BF28zV7ZKwVl9hUT7LvbRfS4RMDwS0TArS0pk';
+var cookie_io = 'gzCUBiSB1yRuXxeGAAAP';
+var cookie_csrf = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 
 const request = require('supertest');
 describe('API Test', function() {
@@ -23,12 +23,12 @@ describe('API Test', function() {
 
     after(function (done) {
       server.close(function() {
-        //console.log("close server");
         server.shutdown;
       });
       done();
     });
 
+var curr_user_id;
 it('should get user info /api/me GET', function(done) {
    request(Url)
            .get('/api/me')
@@ -36,18 +36,17 @@ it('should get user info /api/me GET', function(done) {
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           //.set('Connection','keep-alive')
-           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
            .send({ fb_id: '123456', displayName: 'Mary White' })
 
         .end(function(err,res) {
-            //console.log(res.body);
             res.should.have.status(200);
             res.should.be.json;
             res.body.should.have.property('code');
             res.body.should.have.property('data');
             res.body.data.should.have.property('nickname');
             res.body.data.should.have.property('online');
+            curr_user_id = res.body.data.id;
             done();
         });
 });
@@ -59,11 +58,9 @@ it('should list all rooms /api/lounge GET', function(done) {
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           //.set('Connection','keep-alive')
-           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
            .send({ fb_id: '123456', displayName: 'Mary White' })
         .end(function(err, res) {
-           //console.log(res.body);
             res.should.have.status(200);
             res.should.be.json;
             res.body.should.be.a('object');
@@ -82,12 +79,10 @@ it('should chagne nickname /api/me POST', function(done) {
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           //.set('Connection','keep-alive')
-           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
            .type('form')
            .send({nickname:'Mary'})
         .end(function(err, res) {
-          //console.log(res.body);
             res.should.have.status(200);
             res.should.be.json;
             res.body.should.be.a('object');
@@ -107,8 +102,7 @@ it('should back to game center / GET', function(done) {
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  //.set('Connection','keep-alive')
-  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
   .end(function(err, res) {
     res.should.have.status(200);
     done();
@@ -123,8 +117,7 @@ it('should create room /api/room POST', function(done) {
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  //.set('Connection','keep-alive')
-  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
   .end(function(err, res) {
     res.should.have.status(200);
     res.body.should.have.property('code');
@@ -144,7 +137,7 @@ it('should get user ready /api/ready POST', function(done) {
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
   //.set('Connection','keep-alive')
-  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
   .send({ready:true})
   .end(function(err, res) {
     res.should.have.status(200);
@@ -155,6 +148,7 @@ it('should get user ready /api/ready POST', function(done) {
 
 });
 
+var curr_room_id;
 it('should list user\'s current room /api/room GET', function(done) {
    request(Url)
     .get('/api/room')
@@ -162,46 +156,26 @@ it('should list user\'s current room /api/room GET', function(done) {
     .set('Content-Type', 'application/json')
     .set('Accept-Encoding','gzip, deflate')
     .set('Accept-Language','zh-CN,zh;q=0.8')
-    //.set('Connection','keep-alive')
-    .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+    .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
         .end(function(err,res) {
             res.should.have.status(200);
             res.should.be.json;
             res.body.should.have.property('data');
             res.body.data.should.have.property('id');
+            curr_room_id = res.body.data.id;
             res.body.data.should.have.property('users');
             done();
         });
 });
 
-it('should exit current room /api/exit POST', function(done) {
-   request(Url)
-  .post('/api/exit')
-  .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-  .set('Content-Type', 'application/json')
-  .set('Accept-Encoding','gzip, deflate')
-  .set('Accept-Language','zh-CN,zh;q=0.8')
-  //.set('Connection','close')
-  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
-  .end(function(err,res) {
-              res.should.have.status(200);
-              res.should.be.json;
-              res.body.should.have.property('code');
-              res.body.code.should.equal(0);
-              done();
-          });
-
-});
-
-
 it('should get info about a public room /api/room/{room_id} GET', function(done) {
   request(Url)
-  .get('/api/room/3')
+  .get('/api/room/'+curr_room_id)
   .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
   .set('Content-Type', 'application/json')
   .set('Accept-Encoding','gzip, deflate')
   .set('Accept-Language','zh-CN,zh;q=0.8')
-  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3]) 
+  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
   .end(function(err,res) {
     res.should.have.status(200);
     res.should.be.json;
@@ -214,14 +188,33 @@ it('should get info about a public room /api/room/{room_id} GET', function(done)
   });
 });
 
+it('should exit current room /api/exit POST', function(done) {
+   request(Url)
+  .post('/api/exit')
+  .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+  .set('Content-Type', 'application/json')
+  .set('Accept-Encoding','gzip, deflate')
+  .set('Accept-Language','zh-CN,zh;q=0.8')
+  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
+  .end(function(err,res) {
+              res.should.have.status(200);
+              res.should.be.json;
+              res.body.should.have.property('code');
+              res.body.code.should.equal(0);
+              done();
+          });
+
+});
+
+
 it('should get a certain user info /api/user/{user_id} GET', function(done) {
    request(Url)
-           .get('/api/user/1')
+           .get('/api/user/'+curr_user_id)
            .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
         .end(function(err,res) {
             //console.log(res);
             res.should.have.status(200);
@@ -244,7 +237,7 @@ it('should get info of past round /api/round/{round_id} GET', function(done) {
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
-           .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
         .end(function(err,res) {
             //console.log(res);
             res.should.have.status(200);
@@ -269,7 +262,7 @@ it('should get info of past round /api/round/{round_id} GET', function(done) {
 //  .set('Content-Type', 'application/json')
 //  .set('Accept-Encoding','gzip, deflate')
 //  .set('Accept-Language','zh-CN,zh;q=0.8')
-//  .set('Cookie',['connect.sid='+cookie1,'io='+cookie2,'csrftoken='+cookie3])
+//  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
 //  .end(function(err,res) {
 //    res.should.have.status(200);
 //    res.should.be.json;
