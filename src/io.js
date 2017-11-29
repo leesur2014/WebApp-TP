@@ -1,5 +1,5 @@
 var io = require('socket.io')({
-  pingTimeout: 10000,
+  pingTimeout: 2000,
   pingInterval: 10000
 });
 var debug = require('debug')('io');
