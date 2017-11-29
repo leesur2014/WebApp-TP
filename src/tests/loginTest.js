@@ -32,7 +32,6 @@ describe("Login Test",function () {
                 .pressButton('login', function (err,brow) {
                     brw.assert.success();    
                     const request = require('supertest');
-                    done();
                 });
             done();
            });

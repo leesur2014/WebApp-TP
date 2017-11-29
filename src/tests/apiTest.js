@@ -222,7 +222,7 @@ it('should get a certain user info /api/user/{user_id} GET', function(done) {
             res.body.should.have.property('code');
             res.body.should.have.property('data');
             res.body.data.should.have.property('id');
-            res.body.data.id.should.equal(1);
+            res.body.data.id.should.equal(curr_user_id);
             res.body.data.should.have.property('nickname');
             res.body.data.should.have.property('score_draw');
             res.body.data.should.have.property('score_guess');
