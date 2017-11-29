@@ -184,6 +184,10 @@ $(function () {
 
         var tbody = $("#round-result-tbody");
 
+        var title = $(".modal-title")
+        var ans = $("<li>").text('The answer is' + resp.data.answer);
+        title.append(ans);
+
         tbody.append(generate_result_row(users[resp.data.painter_id].nickname, resp.data.painter_score));
 
         for (var i in resp.data.users) {
