@@ -148,6 +148,51 @@ it('should get user ready /api/ready POST', function(done) {
 
 });
 
+var cookie_sid2 = 's%3AbUtTTt-wE6s6gHHo1WCkgOhNIRXdvPec.s4oGsz3OXADPzi5HPOdvJXEtH3y4nisN3ex4YBjBS4o';
+var cookie_io2 = 'TqcGcmcm2QVs25wyAAAR';
+it('should get another user ready /api/ready POST', function(done) {
+   request(Url)
+  .post('/api/ready')
+  .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+  .set('Content-Type', 'application/json')
+  .set('Accept-Encoding','gzip, deflate')
+  .set('Accept-Language','zh-CN,zh;q=0.8')
+  .set('Cookie',['connect.sid='+cookie_sid2,'io='+cookie_io2,'csrftoken='+cookie_csrf]) 
+  .send({ready:true})
+  .end(function(err, res) {
+    res.should.have.status(200);
+    res.should.be.json;
+    res.body.should.have.property('code');
+    done();
+  });
+});
+
+var passed_round_id;
+it('should get info of current round /api/round GET', function(done) {
+   request(Url)
+           .get('/api/round')
+           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+           .set('Content-Type', 'application/json')
+           .set('Accept-Encoding','gzip, deflate')
+           .set('Accept-Language','zh-CN,zh;q=0.8')
+           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
+        .end(function(err,res) {
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('code');
+            res.body.should.have.property('data');
+            res.body.data.should.have.property('id');
+            passed_round_id = res.body.data.id;
+            res.body.data.should.have.property('painter_id');
+            res.body.data.should.have.property('room_id');
+            res.body.data.should.have.property('started_at');
+            res.body.data.should.have.property('ended_at');
+            res.body.data.should.have.property('answer');
+            done();
+        });
+});
+
+
 var curr_room_id;
 it('should list user\'s current room /api/room GET', function(done) {
    request(Url)
@@ -232,20 +277,19 @@ it('should get a certain user info /api/user/{user_id} GET', function(done) {
 
 it('should get info of past round /api/round/{round_id} GET', function(done) {
    request(Url)
-           .get('/api/round/2')
+           .get('/api/round/'+passed_round_id)
            .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
            .set('Content-Type', 'application/json')
            .set('Accept-Encoding','gzip, deflate')
            .set('Accept-Language','zh-CN,zh;q=0.8')
            .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
         .end(function(err,res) {
-            //console.log(res);
             res.should.have.status(200);
             res.should.be.json;
             res.body.should.have.property('code');
             res.body.should.have.property('data');
             res.body.data.should.have.property('id');
-            res.body.data.id.should.equal(2);
+            res.body.data.id.should.equal(passed_round_id);
             res.body.data.should.have.property('painter_id');
             res.body.data.should.have.property('room_id');
             res.body.data.should.have.property('started_at');
