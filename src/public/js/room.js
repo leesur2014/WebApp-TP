@@ -184,9 +184,7 @@ $(function () {
 
         var tbody = $("#round-result-tbody");
 
-        var title = $(".modal-title")
-        var ans = $("<h2/>").text('The answer is ' + resp.data.answer);
-        title.append(ans);
+        $("#round-result-answer").text(resp.data.answer);
 
         tbody.append(generate_result_row(users[resp.data.painter_id].nickname, resp.data.painter_score));
 
