@@ -37,6 +37,18 @@ $(function() {
         }
     });
 
+    socket.on('reconnecting', function (attempt) {
+      show_alert("Reconnecting to the server...");
+    });
+
+    socket.on('reconnect_failed', function (attempt) {
+      show_alert("Reconnection failed. Please check your network and refresh the page.");
+    });
+
+    socket.on('reconnect', function (attempt) {
+      hide_alert();
+    });
+
     // populate the rooms array
     $.get('/api/lounge', function(resp) {
         for (var i = 0; i < resp.data.length; ++i)
@@ -107,4 +119,17 @@ function generate_room(room) {
     panel_foot.append(join_actions);
     row.append(panel_foot);
     return row;
+}
+
+
+function show_alert(msg) {
+  var el = $("<p>").text(msg);
+  var div = $("alert-div")
+  div.empty();
+  div.append(el);
+  div.show();
+}
+
+function hide_alert() {
+  $("alert-div").hide();
 }
