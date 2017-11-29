@@ -127,12 +127,12 @@ function generate_room(room) {
 
 function show_alert(msg) {
   var el = $("<p>").text(msg);
-  var div = $("alert-div")
+  var div = $("#alert-div");
   div.empty();
   div.append(el);
   div.show();
 }
 
 function hide_alert() {
-  $("alert-div").hide();
+  $("#alert-div").hide();
 }
