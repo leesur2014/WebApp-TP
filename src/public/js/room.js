@@ -205,6 +205,19 @@ $(function () {
         $(".count-down").hide();
       }
     });
+
+
+    socket.on('reconnecting', function (attempt) {
+      show_alert("Reconnecting to the server...");
+    });
+
+    socket.on('reconnect_failed', function (attempt) {
+      show_alert("Reconnection failed. Please check your network and refresh the page.");
+    });
+
+    socket.on('reconnect', function (attempt) {
+      hide_alert();
+    });
   }
 
 
@@ -409,4 +422,17 @@ function generate_result_row(nickname, score) {
   row.append($("<td>").text(score));
 
   return row;
+}
+
+
+function show_alert(msg) {
+  var el = $("<p>").text(msg);
+  var div = $("alert-div")
+  div.empty();
+  div.append(el);
+  div.show();
+}
+
+function hide_alert() {
+  $("alert-div").hide();
 }
