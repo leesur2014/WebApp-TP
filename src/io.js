@@ -1,4 +1,7 @@
-var io = require('socket.io')();
+var io = require('socket.io')({
+  pingTimeout: 10000,
+  pingInterval: 10000
+});
 var debug = require('debug')('io');
 var db = require('./db');
 

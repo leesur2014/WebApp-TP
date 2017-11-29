@@ -99,7 +99,9 @@ $(function () {
 
 
   function init_socket() {
-    var socket = io('/room?token=' + me.token);
+    var socket = io('/room?token=' + me.token, {
+      reconnectionAttempts: 5
+    });
 
     socket.on('user_enter', function(msg) {
       $.getJSON('/api/user/' + msg.user_id, function (resp) {
