@@ -38,7 +38,7 @@ $(function() {
     });
 
     socket.on('reconnecting', function (attempt) {
-      show_alert(`Connection lost. Reconnecting #{attempt}...`);
+      show_alert(`Connection lost. Reconnecting #${attempt}...`);
     });
 
     socket.on('reconnect_failed', function (attempt) {
