@@ -28,7 +28,7 @@ describe("Login Test",function () {
                 throw err;
             }
             assert.equal(brw.location.pathname, '/login.php');
-            brw.fill('email','542785042@qq.com').fill('pass', '2030QWEqwe')
+            brw.fill('email','15244664776@163.com').fill('pass', 'password1234')
                 .pressButton('login', function (err,brow) {
                     brw.assert.success();    
                     const request = require('supertest');
