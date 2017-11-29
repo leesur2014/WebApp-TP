@@ -38,14 +38,17 @@ $(function() {
     });
 
     socket.on('reconnecting', function (attempt) {
+      console.log("Reconnecting");
       show_alert("Reconnecting to the server...");
     });
 
     socket.on('reconnect_failed', function (attempt) {
+      console.log("Reconnect failed");
       show_alert("Reconnection failed. Please check your network and refresh the page.");
     });
 
     socket.on('reconnect', function (attempt) {
+      console.log("Reconnect success");
       hide_alert();
     });
 
