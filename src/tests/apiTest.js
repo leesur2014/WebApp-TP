@@ -302,51 +302,5 @@ it('should get a certain user info /api/user/{user_id} GET', function(done) {
 //        });
 //});
 
-
-
 });
 
-/*
-Method | URL | Description
----|----|-------------
--GET | `/api/me` | Get current user's info
--POST | `/api/me` | change my nickname
--GET | `/api/lounge` | Get a list of public rooms
--GET | `/api/room` | Get detailed info about current room
--GET | `/api/room/{room_id}` | Get detailed info about a public room
--GET | `/api/user/{user_id}` | Get info about a user
-/GET | `/api/round` | Get detailed info about current round
--GET | `/api/round/{round_id}` | Get result of a past round
--POST | `/api/room` | Create a room
-POST | `/api/enter` | Join a room
--POST | `/api/exit` | Quit a room
-POST | `/api/ready` | Set/clear the user's ready bit
-POST | `/api/guess` | Submit the answer for a round
-POST | `/api/draw` | Send the painter's drawing
-GET | `/api/top-users` | Get a list of top users
-
-it('should list user\'s current room /api/room GET', function(done) {
-    chai.request(server)
-        .get('/api/room')
-        .end(function(err,res) {
-            res.should.have.status(200);
-            res.should.be.json;
-            res.body.should.have.property('data');
-            res.body.data.should.have.property('id');
-            res.body.data.should.have.property('users');
-            done();
-        });
-});
-
-it('should get the user info /api/user/{user_id} GET', function(done) {
-    chai.request(server)
-        .get('/api/user/2')
-        .end(function(err, res) {
-            res.should.have.status(200);
-            res.body.should.have.property('data');
-            res.body.data.should.have.property('id');
-            res.body.data.id.should.equal('2');
-            done();
-        });
-});
-*/
