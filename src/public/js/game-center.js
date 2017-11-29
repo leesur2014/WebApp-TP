@@ -1,6 +1,8 @@
 $(function() {
     var token = $('#user-token').val();
-    var socket = io('/lounge?token=' + token);
+    var socket = io('/lounge?token=' + token, {
+      reconnectionAttempts: 5
+    });
     var rooms = []; // map room id to jquery elements
 
     socket.on('room_create', function(msg) {
