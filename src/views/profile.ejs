@@ -5,9 +5,9 @@
         <h3 class="modal-title">Profile</h3>
       </div>
       <div class="modal-body">
-        <form id="change-nickname-form" class="form-inline">
-           <li class="navbar-text">Drawing Score: <%= user.score_draw %></li>
-           <li class="navbar-text">Guessing Score: <%= user.score_guess %></li>
+        <form id="change-nickname-form" class="form-group">
+           <input class="form-control" type="text" placeholder="Drawing Score: <%= user.score_draw %>" readonly>
+           <input class="form-control" type="text" placeholder="Guessing Score: <%= user.score_guess %>" readonly>
           <label for="input-nickname">Nickname</label>
           <input type="text" name="nickname" id="input-nickname" class="form-control" value="<%= user.nickname %>" required>
           <button type="submit" class="btn btn-primary">Submit</button>
