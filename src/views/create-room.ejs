@@ -6,9 +6,21 @@
       </div>
       <form id="create-room-form">
         <div class="modal-body">
-          <div class="form-group">
+          <div class="radio">
+            <label>
+              <input type="radio" name="room-type" value="public" checked>
+              Create a Public Room
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="room-type" value="private">
+              Create a Private Room
+            </label>
+          </div>
+          <div class="form-group" id="room-password-div" hidden="true">
             <label>Passcode</label>
-            <input type="text" name ="passcode" class="form-control" placeholder="Keep empty if you want to create a public room">
+            <input type="text" name ="passcode" id="room-password-input" class="form-control">
           </div>
         </div>
         <div class="modal-footer">
