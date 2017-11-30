@@ -56,7 +56,7 @@ $(function () {
         init_idle();
       }
 
-      init_socket();
+      init_room_socket();
 
     });
 
@@ -98,7 +98,21 @@ $(function () {
   })
 
 
-  function init_socket() {
+  function init_round_socket() {
+    var socket = io('/round?token=' + me.token, {
+      reconnectionAttempts: 5
+    });
+
+    socket.on('user_guess', function(msg) {
+      if (msg.submission) {
+        add_message(users[msg.user_id].nickname + " guessed " + msg.submission);
+      } else {
+        add_message(users[msg.user_id].nickname + " made a " + (msg.correct ? "correct" : "wrong") + " guess");
+      }
+    });
+  }
+
+  function init_room_socket() {
     var socket = io('/room?token=' + me.token, {
       reconnectionAttempts: 5
     });
@@ -382,6 +396,7 @@ $(function () {
     console.assert(round);
     $("#idle-div").hide();
     $("#users-div").hide();
+    init_round_socket();
     if (me.id == round.painter_id) {
       init_painter();
     } else if (!me.observer) {
