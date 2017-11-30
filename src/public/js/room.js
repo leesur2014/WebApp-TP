@@ -202,11 +202,7 @@ $(function () {
 
     socket.on('count_down', function(msg) {
       if (round) {
-        $(".count-down").text(msg.seconds + " seconds left");
-        $(".count-down").show();
-      } else {
-        // should not reach here
-        $(".count-down").hide();
+        $(".count-down").text(msg.seconds);
       }
     });
 
@@ -375,7 +371,6 @@ $(function () {
   }
 
   function init_idle() {
-    $(".count-down").hide();
     $("#painter-div").hide();
     $("#guesser-div").hide();
     $("#users-div").show();
