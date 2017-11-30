@@ -14,6 +14,12 @@ const config = {
 }
 
 var pgp = require('pg-promise')(options);
+
+// https://github.com/vitaly-t/pg-promise/issues/389
+const moment = require('moment');
+// 1114 is OID for timestamp in Postgres
+pgp.pg.types.setTypeParser(1114, str => moment.utc(str).format());
+
 var db = pgp(config);
 
 module.exports = db;
