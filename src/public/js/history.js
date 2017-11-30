@@ -1,28 +1,21 @@
 $(function () {
 
-  return;
-  
-  $.get('/api/top-users', function(res) {
+  $.get('/api/history', function(res) {
+    if (res.code != 0) {
+      alert("Error: " + res.error);
+      return;
+    }
     for(var i = 0; i < res.data.length; i++) {
         var row = $('<tr>');
+        var datetime = new Date(res.data[i].started_at);
 
-        var nickname = $('<td>');
-        nickname.text(res.data[i].nickname);
-        row.append(nickname);
+        row.append($('<td>').text(datetime.toLocaleDateString()));
+        row.append($('<td>').text(datetime.toLocaleTimeString()));
+        row.append($('<td>').text(res.data[i].painter ? "Painter" : "Guesser"));
+        row.append($('<td>').text(res.data[i].score));
 
-        var score_draw = $('<td>');
-        score_draw.text(res.data[i].score_draw);
-        row.append(score_draw);
-
-        var score_guess = $('<td>');
-        score_guess.text(res.data[i].score_guess);
-        row.append(score_guess);
-
-        var score_total = $('<td>');
-        score_total.text(res.data[i].score);
-        row.append(score_total);
-
-        $('#rank-table').append(row);
+        console.log(res.data[i]);
+        $('#history-table').append(row);
     }
   });
 
