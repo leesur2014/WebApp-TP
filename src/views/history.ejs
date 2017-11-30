@@ -20,8 +20,8 @@
       <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
               <li><a href="/">Game Center</a></li>
-              <li class="active"><a href="/score-board">Score board</a></li>
-              <li><a href="/history">History</a></li>
+              <li><a href="/score-board">Score board</a></li>
+              <li class="active"><a href="/history">History</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
@@ -39,21 +39,22 @@
   </nav>
 
   <div class="container">
+    <h2 class="text-center">Your Past Rounds</h2>
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Nickname</th>
-          <th>Drawing Score</th>
-          <th>Guessing Score</th>
-          <th>Total Score</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Role</th>
+          <th>Score</th>
         </tr>
       </thead>
-      <tbody id="rank-table">
+      <tbody id="history-table">
       </tbody>
     </table>
   </div>
 
   <% include scripts %>
-  <script src="/static/js/score-board.js"></script>
+  <script src="/static/js/history.js"></script>
 </body>
 </html>
