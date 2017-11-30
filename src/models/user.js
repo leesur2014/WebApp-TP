@@ -22,13 +22,11 @@ class User {
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
         debug("user", user.id, "logged in");
-        io.lounge.emit('user_login', {user_id: user.id});
         return user;
       });
   }
 
   logout() {
-    io.lounge.emit('user_logout', {user_id: this.id});
     debug("user", user.id, "logging out");
     return db.proc('user_logout', this.id);
   }
