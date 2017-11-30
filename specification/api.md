@@ -253,11 +253,13 @@ GET /api/round/100
         {
       "user_id": 1,
       "score": 0,
-      "nickname": "Jenny"
+      "nickname": "Jenny",
+      "submission": "apple"
       },
         {
       "user_id": 4,
       "score": 0,
+      "submission": "orange",
       "nickname": "Zhang"
       }
     ]
@@ -265,7 +267,7 @@ GET /api/round/100
 }
 ```
 
-### Get the latest image of a round
+### Get info of the current round
 
 ```
 GET /api/round
@@ -297,6 +299,11 @@ GET /api/round
   }
 }
 ```
+
+Note: If the user is a guesser, the round's answer and other guesser's submissions
+are filtered. Other users in the room, i.e. the painter and observers, can get
+all information about current round.
+
 
 
 ### enter a room

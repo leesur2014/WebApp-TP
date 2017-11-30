@@ -8,7 +8,8 @@ Round = {};
 Round.getInfoById = function (id) {
   return db.proc("round_get_by_id", [id])
     .then(function (round) {
-      return db.any('SELECT round_user.user_id, users.nickname, round_user.score FROM round_user INNER JOIN users ON round_user.user_id=users.id WHERE round_user.round_id = $1', id)
+      return db.any('SELECT round_user.user_id, users.nickname, round_user.score, round_user.submission' +
+        ' FROM round_user INNER JOIN users ON round_user.user_id=users.id WHERE round_user.round_id = $1', id)
         .then(function (data) {
           round.users = data;
           return round;

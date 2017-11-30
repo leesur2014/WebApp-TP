@@ -126,8 +126,9 @@ router.get('/round', function(req, res) {
   {
     Round.getInfoById(req.user.round_id)
       .then(function (round) {
-        if (round.painter_id != req.user.id)
-        {
+        if (!req.user.observer && round.painter_id != req.user.id) {
+          // if the user is nor an observer or the painter
+          // remove answer
           delete round.answer;
         }
         return send_data(res, round);

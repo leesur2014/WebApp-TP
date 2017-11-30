@@ -56,7 +56,7 @@ $(function () {
         init_idle();
       }
 
-      init_socket();
+      init_room_socket();
 
     });
 
@@ -98,7 +98,21 @@ $(function () {
   })
 
 
-  function init_socket() {
+  function init_round_socket() {
+    var socket = io('/round?token=' + me.token, {
+      reconnectionAttempts: 5
+    });
+
+    socket.on('user_guess', function(msg) {
+      if (msg.submission) {
+        add_message(users[msg.user_id].nickname + " guessed " + msg.submission);
+      } else {
+        add_message(users[msg.user_id].nickname + " made a " + (msg.correct ? "correct" : "wrong") + " guess");
+      }
+    });
+  }
+
+  function init_room_socket() {
     var socket = io('/room?token=' + me.token, {
       reconnectionAttempts: 5
     });
@@ -137,10 +151,6 @@ $(function () {
           add_message(user.nickname + " is not ready.");
         }
       }
-    });
-
-    socket.on('user_guess', function(msg) {
-      add_message(users[msg.user_id].nickname + " made a " + (msg.correct ? "correct" : "wrong") + " guess");
     });
 
     socket.on('user_draw', function(msg) {
@@ -358,6 +368,7 @@ $(function () {
     context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     $("#guess-form").hide();
+    $("#guesser-prompt").text("The answer is " + round.answer);
     $("#guesser-div").show();
 
     if (round.image) {
@@ -386,6 +397,7 @@ $(function () {
     console.assert(round);
     $("#idle-div").hide();
     $("#users-div").hide();
+    init_round_socket();
     if (me.id == round.painter_id) {
       init_painter();
     } else if (!me.observer) {

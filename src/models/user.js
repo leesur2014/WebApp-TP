@@ -9,17 +9,10 @@ var io = require('../io');
 class User {
 
   static getById(user_id) {
-    return db.proc("user_get_by_id", user_id)
+    return db.one("SELECT * FROM users_extra WHERE id = $1", user_id)
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
-        return db.proc('user_get_current_round', user_id)
-          .then(function (round) {
-            if (round == null)
-              user.round_id = null;
-            else
-              user.round_id = round.id;
-            return user;
-          })
+        return user;
       });
   }
 
@@ -29,13 +22,11 @@ class User {
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
         debug("user", user.id, "logged in");
-        io.lounge.emit('user_login', {user_id: user.id});
         return user;
       });
   }
 
   logout() {
-    io.lounge.emit('user_logout', {user_id: this.id});
     debug("user", user.id, "logging out");
     return db.proc('user_logout', this.id);
   }
@@ -120,8 +111,17 @@ class User {
     var user = this;
     return db.proc('user_guess', [this.id, submission], (d) => d.user_guess)
       .then(function (correct) {
-        io.room.to('room_' + user.room_id)
+        // notify other guessers
+        io.round.to(`round_${user.round_id}_guesser`)
           .emit('user_guess', {user_id: user.id, correct: correct});
+
+        // notify observers and the painter
+        io.round.to(`round_${user.round_id}`)
+          .emit('user_guess', {
+            user_id: user.id,
+            correct: correct,
+            submission: submission
+          });
 
         if (correct)
         {
