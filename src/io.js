@@ -85,23 +85,6 @@ room.on('connection', function(socket) {
         debug("socket", socket.id, "error:", reason);
       });
 
-      socket.on('user_draw_delta', function(data) {
-        debug(data);
-        db.proc('room_get_current_round', user.room_id)
-          .then(function (round) {
-            if (round && round.painter_id == user.id)
-            {
-              // only allow the painter to draw
-              // TODO: validate data
-              data.timestamp = new Date();
-              room.to('room_' + user.room_id).emit('user_draw_delta', data);
-            }
-          })
-          .catch(function (e) {
-            debug(e);
-          });
-      });
-
     })
     .catch(function (e) {
       debug("disconnect due to auth failure");
