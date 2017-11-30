@@ -54,7 +54,7 @@ lounge.on('connection', function(socket) {
 room.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
-      debug("user", user.id, "connected to /round via", socket.id);
+      debug("user", user.id, "connected to /room via", socket.id);
 
       if (user.room_id == null)
       {
