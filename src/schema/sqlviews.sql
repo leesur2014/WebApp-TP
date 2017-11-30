@@ -12,3 +12,18 @@ CREATE VIEW top_users AS SELECT id, nickname, score_draw, score_guess, (score_gu
 
 CREATE VIEW users_extra AS SELECT *, user_get_current_round_id(id) AS round_id,
   user_is_painter(id) AS painter FROM users;
+
+CREATE VIEW history_painter AS
+SELECT users.id AS user_id, rounds.id AS round_id,
+rounds.started_at, rounds.ended_at, rounds.painter_score AS score
+FROM rounds JOIN users ON rounds.painter_id = users.id;
+
+CREATE VIEW history_guesser AS
+SELECT round_user.user_id, round_user.round_id, rounds.started_at, rounds.ended_at, round_user.score
+FROM rounds JOIN round_user ON round_user.round_id = rounds.id;
+
+
+CREATE VIEW history AS
+SELECT *, TRUE as painter FROM history_painter UNION
+SELECT *, FALSE as painter FROM history_guesser
+ORDER BY round_id DESC;
