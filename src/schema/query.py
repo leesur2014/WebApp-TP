@@ -1,18 +1,9 @@
-import csv
-
 def main():
-    my_words = []
-    with open('/Users/xuhuiwang/Documents/words.csv', 'rb') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            # print('Number of elements:', len(row))
-            # append all nouns
-            if 'n' in row[1] and not 'a' in row[1] and not 'pron' in row[1] and not 'v' in row[1] and row[0] not in my_words:
-                my_words.append((row[0]))
-
-    print(len(my_words))
-    print("'), ('".join(my_words))
-
+    with open('words.txt') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                print("INSERT INTO dictionary VALUES ('{}');".format(line))
 
 if __name__ == "__main__":
     main()
