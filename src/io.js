@@ -63,12 +63,7 @@ room.on('connection', function(socket) {
       }
 
       debug("user", user.id, "in room", user.room_id);
-
-      if (user.observer) {
-        socket.join("observer_room_" + user.room_id);
-      } else {
-        socket.join("room_" + user.room_id);
-      }
+      socket.join("room_" + user.room_id);
 
       socket.conn.on('packet', function (packet) {
         debug("received", packet.type, "packet from user", user.id);
