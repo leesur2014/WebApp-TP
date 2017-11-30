@@ -34,6 +34,16 @@ router.use('/', function (req, res, next) {
     res.send({code: 401, error: "unauthorized"});
 });
 
+router.get('/history', function (req, res) {
+  req.user.getHistory()
+    .then(function (rows) {
+      return send_data(res, rows);
+    })
+    .catch(function (err)
+    {
+      return send_error(res, err);
+    });
+});
 
 router.get('/top-users', function (req, res) {
   db.any('SELECT * FROM top_users LIMIT 100')

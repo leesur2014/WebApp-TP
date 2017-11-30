@@ -44,6 +44,9 @@ class User {
       });
   }
 
+  getHistory() {
+    return db.any('SELECT * FROM history WHERE user_id = $1', this.id);
+  }
 
   enterRoom(room_id, passcode = '', observer = false) {
     var user = this;
