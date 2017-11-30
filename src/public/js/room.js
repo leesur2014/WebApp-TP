@@ -409,9 +409,10 @@ $(function () {
 });
 
 function add_message(msg) {
-  var el = $("<li>").text(msg);
+  var el = $("<li>").text(msg).hide();
   el.addClass("list-group-item");
   $("#messages").prepend(el);
+  el.show('slow');
 }
 
 function generate_user_row(user) {
