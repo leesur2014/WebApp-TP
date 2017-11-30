@@ -208,7 +208,7 @@ it('should get user ready /api/ready POST', function(done) {
 //});
 
 
-var passed_round_id;
+//var passed_round_id;
 //it('should get info of current round /api/round GET', function(done) {
 //   request(Url)
 //           .get('/api/round')
