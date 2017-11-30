@@ -16,11 +16,13 @@ CREATE VIEW users_extra AS SELECT *, user_get_current_round_id(id) AS round_id,
 CREATE VIEW history_painter AS
 SELECT users.id AS user_id, rounds.id AS round_id,
 rounds.started_at, rounds.ended_at, rounds.painter_score AS score
-FROM rounds JOIN users ON rounds.painter_id = users.id;
+FROM rounds JOIN users ON rounds.painter_id = users.id
+WHERE rounds.ended_at IS NOT NULL;
 
 CREATE VIEW history_guesser AS
 SELECT round_user.user_id, round_user.round_id, rounds.started_at, rounds.ended_at, round_user.score
-FROM rounds JOIN round_user ON round_user.round_id = rounds.id;
+FROM rounds JOIN round_user ON round_user.round_id = rounds.id
+WHERE rounds.ended_at IS NOT NULL;
 
 
 CREATE VIEW history AS
