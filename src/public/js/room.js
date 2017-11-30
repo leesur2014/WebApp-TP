@@ -368,7 +368,7 @@ $(function () {
     context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     $("#guess-form").hide();
-    $("#guesser-prompt").text("The answer is " + round.answer);
+    $("#guesser-prompt").text(`The answer is ${round.answer}.`);
     $("#guesser-div").show();
 
     if (round.image) {
