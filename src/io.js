@@ -5,13 +5,14 @@ var io = require('socket.io')({
 var debug = require('debug')('io');
 var db = require('./db');
 
-// two namespaces
+
 var lounge = io.of('/lounge');
 var room = io.of('/room');
+var round = io.of('/round');
 
 function getUser(socket) {
   let token = socket.handshake.query.token;
-  return db.one('SELECT * FROM users WHERE token = $1 AND online = TRUE', token || 'token_missing');
+  return db.one('SELECT * FROM users_extra WHERE token = $1 AND online = TRUE', token || 'token_missing');
 };
 
 function pingUser(userId) {
@@ -53,7 +54,7 @@ lounge.on('connection', function(socket) {
 room.on('connection', function(socket) {
   getUser(socket)
     .then(function (user) {
-      debug("user", user.id, "connected to /room via", socket.id);
+      debug("user", user.id, "connected to /round via", socket.id);
 
       if (user.room_id == null)
       {
@@ -88,8 +89,38 @@ room.on('connection', function(socket) {
 });
 
 
+
+round.on('connection', function(socket) {
+  getUser(socket)
+    .then(function (user) {
+      debug("user", user.id, "connected to /round via", socket.id);
+
+      if (user.round_id == null)
+      {
+        debug("user", user.id, "is not in a round, disconnect");
+        socket.disconnect(true);
+        return;
+      }
+
+      if (user.painter || user.observer) {
+        debug("user", user.id, "in round", user.round_id, "as a painter/observer");
+        socket.join(`round_${user.round_id}`);
+      } else {
+        debug("user", user.id, "in round", user.round_id, "as a guesser");
+        socket.join(`round_${user.round_id}_guesser`);
+      }
+
+    })
+    .catch(function (e) {
+      debug("disconnect due to auth failure");
+      socket.disconnect(true);
+    });
+});
+
+
 module.exports = {
   lounge: lounge,
   room: room,
-  io: io
+  io: io,
+  round: round
 };
