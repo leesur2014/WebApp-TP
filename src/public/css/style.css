@@ -3,10 +3,6 @@
     opacity:0.6 !important;
 }
 
-#change-nickname-form button {
-    width: 100%;
-}
-
 .room-panel {
     max-width: 40em;
     margin: 2em;
