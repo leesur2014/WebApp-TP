@@ -6,6 +6,7 @@ src/npm
 *.iml
 
 package-lock.json
+env.*
 
 # Class-specific section #
 
