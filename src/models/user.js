@@ -9,17 +9,10 @@ var io = require('../io');
 class User {
 
   static getById(user_id) {
-    return db.proc("user_get_by_id", user_id)
+    return db.one("SELECT * FROM users_with_round WHERE id = $1", user_id)
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
-        return db.proc('user_get_current_round', user_id)
-          .then(function (round) {
-            if (round == null)
-              user.round_id = null;
-            else
-              user.round_id = round.id;
-            return user;
-          })
+        return user;
       });
   }
 
