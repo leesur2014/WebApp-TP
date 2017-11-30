@@ -88,6 +88,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION user_is_painter(_user_id INT) RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (SELECT * FROM user_get_current_round(_user_id) WHERE painter_id = _user_id);
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION room_get_current_round(_room_id INT) RETURNS SETOF rounds AS $$
 BEGIN
