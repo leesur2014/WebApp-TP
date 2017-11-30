@@ -1,6 +1,12 @@
 $(function () {
 
   $.get('/api/top-users', function(res) {
+
+    if (res.code != 0) {
+      alert("Error: " + res.error);
+      return;
+    }
+    
     for(var i = 0; i < res.data.length; i++) {
         var row = $('<tr>');
 
