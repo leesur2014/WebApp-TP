@@ -113,8 +113,17 @@ class User {
     var user = this;
     return db.proc('user_guess', [this.id, submission], (d) => d.user_guess)
       .then(function (correct) {
-        io.room.to('room_' + user.room_id)
+        // notify other guessers
+        io.round.to(`round_${user.round_id}_guesser`)
           .emit('user_guess', {user_id: user.id, correct: correct});
+
+        // notify observers and the painter
+        io.round.to(`round_${user.round_id}`)
+          .emit('user_guess', {
+            user_id: user.id,
+            correct: correct,
+            submission: submission
+          });
 
         if (correct)
         {
