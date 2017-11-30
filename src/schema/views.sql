@@ -7,11 +7,12 @@ CREATE VIEW open_rounds AS SELECT * FROM rounds WHERE ended_at IS NULL ORDER BY 
 
 CREATE VIEW top_guessers AS SELECT id, nickname, score_guess FROM users ORDER BY score_guess;
 CREATE VIEW top_painters AS SELECT id, nickname, score_draw FROM users ORDER BY score_draw;
-CREATE VIEW top_users AS SELECT id, nickname, score_draw, score_guess, (score_guess + score_draw)
-  AS score FROM users ORDER BY score DESC;
 
 CREATE VIEW users_extra AS SELECT *, user_get_current_round_id(id) AS round_id,
-  user_is_painter(id) AS painter FROM users;
+(score_guess + score_draw) AS score, user_is_painter(id) AS painter FROM users;
+
+CREATE VIEW top_users AS SELECT id, nickname, score_draw, score_guess, score,
+rank() OVER (ORDER BY score DESC) FROM users_extra;
 
 CREATE VIEW history_painter AS
 SELECT users.id AS user_id, rounds.id AS round_id,
