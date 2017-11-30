@@ -46,7 +46,9 @@
         </div>
 
         <div id="painter-div" class="col-sx-12 col-md-8" hidden="true">
-          <div class="alert alert-info" role="alert">Please draw <b id="word"></b>, <span class="count-down"></span></div>
+          <div class="alert alert-info" role="alert">
+            <p>Please draw <em id="word"></em> in <span class="count-down"></span> seconds</p>
+          </div>
           <canvas id="painter-canvas" width="600" height="400"></canvas>
           <div class="btn-group" role="group" id="style-div">
             <button type="button" id="pencil-btn" class="btn btn-default active">Pencil</button>
@@ -64,7 +66,9 @@
         </div>
 
         <div id="guesser-div" class="col-sx-12 col-md-8" hidden="true">
-        <div class="alert alert-info" role="alert">Please guess an answer. Time remaining: <span class="count-down"></span></div>
+          <div class="alert alert-info" role="alert">
+            <p>Please guess an answer. Time remaining: <span class="count-down"></span> seconds</p>
+          </div>
           <canvas id="guesser-canvas" width="600" height="400"></canvas>
           <form class="form-inline" id="guess-form">
             <input class="form-control" type="text" name="submission" placeholder="Enter your answer here" required>
@@ -90,7 +94,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title">Round Ended, the answer is <i id="round-result-answer"></i></h3>
+            <h3 class="modal-title">Round Ended, the answer is <em id="round-result-answer"></em></h3>
           </div>
           <div class="modal-body">
             <table class="table">
