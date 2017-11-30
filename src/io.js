@@ -64,7 +64,7 @@ room.on('connection', function(socket) {
 
       debug("user", user.id, "in room", user.room_id);
 
-      if (user.observer === true) {
+      if (user.observer) {
         socket.join("observer_room_" + user.room_id);
       } else {
         socket.join("room_" + user.room_id);
