@@ -139,10 +139,6 @@ $(function () {
       }
     });
 
-    socket.on('user_guess', function(msg) {
-      add_message(users[msg.user_id].nickname + " made a " + (msg.correct ? "correct" : "wrong") + " guess");
-    });
-
     socket.on('user_draw', function(msg) {
       if ((round.painter_id != me.id) && canvas && context) {
         // if I am not the painter
