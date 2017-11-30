@@ -9,7 +9,7 @@ var io = require('../io');
 class User {
 
   static getById(user_id) {
-    return db.one("SELECT * FROM users_with_round WHERE id = $1", user_id)
+    return db.one("SELECT * FROM users_extra WHERE id = $1", user_id)
       .then(function (user) {
         Object.setPrototypeOf(user, User.prototype);
         return user;
