@@ -26,6 +26,7 @@ POST | `/api/ready` | Set/clear the user's ready bit
 POST | `/api/guess` | Submit the answer for a round
 POST | `/api/draw` | Send the painter's drawing
 GET | `/api/top-users` | Get a list of top users
+GET | `/api/history` | Get a list of past rounds
 
 All POST requests body is an URLencoded string.
 
@@ -486,6 +487,53 @@ GET /api/top-users
   "code":0,
   "data":[
     {"id":1,"nickname":"Jim Zhong","score_draw":0,"score_guess":0,"score":0}
+  ]
+}
+```
+
+
+### Get the user's past rounds
+
+```
+GET /api/history
+```
+
+```json
+{
+"code": 0,
+"data": [
+    {
+  "user_id": 1,
+  "round_id": 70,
+  "started_at": "2017-11-30T08:30:45.188Z",
+  "ended_at": "2017-11-30T08:38:39.150Z",
+  "score": -5,
+  "painter": true
+  },
+    {
+  "user_id": 1,
+  "round_id": 69,
+  "started_at": "2017-11-30T08:29:45.373Z",
+  "ended_at": "2017-11-30T08:30:17.461Z",
+  "score": 5,
+  "painter": false
+  },
+    {
+  "user_id": 1,
+  "round_id": 68,
+  "started_at": "2017-11-30T08:18:34.710Z",
+  "ended_at": "2017-11-30T08:19:13.416Z",
+  "score": 2,
+  "painter": true
+  },
+    {
+  "user_id": 1,
+  "round_id": 67,
+  "started_at": "2017-11-30T08:17:24.812Z",
+  "ended_at": "2017-11-30T08:18:17.176Z",
+  "score": 5,
+  "painter": false
+  }
   ]
 }
 ```
