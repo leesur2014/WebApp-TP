@@ -70,6 +70,15 @@ app.get('/score-board',function(req,res) {
     return res.render('score-board', {user: req.user});
 });
 
+app.get('/history',function(req,res) {
+    if (!req.isAuthenticated())
+    {
+        return res.redirect('/');
+    }
+    return res.render('history', {user: req.user});
+});
+
+
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
