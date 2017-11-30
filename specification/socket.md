@@ -18,17 +18,20 @@ client(i.e. front-end) can get this token at the `/api/me` endpoint.
 The client should connect to the server's socket io endpoint in the following way
 
 ```js
-const socket = io("https://guessmydrawing.fun/{endpoint}?token=xxxxxxx");
+var socket = io(`${endpoint}?token=${token}`);
 ```
 
 The connection will be disconnected immediately if authentication fails.
 
-The endpoint has two values: `lounge` and `room`. The `lounge` endpoint allows the server
-to push changes in the game center. While the `room` allows the server to push changes in
-the room the user is in.
+The endpoint has three values: `/lounge`, `/room` and `/round`. The `/lounge` endpoint allows the server
+to push changes in the game center. While the `/room` allows the server to push changes in
+the room the user is in. The `/round` allows users to know guesser's actions in a round.
 
 If the user is not in a room. The client should not connect to the `room` endpoint.
 When a user exits a room, the socket.io connection to `room` should be disconnected.
+
+Clients should connect to `/round` once a `round_start` event is received on a `/room` socket.
+And clients should disconnect `/round` when a  `round_end` event is received.
 
 ### Lounge events
 
@@ -50,7 +53,6 @@ Event name | Description
 `user_enter` | A user entered this room
 `user_exit` | A user exited this room
 `user_change` | A user changed his/her ready state
-`user_guess` | A user submitted a guess
 `user_draw` | The painter updated his/her canvas
 `round_start` | A round has started
 `round_end` | A round has ended
@@ -70,15 +72,6 @@ Data has `user_id`, `nickname` and `ready` field.
   "user_id": 10,
   "nickname": "Shelly Zhang",
   "ready": true
-}
-```
-
-#### `user_guess`
-
-```json
-{
-  "user_id": 10,
-  "correct": true
 }
 ```
 
@@ -110,6 +103,20 @@ seconds field which contains the number of seconds left in this round.
   "seconds": 10
 }
 ```
+
+### Round events
+
+There is only one `user_guess` event.
+
+```json
+{
+  "user_id": 10,
+  "correct": true,
+  "submission": "apple"
+}
+```
+
+Note: "submission" property exists if the user is not a guesser.
 
 ### References
 
