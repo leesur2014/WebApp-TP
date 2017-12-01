@@ -71,6 +71,11 @@ $(function() {
         alert("Failed to fetch the public room list");
     });
 
+    window.addEventListener("beforeunload", function () {
+      socket.off();
+      socket.close();
+      console.log("socket closed");
+    });
 });
 
 function enter_public_room(room_id, observer) {
