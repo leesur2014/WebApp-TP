@@ -2,7 +2,9 @@
 
 CREATE OR REPLACE FUNCTION user_ping(_user_id INT) RETURNS void AS $$
 BEGIN
-  UPDATE users SET last_seen = now_utc() WHERE id = _user_id AND online = TRUE;
+  UPDATE users
+  SET last_seen = now_utc()
+  WHERE id = _user_id AND online = TRUE;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -12,11 +14,18 @@ DECLARE
   _user users%ROWTYPE;
 BEGIN
   SELECT * INTO _user FROM users WHERE fb_id = _fb_id;
+
   IF NOT FOUND THEN
-      INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
+    INSERT INTO users (fb_id, nickname)
+    VALUES (_fb_id, _nickname)
+    RETURNING * INTO _user;
   END IF;
-  UPDATE users SET last_seen = now_utc(), token = _token, online = TRUE
-      WHERE id = _user.id RETURNING * INTO _user;
+
+  UPDATE users
+  SET last_seen = now_utc(), token = _token, online = TRUE
+  WHERE id = _user.id
+  RETURNING * INTO _user;
+
   RETURN _user;
 END;
 $$ LANGUAGE plpgsql;
@@ -24,7 +33,9 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION user_logout(_user_id INT) RETURNS void AS $$
 BEGIN
-  UPDATE users SET online = FALSE, token = NULL, room_id = NULL WHERE id = _user_id;
+  UPDATE users
+  SET online = FALSE, token = NULL, room_id = NULL, ready = FALSE
+  WHERE id = _user_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -311,5 +322,18 @@ BEGIN
     ELSE
         RETURN 0;
   END CASE;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION user_auto_logout(_thresh INTERVAL DEFAULT '60S') RETURNS SETOF users AS $$
+DECLARE
+  _row RECORD;
+BEGIN
+  FOR _row IN SELECT * FROM users WHERE online = TRUE AND last_seen < now_utc() - _thresh LOOP
+    PERFORM user_logout(_row.id);
+    RETURN NEXT _row;
+  END LOOP;
+  RETURN;
 END;
 $$ LANGUAGE plpgsql;
