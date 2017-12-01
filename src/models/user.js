@@ -51,7 +51,7 @@ class User {
   getRanking() {
     return Promise.all([
       db.one("SELECT rank FROM top_users WHERE id = $1", this.id, d => d.rank),
-      db.one("SELECT count(*) FROM users", d => d.count)
+      db.one("SELECT count(*) FROM users", null, d => d.count)
     ]).then(function (data) {
       return {
         rank: data[0],
