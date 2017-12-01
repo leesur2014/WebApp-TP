@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION user_ping(_user_id INT) RETURNS void AS $$
 BEGIN
   UPDATE users
   SET last_seen = now_utc()
-  WHERE id = _user_id AND online = TRUE;
+  WHERE id = _user_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -22,7 +22,7 @@ BEGIN
   END IF;
 
   UPDATE users
-  SET last_seen = now_utc(), token = _token, online = TRUE
+  SET last_seen = now_utc(), token = _token
   WHERE id = _user.id
   RETURNING * INTO _user;
 
@@ -34,7 +34,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION user_logout(_user_id INT) RETURNS void AS $$
 BEGIN
   UPDATE users
-  SET online = FALSE, token = NULL, room_id = NULL, ready = FALSE
+  SET token = NULL, room_id = NULL, ready = FALS
   WHERE id = _user_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -326,12 +326,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION user_auto_logout(_thresh INTERVAL DEFAULT '60S') RETURNS SETOF users AS $$
+CREATE OR REPLACE FUNCTION user_cleanup(_thresh INTERVAL DEFAULT '60S') RETURNS SETOF users AS $$
 DECLARE
   _row RECORD;
 BEGIN
-  FOR _row IN SELECT * FROM users WHERE online = TRUE AND last_seen < now_utc() - _thresh LOOP
-    PERFORM user_logout(_row.id);
+  FOR _row IN
+    SELECT * FROM users
+    WHERE last_seen < now_utc() - _thresh AND room_id IS NOT NULL
+  LOOP
+    UPDATE users SET room_id = NULL WHERE id = _row.id;
     RETURN NEXT _row;
   END LOOP;
   RETURN;
