@@ -45,6 +45,17 @@ router.get('/history', function (req, res) {
     });
 });
 
+router.get('/rank', function (req, res) {
+  req.user.getRanking()
+    .then(function (data) {
+      return send_data(res, data);
+    })
+    .catch(function (err)
+    {
+      return send_error(res, err);
+    });
+});
+
 router.get('/top-users', function (req, res) {
   db.any('SELECT * FROM top_users LIMIT 100')
     .then(function (rows) {

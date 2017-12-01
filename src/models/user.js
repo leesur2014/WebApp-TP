@@ -48,6 +48,18 @@ class User {
     return db.any('SELECT * FROM history WHERE user_id = $1', this.id);
   }
 
+  getRanking() {
+    return Promise.all([
+      db.one("SELECT rank FROM top_users WHERE id = $1", this.id, d => d.rank),
+      db.one("SELECT count(*) FROM users", d => d.count)
+    ]).then(function (data) {
+      return {
+        rank: data[0],
+        total: data[1]
+      };
+    });
+  }
+
   enterRoom(room_id, passcode = '', observer = false) {
     var user = this;
     if (user.room_id != null)
