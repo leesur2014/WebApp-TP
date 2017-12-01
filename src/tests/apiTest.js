@@ -6,11 +6,11 @@ var app = require('../app');
 var expect = chai.expect;
 var server = require('../app').server;   
 var assert = chai.assert;      
-var Url = 'http://localhost:3000';
-//var Url = 'http://guessmydrawing.fun';
+//var Url = 'http://localhost:3000';
+var Url = 'http://guessmydrawing.fun';
 
-var cookie_sid = 's%3AmGQ77F9dWJDXDL2QQ29AGKOO3EVmpBwb.N5nlUsctTV9HKIWwVo1bL1X3bHMXDUhfQ5jlxVuNeCw';
-var cookie_io = '5-wpp5xh1S6rvbrgAAAA';
+var cookie_sid = 's%3AAJ8LJx2kzxf8AbPJqw_3XlFKeN7BurQs.RgcAntEmAjBQK8rUtMhrURgJcJZsKEbuB03F%2BQc%2F93Y';
+var cookie_io = 'M6cmQ35zFMM9-fQWAAAO';
 var cookie_csrf = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 
 const request = require('supertest');
