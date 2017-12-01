@@ -56,8 +56,8 @@ router.get('/rank', function (req, res) {
     });
 });
 
-router.get('/top-users', function (req, res) {
-  db.any('SELECT * FROM top_users LIMIT 100')
+router.get('/score-board', function (req, res) {
+  db.any('SELECT * FROM score_board LIMIT 100')
     .then(function (rows) {
       return send_data(res, rows);
     })
@@ -97,12 +97,8 @@ router.post('/me', function(req, res) {
 });
 
 router.get('/user/:id(\\d+)', function(req, res) {
-  User.getById(req.params.id)
+  db.one("SELECT * FROM users_safe WHERE id = $1", req.params.id)
     .then(function (user) {
-      delete user.fb_id;
-      delete user.token;
-      delete user.room_id;
-      delete user.round_id;
       return send_data(res, user);
     })
     .catch(function (err)
@@ -149,7 +145,6 @@ router.get('/round', function(req, res) {
       .then(function (round) {
         if (!req.user.observer && round.painter_id != req.user.id) {
           // if the user is nor an observer or the painter
-          // remove answer
           delete round.answer;
         }
         return send_data(res, round);
@@ -268,10 +263,7 @@ router.post('/guess', function(req, res) {
   var submission = validator.escape(req.body.submission);
   req.user.guess(submission)
     .then(function (correct) {
-      res.send({
-        code: 0,
-        correct: correct
-      });
+      return send_data(res, {correct: correct});
     })
     .catch(function (err) {
       send_error(res, err);
