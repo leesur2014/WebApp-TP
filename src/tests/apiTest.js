@@ -169,6 +169,29 @@ it('should list top users /api/top-users GET', function(done) {
         });
 });
 
+it('should list users history records /api/history GET', function(done) {
+  request(Url)
+    .get('/api/history')
+    .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+    .set('Content-Type', 'application/json')
+    .set('Accept-Encoding','gzip, deflate')
+    .set('Accept-Language','zh-CN,zh;q=0.8')
+    .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
+        .end(function(err,res) {
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('data');
+            res.body.data.should.be.a('array');
+            res.body.data[0].should.have.property('user_id');
+            res.body.data[0].should.have.property('round_id');
+            res.body.data[0].should.have.property('started_at');
+            res.body.data[0].should.have.property('ended_at');
+            res.body.data[0].should.have.property('score');
+            res.body.data[0].should.have.property('painter');
+            done();
+        });
+});
+
 //var cookie_sid2 = 's%3AbUtTTt-wE6s6gHHo1WCkgOhNIRXdvPec.s4oGsz3OXADPzi5HPOdvJXEtH3y4nisN3ex4YBjBS4o';
 //var cookie_io2 = 'HYw3PS1xOMaiLn8qAACI';
 //it('should enter room as player /api/enter POST', function(done) {
