@@ -52,7 +52,7 @@ $(function() {
     });
 
     // populate the rooms array
-    $.get('/api/lounge', function(resp) {
+    $.getJSON('/api/lounge', function(resp) {
         for (var i = 0; i < resp.data.length; ++i)
         {
             var room = rooms[resp.data[i].id] = generate_room(resp.data[i]);
