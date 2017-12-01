@@ -41,11 +41,11 @@ $(function() {
 
     socket.on('disconnect', function () {
       show_alert('Disconnected from the server. Please refresh the page.');
-    })；
+    });
 
     socket.on('error', function (error) {
       show_alert('An error occurred. Please refresh the page.');
-    })；
+    });
 
     socket.on('reconnecting', function (attempt) {
       show_alert(`Connection lost. Reconnecting #${attempt}...`);
