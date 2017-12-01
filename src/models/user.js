@@ -39,7 +39,9 @@ class User {
     return db.proc('user_create_room', [this.id, passcode])
       .then(function (room) {
         debug("room", room.id, "created");
-        io.lounge.emit('room_create', {room_id: room.id});
+        if (passcode === '') {
+          io.lounge.emit('room_create', {room_id: room.id});
+        }
         return room;
       });
   }
@@ -70,7 +72,8 @@ class User {
       .then(function () {
         debug("user", user.id, "entered room", room_id);
         io.room.to('room_' + room_id).emit('user_enter', {user_id: user.id});
-        io.lounge.emit('room_change', {room_id: room_id});
+        if (passcode === '')
+          io.lounge.emit('room_change', {room_id: room_id});
       });
   }
 
@@ -90,17 +93,19 @@ class User {
           //attempt to end current round
           Round.tryToEnd(user.round_id);
         }
-        db.one('SELECT id FROM rooms WHERE id = $1', user.room_id)
+        db.one('SELECT id, passcode FROM rooms WHERE id = $1', user.room_id)
           .then(function (room) {
             // the room still exists
-            io.lounge.emit('room_change', {room_id: user.room_id});
-            if (user.round_id === null)
-            {
+            if (room.passcode === '') {
+              io.lounge.emit('room_change', {room_id: user.room_id});
+            }
+            if (user.round_id === null) {
               // attempt to start a round
               Round.tryToStart(user.room_id);
             }
           })
           .catch(function (err) {
+            // room is auto deleted by DB trigger
             debug("room", user.room_id, "deleted");
             io.lounge.emit('room_delete', {room_id: user.room_id})
           });
@@ -114,12 +119,11 @@ class User {
         io.room.to('room_' + user.room_id)
           .emit('user_change', {user_id: user.id, ready: state});
 
-        if (state)
-        {
+        if (state) {
           // attempt to start a new round
           return Round.tryToStart(user.room_id);
         }
-      })
+      });
   }
 
   guess(submission) {
@@ -139,9 +143,8 @@ class User {
           });
 
         if (correct)
-        {
           Round.tryToEnd(user.round_id);
-        }
+          
         return correct;
       });
   }

@@ -4,7 +4,7 @@ var io = require('../io');
 Room = {};
 
 Room.getById = function (id) {
-  return db.proc("room_get_by_id", [id]);
+  return db.proc("SELECT * FROM rooms_extra WHERE id = $1", [id]);
 };
 
 Room.getAllPublicRooms = function () {
@@ -16,13 +16,8 @@ Room.getPublicRoomById = function (room_id) {
 }
 
 Room.getInfoById = async function (room_id) {
-  let room = await db.proc("room_get_by_id", room_id);
-  room.users = await db.any('SELECT id FROM room_get_users($1)', room.id);
-  room.round_id = await db.proc('room_get_current_round', room.id, function (round) {
-    if (round)
-      return round.id;
-    return null;
-  });
+  let room = await db.proc("SELECT * FROM rooms_extra WHERE id = $1", room_id);
+  room.users = await db.any('SELECT id FROM users WHERE room_id = $1', room.id);
   return room;
 };
 

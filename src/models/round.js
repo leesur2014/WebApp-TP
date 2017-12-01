@@ -6,7 +6,7 @@ Round = {};
 
 
 Round.getInfoById = function (id) {
-  return db.proc("round_get_by_id", [id])
+  return db.one("SELECT * FROM rounds WHERE id = $1", id)
     .then(function (round) {
       return db.any('SELECT round_user.user_id, users.nickname, round_user.score, round_user.submission' +
         ' FROM round_user INNER JOIN users ON round_user.user_id=users.id WHERE round_user.round_id = $1', id)
@@ -20,13 +20,12 @@ Round.getInfoById = function (id) {
 Round.tryToEnd = function (round_id) {
   db.proc("try_round_end", round_id)
     .then(function (round) {
-      debug("round end: ", round.id);
+      debug("round", round.id, "ended");
       io.lounge.emit('room_change', {room_id: round.room_id});
       io.room.to("room_" + round.room_id).emit('round_end', {round_id: round.id});
     })
     .catch(function (e)
     {
-      debug(e);
       // this is not an error
     });
 };
@@ -36,16 +35,23 @@ Round.tryToStart = function (room_id) {
   return db.proc('room_start_round', room_id)
     .then(function (round) {
       // reach here if new round is started
-      io.lounge.emit('room_change', {room_id: room_id});
+      db.one("SELECT * FROM public_rooms WHERE id = $1", room_id)
+        .then(function () {
+          // only emit to lounge if room is public
+          io.lounge.emit('room_change', {room_id: room_id});
+        })
+        .catch(function () {
+          // not an error
+        });
+
       io.room.to('room_' + room_id).emit('round_start', {round_id: round.id});
 
       var seconds = 60;
       var timer = setInterval(function () {
         db.one("SELECT * FROM open_rounds WHERE id = $1", round.id)
           .then(function(round) {
-            seconds--;
-            if (seconds <= 0)
-            {
+            // reach here if the round is still open
+            if (--seconds <= 0) {
               // timeout, end this round
               debug("round", round.id, "timed out");
               clearInterval(timer);
@@ -63,7 +69,7 @@ Round.tryToStart = function (room_id) {
             }
           })
           .catch(function(e) {
-            // reach here if the round is already ended
+            // reach here if the round has already ended
             // or an error happens
             clearInterval(timer);
           });
