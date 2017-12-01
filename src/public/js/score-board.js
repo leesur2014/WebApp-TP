@@ -1,6 +1,6 @@
 $(function () {
 
-  $.get('/api/top-users', function(res) {
+  $.getJSON('/api/score-board', function(res) {
 
     if (res.code != 0) {
       alert("Error: " + res.error);
