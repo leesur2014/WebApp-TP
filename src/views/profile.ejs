@@ -5,13 +5,11 @@
         <h3 class="modal-title">Profile</h3>
       </div>
       <div class="modal-body">
-          <ul class="list-group">
-            <li class="list-group-item">Drawing Score: <%= user.score_draw %></li>
-            <li class="list-group-item">Guessing Score: <%= user.score_guess %></li>
-
-          </ul>
-          <hr>
-
+        <table class="table">
+          <tr><td>Drawing Score</td><td><%= user.score_draw %></td></tr>
+          <tr><td>Guessing Score</td><td><%= user.score_guess %></td></tr>
+          <tr><td>Ranking</td><td id="user-ranking"></td></tr>
+        </table>
         <form id="change-nickname-form" class="form-inline">
           <div class="form-group">
               <label for="input-nickname">Nickname</label>
