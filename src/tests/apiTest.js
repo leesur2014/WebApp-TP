@@ -10,7 +10,7 @@ var assert = chai.assert;
 var Url = 'http://guessmydrawing.fun';
 
 var cookie_sid = 's%3AAJ8LJx2kzxf8AbPJqw_3XlFKeN7BurQs.RgcAntEmAjBQK8rUtMhrURgJcJZsKEbuB03F%2BQc%2F93Y';
-var cookie_io = 'M6cmQ35zFMM9-fQWAAAO';
+var cookie_io = 'hLjqFR4b4PIq51wIAAAU';
 var cookie_csrf = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 
 const request = require('supertest');
@@ -229,8 +229,6 @@ it('should get user ready /api/ready POST', function(done) {
   });
 
 });
-
-
 //it('should get another user ready /api/ready POST', function(done) {
 //   request(Url)
 //  .post('/api/ready')
@@ -274,9 +272,6 @@ it('should get user ready /api/ready POST', function(done) {
 //        });
 //});
 
-
-
-
 it('should exit current room /api/exit POST', function(done) {
    request(Url)
   .post('/api/exit')
@@ -294,7 +289,6 @@ it('should exit current room /api/exit POST', function(done) {
           });
 
 });
-
 
 //it('should get a certain user info /api/user/{user_id} GET', function(done) {
 //   request(Url)
