@@ -5,7 +5,7 @@ $(function () {
   var me;
   var userRows = [];
   var users = [];
-
+  var socket;
   var canvas;
   var context;
 
@@ -62,12 +62,15 @@ $(function () {
 
 
   $('#logout-btn').click(function() {
-    if (round != null)
-    {
+    if (round != null) {
       var r = confirm("You are in a round. Do you still want to exit?");
       if (!r)  return;
     }
-
+    if (socket) {
+      // close socket before quitting the room
+      console.log("socket closed");
+      socket.close();
+    }
     $.post("/api/exit", {force: (round != null)}, function(resp) {
       if (resp.code != 0)
       {
@@ -113,7 +116,7 @@ $(function () {
   }
 
   function init_room_socket() {
-    var socket = io('/room?token=' + me.token, {
+    socket = io('/room?token=' + me.token, {
       reconnectionAttempts: 5
     });
 
