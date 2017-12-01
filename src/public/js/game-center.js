@@ -7,7 +7,7 @@ $(function() {
 
     socket.on('room_create', function(msg) {
         var room_id = msg.room_id;
-        $.get('/api/room/' + room_id, function(resp) {
+        $.getJSON('/api/room/' + room_id, function(resp) {
             rooms[room_id] = generate_room(resp.data);
             $('#room-container').prepend(rooms[room_id]);
             console.log("added room", room_id);
@@ -19,7 +19,7 @@ $(function() {
         if (rooms[room_id])
         {
           // update only if the room id is in the rooms array
-          $.get('/api/room/' + room_id, function(resp)
+          $.getJSON('/api/room/' + room_id, function(resp)
           {
               var new_element = generate_room(resp.data);
               rooms[room_id].replaceWith(new_element);
@@ -31,7 +31,7 @@ $(function() {
 
     socket.on('room_delete', function(msg) {
         var room_id = msg.room_id;
-        if (rooms[room_id] != null)
+        if (rooms[room_id])
         {
             rooms[room_id].remove();
             delete rooms[room_id];
