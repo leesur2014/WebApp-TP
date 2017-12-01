@@ -104,7 +104,7 @@ setInterval(function () {
     db.proc('user_auto_logout')
         .then(function (users) {
             if (users)
-                debug(users.length, "users logged out");
+                debug("logged out", users);
         })
         .catch(function (e) {
             debug(e);
