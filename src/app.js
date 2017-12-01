@@ -22,7 +22,7 @@ var http = require('http').Server(app);
 var io = require('./io').io;
 io.attach(http);
 
-app.use(logger('common'));
+app.use(logger('tiny'));
 
 app.use(session({
     store: new RedisStore({
