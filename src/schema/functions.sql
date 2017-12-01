@@ -177,7 +177,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION user_enter_room(_user_id INT, _room_id INT, _passcode VARCHAR DEFAULT '',
-  _is_observer BOOLEAN, _max_players INT DEFAULT 6) RETURNS VOID AS $$
+  _is_observer BOOLEAN DEFAULT FALSE, _max_players INT DEFAULT 6) RETURNS VOID AS $$
 DECLARE
 	_user RECORD;
 	_room rooms%ROWTYPE;
@@ -260,7 +260,7 @@ BEGIN
   ELSE
     _score := 0;
     IF _submission = _round.answer THEN
-      _score := _calc_guesser_score((_record.attempt + 1);
+      _score := _calc_guesser_score(_record.attempt + 1);
     END IF;
 
     UPDATE round_user
@@ -301,7 +301,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION _calc_guesser_score((_attempt INT) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION _calc_guesser_score(_attempt INT) RETURNS INT AS $$
 BEGIN
   CASE _attempt
     WHEN 1, 2, 3 THEN
