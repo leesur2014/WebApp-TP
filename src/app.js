@@ -98,7 +98,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 setInterval(function () {
-    db.any('SELECT * FROM user_auto_logout()')
+    db.any('SELECT * FROM user_cleanup()')
         .then(function (users) {
             if (users)
                 debug("logged out", users.length, "users");
