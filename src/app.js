@@ -104,7 +104,7 @@ setInterval(function () {
     db.any('SELECT * FROM user_auto_logout()')
         .then(function (users) {
             if (users)
-                debug("logged out", users);
+                debug("logged out", users.length, "users");
         })
         .catch(function (e) {
             debug(e);
