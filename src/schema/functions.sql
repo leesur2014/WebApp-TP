@@ -24,7 +24,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION user_logout(_user_id INT) RETURNS void AS $$
 BEGIN
-  UPDATE users SET online = FALSE, token = NULL, room_id = NULL WHERE id = _user_id;
+  UPDATE users SET online = FALSE, token = NULL, room_id = NULL, ready = FALSE WHERE id = _user_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -311,5 +311,18 @@ BEGIN
     ELSE
         RETURN 0;
   END CASE;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION user_auto_logout(_thresh INTERVAL DEFAULT '60S') RETURNS SETOF users AS $$
+DECLARE
+  _row RECORD;
+BEGIN
+  FOR _row IN SELECT * FROM users WHERE online = TRUE AND last_seen < now_utc() - _thresh LOOP
+    PERFORM user_logout(_row.id);
+    RETURN NEXT _row;
+  END LOOP;
+  RETURN;
 END;
 $$ LANGUAGE plpgsql;
