@@ -88,7 +88,7 @@ $(function () {
       if (resp.code != 0) {
         alert("Error: " + resp.error);
       }
-      else if (resp.correct) {
+      else if (resp.data.correct) {
         $("#guess-result").text("Correct guess!");
       } else {
         $("#guess-result").text("Wrong guess, try again. :)");
