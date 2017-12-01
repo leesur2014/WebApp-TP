@@ -29,7 +29,11 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(id, done) {
   User.getById(id)
     .then(function (user) {
-      done(null, user);
+      if (user.online) {
+        done(null, user);
+      } else {
+        done(null, null);
+      }
     })
     .catch(function(err) {
       // control reaches here if a logged in user is deleted from the DB
