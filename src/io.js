@@ -12,7 +12,7 @@ var round = io.of('/round');
 
 function getUser(socket) {
   let token = socket.handshake.query.token;
-  return db.one('SELECT * FROM users_extra WHERE token = $1 AND online = TRUE', token || 'token_missing');
+  return db.one('SELECT * FROM users_extra WHERE token = $1', token || 'token_missing');
 };
 
 function pingUser(userId) {
