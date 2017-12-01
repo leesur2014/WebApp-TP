@@ -42,26 +42,18 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION _room_can_start_round(_room_id INT) RETURNS BOOLEAN AS $$
+DECLARE
+  _room RECORD;
 BEGIN
   -- ensure room exists
-  IF NOT EXISTS (SELECT * FROM rooms WHERE id = _room_id) THEN
-    RETURN FALSE;
-  END IF;
-  -- ensure there is no active rounds in this room
-	IF EXISTS (SELECT id FROM open_rounds WHERE room_id = _room_id) THEN
-    RAISE INFO 'there is an open round in room %', _room_id;
-		RETURN FALSE;
-	END IF;
+
 	-- ensure that there are at least two players in this room
 	IF (SELECT count(*) FROM users WHERE room_id = _room_id AND observer = FALSE) < 2 THEN
 		RAISE INFO 'less than 2 players in room %', _room_id;
     RETURN FALSE;
 	END IF;
     -- ensure that all players are ready
-  IF EXISTS (SELECT id FROM users WHERE room_id = _room_id AND observer = FALSE AND ready = FALSE) THEN
-    RAISE INFO 'some players in room % are not ready', _room_id;
-    RETURN FALSE;
-  END IF;
+
 	RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;
@@ -69,28 +61,46 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION room_start_round(_room_id INT) RETURNS rounds AS $$
 DECLARE
+  _room RECORD;
 	_round rounds%ROWTYPE;
  	_painter RECORD;
 	_player RECORD;
 BEGIN
-	IF NOT _room_can_start_round(_room_id) THEN
-    RAISE EXCEPTION 'cannot start a new round';
+  SELECT * INTO STRICT _room
+  FROM rooms_extra
+  WHERE id = _room_id;
+
+  IF _room.round_id IS NOT NULL THEN
+    RAISE EXCEPTION 'The room is having a round';
   END IF;
+
+  IF _room.player_count < 2 THEN
+    RAISE EXCEPTION 'Less than 2 players in the room';
+  END IF;
+
+  IF EXISTS (SELECT id FROM users WHERE room_id = _room_id AND observer = FALSE AND ready = FALSE) THEN
+    RAISE EXCEPTION 'some players in room % are not ready', _room_id;
+  END IF;
+
+  -- OK to start a round here
 	-- select a random user as the painter
 	SELECT * INTO STRICT _painter
   FROM users
   WHERE room_id = _room_id AND observer = FALSE
   ORDER BY RANDOM() LIMIT 1;
+
 	-- create the round entry
 	INSERT INTO rounds (room_id, painter_id, answer)
   VALUES (_room_id, _painter.id, dictionary_get_random_word())
 	RETURNING * INTO _round;
+
 	-- create a row for each of the rest players in round_user table
 	FOR _player IN SELECT * FROM users WHERE room_id = _room_id AND observer = FALSE LOOP
 		IF _player.id <> _painter.id THEN
 			INSERT INTO round_user (round_id, user_id) VALUES (_round.id, _player.id);
 		END IF;
   END LOOP;
+  
 	-- clear ready bit of every user in the room
 	UPDATE users SET ready = FALSE WHERE room_id = _room_id;
 	RETURN _round;
