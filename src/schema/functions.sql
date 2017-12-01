@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION user_login(_fb_id VARCHAR, _nickname VARCHAR, _token 
 DECLARE
   _user users%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT _user FROM users WHERE fb_id = _fb_id;
+  SELECT * INTO _user FROM users WHERE fb_id = _fb_id;
   IF NOT FOUND THEN
       INSERT INTO users (fb_id, nickname) VALUES (_fb_id, _nickname) RETURNING * INTO _user;
   END IF;
@@ -73,7 +73,7 @@ BEGIN
 
 	-- create the round entry
 	INSERT INTO rounds (room_id, painter_id, answer)
-  VALUES (_room_id, _painter.id, dictionary_get_random_word())
+  VALUES (_room_id, _painter.id, _dictionary_get_random_word())
 	RETURNING * INTO _round;
 
 	-- create a row for each of the rest players in round_user table
