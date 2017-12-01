@@ -27,7 +27,7 @@ class User {
   }
 
   logout() {
-    debug("user", user.id, "logging out");
+    debug("user", this.id, "logging out");
     return db.proc('user_logout', this.id);
   }
 
