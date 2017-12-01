@@ -97,9 +97,6 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-http.listen(process.env.PORT || 3000);
-
-
 setInterval(function () {
     db.any('SELECT * FROM user_auto_logout()')
         .then(function (users) {
@@ -110,3 +107,13 @@ setInterval(function () {
             debug(e);
         });
 }, process.env.USER_CLEAN_UP_INTERVAL || 29000);
+
+
+if(!module.parent) {
+    http.listen(process.env.PORT || 3000);
+}
+
+module.exports = {
+    // for testing purpose
+    server: http
+};
