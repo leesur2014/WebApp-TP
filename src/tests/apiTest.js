@@ -148,27 +148,6 @@ it('should list user\'s current room /api/room GET', function(done) {
         });
 });
 
-it('should list top users /api/top-users GET', function(done) {
-  request(Url)
-    .get('/api/top-uesrs')
-    .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-    .set('Content-Type', 'application/json')
-    .set('Accept-Encoding','gzip, deflate')
-    .set('Accept-Language','zh-CN,zh;q=0.8')
-    .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
-        .end(function(err,res) {
-            res.should.have.status(200);
-            res.should.be.json;
-            res.body.should.have.property('data');
-            res.body.data.should.have.property('id');
-            res.body.data.should.have.property('nickname');
-            res.body.data.should.have.property('score_draw');
-            res.body.data.should.have.property('score_guess');
-            res.body.data.should.have.property('score');
-            done();
-        });
-});
-
 it('should list users history records /api/history GET', function(done) {
   request(Url)
     .get('/api/history')
@@ -188,6 +167,24 @@ it('should list users history records /api/history GET', function(done) {
             res.body.data[0].should.have.property('ended_at');
             res.body.data[0].should.have.property('score');
             res.body.data[0].should.have.property('painter');
+            done();
+        });
+});
+
+it('should get users rank info /api/rank GET', function(done) {
+  request(Url)
+    .get('/api/rank')
+    .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
+    .set('Content-Type', 'application/json')
+    .set('Accept-Encoding','gzip, deflate')
+    .set('Accept-Language','zh-CN,zh;q=0.8')
+    .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
+        .end(function(err,res) {
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('data');
+            res.body.data.should.have.property('rank');
+            res.body.data.should.have.property('total');
             done();
         });
 });
