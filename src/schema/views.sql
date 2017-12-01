@@ -63,9 +63,9 @@ CREATE VIEW users_extra AS
 
 CREATE VIEW rooms_extra AS
   SELECT *,
-  _room_get_current_round_id(id) AS round_id
+  _room_get_current_round_id(id) AS round_id,
   _room_count_users(id) AS user_count,
-  _room_count_players(id) AS player_count,
+  _room_count_players(id) AS player_count
   FROM rooms;
 
 CREATE VIEW public_rooms AS
