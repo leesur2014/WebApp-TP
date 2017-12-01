@@ -6,9 +6,10 @@ var logger = require('morgan');
 var passport = require('passport');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
-
+var debug = require('debug')('app');
 var app = express();
 
+var db = require('./db');
 var api = require('./routes/api');
 var users = require('./routes/users');
 
@@ -21,7 +22,7 @@ var http = require('http').Server(app);
 var io = require('./io').io;
 io.attach(http);
 
-app.use(logger('dev'));
+app.use(logger('common'));
 
 app.use(session({
     store: new RedisStore({
@@ -45,34 +46,28 @@ app.use('/api', api);
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.get('/',function(req,res) {
-    if (!req.isAuthenticated())
-    {
+    if (!req.isAuthenticated()) {
         // if not authenticated, render login view
         return res.render('index');
     }
-    if (req.user.room_id != null)
-    {
+    if (req.user.room_id != null) {
         // render room view if the user is in a room
         return res.render('room', {user: req.user});
-    }
-    else
-    {
+    } else {
         // render the game-center view if not in a room
         return res.render('game-center', {user: req.user});
     }
 });
 
 app.get('/score-board',function(req,res) {
-    if (!req.isAuthenticated())
-    {
+    if (!req.isAuthenticated()) {
         return res.redirect('/');
     }
     return res.render('score-board', {user: req.user});
 });
 
 app.get('/history',function(req,res) {
-    if (!req.isAuthenticated())
-    {
+    if (!req.isAuthenticated()) {
         return res.redirect('/');
     }
     return res.render('history', {user: req.user});
@@ -102,10 +97,15 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-if(!module.parent) {
-    http.listen(process.env.PORT || 3000);
-}
+http.listen(process.env.PORT || 3000);
 
-module.exports = {
-    server: http
-};
+
+setInterval(function () {
+    db.proc('user_auto_logout')
+        .then(function (users) {
+            debug(users.length, "users logged out");
+        })
+        .catch(function (e) {
+            debug(e);
+        });
+}, process.env.USER_CLEAN_UP_INTERVAL || 29000);
