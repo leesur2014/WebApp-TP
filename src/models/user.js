@@ -52,7 +52,7 @@ class User {
 
   getRanking() {
     return Promise.all([
-      db.one("SELECT rank FROM top_users WHERE id = $1", this.id, d => d.rank),
+      db.one("SELECT rank FROM score_board WHERE id = $1", this.id, d => d.rank),
       db.one("SELECT count(*) FROM users", null, d => d.count)
     ]).then(function (data) {
       return {
@@ -144,7 +144,7 @@ class User {
 
         if (correct)
           Round.tryToEnd(user.round_id);
-          
+
         return correct;
       });
   }
