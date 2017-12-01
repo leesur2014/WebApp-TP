@@ -168,6 +168,7 @@ it('should list top users /api/top-users GET', function(done) {
             done();
         });
 });
+
 //var cookie_sid2 = 's%3AbUtTTt-wE6s6gHHo1WCkgOhNIRXdvPec.s4oGsz3OXADPzi5HPOdvJXEtH3y4nisN3ex4YBjBS4o';
 //var cookie_io2 = 'HYw3PS1xOMaiLn8qAACI';
 //it('should enter room as player /api/enter POST', function(done) {
