@@ -51,7 +51,7 @@ it('should get user info /api/me GET', function(done) {
             res.body.data.should.have.property('last_seen');
             res.body.data.should.have.property('room_id');
             res.body.data.should.have.property('ready');
-            res.body.data.should.have.property('obeserver');
+            res.body.data.should.have.property('observer');
             res.body.data.should.have.property('round_id');
             res.body.data.should.have.property('score');
             res.body.data.should.have.property('painter');
