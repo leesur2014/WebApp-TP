@@ -51,7 +51,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE VIEW users_safe AS
-  SELECT id, nickname, score_draw, score_guess, score_draw + score_guess AS score
+  SELECT id, observer, nickname, score_draw, score_guess, score_draw + score_guess AS score
   FROM users;
 
 CREATE VIEW users_extra AS
