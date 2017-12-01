@@ -27,19 +27,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER on_round_update AFTER
-UPDATE OF painter_score ON rounds
+
+CREATE TRIGGER on_round_update
+AFTER UPDATE OF painter_score ON rounds
 FOR EACH ROW
 EXECUTE PROCEDURE update_score_draw ();
 
 
-CREATE TRIGGER on_round_user_update AFTER
-UPDATE OF score ON round_user
+CREATE TRIGGER on_round_user_update
+AFTER UPDATE OF score ON round_user
 FOR EACH ROW
 EXECUTE PROCEDURE update_score_guess ();
 
-CREATE TRIGGER on_user_exit_room AFTER
-UPDATE OF room_id ON users
+CREATE TRIGGER on_user_exit_room
+AFTER UPDATE OF room_id ON users
 FOR EACH ROW
 WHEN (OLD.room_id IS NOT NULL AND NEW.room_id IS NULL)
 EXECUTE PROCEDURE delete_empty_room ();
