@@ -46,6 +46,7 @@ router.get('/callback',
 
 router.get('/logout', function(req, res){
   req.logout();
+  req.user.logout();
   res.redirect('/');
 });
 
