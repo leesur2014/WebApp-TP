@@ -99,12 +99,11 @@ router.post('/me', function(req, res) {
 router.get('/user/:id(\\d+)', function(req, res) {
   db.one("SELECT * FROM users_safe WHERE id = $1", req.params.id)
     .then(function (user) {
-      if (user.room_id != req.user.room_id || user.room_id == null) {
-        delete user.observer;
-        delete user.ready;
-        delete user.room_id;
+      if (user.room_id === user.room_id && user.room_id != null) {
+        return send_data(res, user);
+      } else {
+        return send_error(res, "access denied");
       }
-      return send_data(res, user);
     })
     .catch(function (err)
     {
