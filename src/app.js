@@ -101,7 +101,7 @@ http.listen(process.env.PORT || 3000);
 
 
 setInterval(function () {
-    db.proc('user_auto_logout')
+    db.any('SELECT * FROM user_auto_logout()')
         .then(function (users) {
             if (users)
                 debug("logged out", users);
