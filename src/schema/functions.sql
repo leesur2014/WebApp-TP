@@ -34,7 +34,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION user_logout(_user_id INT) RETURNS void AS $$
 BEGIN
   UPDATE users
-  SET token = NULL, room_id = NULL, ready = FALS
+  SET token = NULL, room_id = NULL, ready = FALSE
   WHERE id = _user_id;
 END;
 $$ LANGUAGE plpgsql;
