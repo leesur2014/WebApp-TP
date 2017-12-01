@@ -9,8 +9,8 @@ var assert = chai.assert;
 //var Url = 'http://localhost:3000';
 var Url = 'http://guessmydrawing.fun';
 
-var cookie_sid = 's%3AAJ8LJx2kzxf8AbPJqw_3XlFKeN7BurQs.RgcAntEmAjBQK8rUtMhrURgJcJZsKEbuB03F%2BQc%2F93Y';
-var cookie_io = 'hLjqFR4b4PIq51wIAAAU';
+var cookie_sid = 's%3AWdSqYSRyTzSvAe_WTcYO4oioR3NIWWtJ.7zqyz5xzj0uVHulUd%2F6BHmMslGJ3JWfG3il4yZzpXMw';
+var cookie_io = 'FDj-r_Ld4Gvi7jdAAABQ';
 var cookie_csrf = 'AwrHXaiD0A8gtU0S9aEGgrtjQcbUC22aXpUiyCldjZerPFa01xouJ44wj66oKcii';
 
 const request = require('supertest');
@@ -45,7 +45,16 @@ it('should get user info /api/me GET', function(done) {
             res.body.should.have.property('code');
             res.body.should.have.property('data');
             res.body.data.should.have.property('nickname');
-            res.body.data.should.have.property('online');
+            res.body.data.should.have.property('score_draw');
+            res.body.data.should.have.property('score_guess');
+            res.body.data.should.have.property('joined_at');
+            res.body.data.should.have.property('last_seen');
+            res.body.data.should.have.property('room_id');
+            res.body.data.should.have.property('ready');
+            res.body.data.should.have.property('observer');
+            res.body.data.should.have.property('round_id');
+            res.body.data.should.have.property('score');
+            res.body.data.should.have.property('painter');
             curr_user_id = res.body.data.id;
             done();
         });
@@ -189,29 +198,6 @@ it('should get users rank info /api/rank GET', function(done) {
         });
 });
 
-//var cookie_sid2 = 's%3AbUtTTt-wE6s6gHHo1WCkgOhNIRXdvPec.s4oGsz3OXADPzi5HPOdvJXEtH3y4nisN3ex4YBjBS4o';
-//var cookie_io2 = 'HYw3PS1xOMaiLn8qAACI';
-//it('should enter room as player /api/enter POST', function(done) {
-//  request(Url)
-//  .get('/api/enter')
-//  .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-//  .set('Content-Type', 'application/json')
-//  .set('Accept-Encoding','gzip, deflate')
-//  .set('Accept-Language','zh-CN,zh;q=0.8')
-//  .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf]) 
-//  .send({room_id:curr_room_id})
-//  .end(function(err,res) {
-//    res.should.have.status(200);
-//    res.should.be.json;
-//    res.body.should.have.property('data');
-//    res.body.data.should.have.property('id');
-//    res.body.data.should.have.property('user_count');
-//    res.body.data.should.have.property('player_count');
-//    res.body.data.should.have.property('round_id');
-//    done();
-//  });
-//});
-
 it('should get user ready /api/ready POST', function(done) {
    request(Url)
   .post('/api/ready')
@@ -229,48 +215,6 @@ it('should get user ready /api/ready POST', function(done) {
   });
 
 });
-//it('should get another user ready /api/ready POST', function(done) {
-//   request(Url)
-//  .post('/api/ready')
-//  .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-//  .set('Content-Type', 'application/json')
-//  .set('Accept-Encoding','gzip, deflate')
-//  .set('Accept-Language','zh-CN,zh;q=0.8')
-//  .set('Cookie',['connect.sid='+cookie_sid2,'io='+cookie_io2,'csrftoken='+cookie_csrf]) 
-//  .send({ready:true})
-//  .end(function(err, res) {
-//    res.should.have.status(200);
-//    res.should.be.json;
-//    res.body.should.have.property('code');
-//    done();
-//  });
-//});
-
-
-//var passed_round_id;
-//it('should get info of current round /api/round GET', function(done) {
-//   request(Url)
-//           .get('/api/round')
-//           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-//           .set('Content-Type', 'application/json')
-//           .set('Accept-Encoding','gzip, deflate')
-//           .set('Accept-Language','zh-CN,zh;q=0.8')
-//           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
-//        .end(function(err,res) {
-//            res.should.have.status(200);
-//            res.should.be.json;
-//            res.body.should.have.property('code');
-//            res.body.should.have.property('data');
-//            res.body.data.should.have.property('id');
-//            passed_round_id = res.body.data.id;
-//            res.body.data.should.have.property('painter_id');
-//            res.body.data.should.have.property('room_id');
-//            res.body.data.should.have.property('started_at');
-//            res.body.data.should.have.property('ended_at');
-//            res.body.data.should.have.property('answer');
-//            done();
-//        });
-//});
 
 it('should exit current room /api/exit POST', function(done) {
    request(Url)
@@ -289,53 +233,6 @@ it('should exit current room /api/exit POST', function(done) {
           });
 
 });
-
-//it('should get a certain user info /api/user/{user_id} GET', function(done) {
-//   request(Url)
-//           .get('/api/user/'+curr_user_id)
-//           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-//           .set('Content-Type', 'application/json')
-//           .set('Accept-Encoding','gzip, deflate')
-//           .set('Accept-Language','zh-CN,zh;q=0.8')
-//           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
-//        .end(function(err,res) {
-//            res.should.have.status(200);
-//            res.should.be.json;
-//            res.body.should.have.property('code');
-//            res.body.should.have.property('data');
-//            res.body.data.should.have.property('id');
-//            res.body.data.id.should.equal(curr_user_id);
-//            res.body.data.should.have.property('nickname');
-//            res.body.data.should.have.property('score_draw');
-//            res.body.data.should.have.property('score_guess');
-//            done();
-//        });
-//});
-
-//passed_round_id = 1;
-//it('should get info of past round /api/round/{round_id} GET', function(done) {
-//   request(Url)
-//           .get('/api/round/'+passed_round_id)
-//           .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*\/*;q=0.8')
-//           .set('Content-Type', 'application/json')
-//           .set('Accept-Encoding','gzip, deflate')
-//           .set('Accept-Language','zh-CN,zh;q=0.8')
-//           .set('Cookie',['connect.sid='+cookie_sid,'io='+cookie_io,'csrftoken='+cookie_csrf])
-//        .end(function(err,res) {
-//            res.should.have.status(200);
-//            res.should.be.json;
-//            res.body.should.have.property('code');
-//            res.body.should.have.property('data');
-//            res.body.data.should.have.property('id');
-//            res.body.data.id.should.equal(passed_round_id);
-//            res.body.data.should.have.property('painter_id');
-//            res.body.data.should.have.property('room_id');
-//            res.body.data.should.have.property('started_at');
-//            res.body.data.should.have.property('ended_at');
-//            res.body.data.should.have.property('answer');
-//            done();
-//        });
-//});
 
 });
 

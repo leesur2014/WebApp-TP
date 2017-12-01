@@ -24,3 +24,8 @@ canvas {
     color: grey;
     text-align: center;
 }
+
+.word {
+  font-size: 2rem;
+  color: blue;
+}
