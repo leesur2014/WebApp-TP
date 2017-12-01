@@ -68,8 +68,9 @@ $(function () {
     }
     if (socket) {
       // close socket before quitting the room
-      console.log("socket closed");
+      socket.off();
       socket.close();
+      console.log("socket closed");
     }
     $.post("/api/exit", {force: (round != null)}, function(resp) {
       if (resp.code != 0)
