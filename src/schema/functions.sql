@@ -41,24 +41,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION _room_can_start_round(_room_id INT) RETURNS BOOLEAN AS $$
-DECLARE
-  _room RECORD;
-BEGIN
-  -- ensure room exists
-
-	-- ensure that there are at least two players in this room
-	IF (SELECT count(*) FROM users WHERE room_id = _room_id AND observer = FALSE) < 2 THEN
-		RAISE INFO 'less than 2 players in room %', _room_id;
-    RETURN FALSE;
-	END IF;
-    -- ensure that all players are ready
-
-	RETURN TRUE;
-END;
-$$ LANGUAGE plpgsql;
-
-
 CREATE OR REPLACE FUNCTION room_start_round(_room_id INT) RETURNS rounds AS $$
 DECLARE
   _room RECORD;
@@ -100,7 +82,7 @@ BEGIN
 			INSERT INTO round_user (round_id, user_id) VALUES (_round.id, _player.id);
 		END IF;
   END LOOP;
-  
+
 	-- clear ready bit of every user in the room
 	UPDATE users SET ready = FALSE WHERE room_id = _room_id;
 	RETURN _round;

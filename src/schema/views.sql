@@ -50,6 +50,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE VIEW users_safe AS
+  SELECT id, nickname, score_draw, score_guess, score_draw + score_guess AS score
+  FROM users;
+
 CREATE VIEW users_extra AS
   SELECT *,
   _room_get_current_round_id(room_id) AS round_id,
