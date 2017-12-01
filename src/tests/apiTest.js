@@ -229,8 +229,6 @@ it('should get user ready /api/ready POST', function(done) {
   });
 
 });
-
-
 //it('should get another user ready /api/ready POST', function(done) {
 //   request(Url)
 //  .post('/api/ready')
