@@ -268,6 +268,8 @@ $(function () {
       eraser: false
     }
 
+    var send_image = send_image_factory(500);
+
     canvas.addEventListener('mousedown', onMouseDown, false);
     canvas.addEventListener('mouseup', onMouseUp, false);
     canvas.addEventListener('mouseout', onMouseUp, false);
@@ -301,9 +303,7 @@ $(function () {
       } else {
         drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
-      $.post('/api/draw', {image: canvas.toDataURL()}, function (resp) {
-        console.log(resp);
-      });
+      send_image(canvas.toDataURL());
     }
 
     function onMouseMove(e){
@@ -314,9 +314,9 @@ $(function () {
       } else {
         drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
-
       current.x = e.pageX - offset.left;
       current.y = e.pageY - offset.top;
+      send_image(canvas.toDataURL());
     }
 
     $("#pencil-btn").click(function (e) {
@@ -442,9 +442,9 @@ function generate_user_row(user) {
   row.append($("<td>").text(user.score_draw + user.score_guess));
   var observer_status = $('<td>');
   if (user.observer) {
-    observer_status.html("Observer");
+    observer_status.text("Observer");
   } else {
-    observer_status.html("Player");
+    observer_status.text("Player");
     row.addClass('success');
   }
   row.append(observer_status);
@@ -483,4 +483,24 @@ function show_alert(msg) {
 
 function hide_alert() {
   $("#alert-div").hide();
+}
+
+// delay is in milliseconds
+// reference https://remysharp.com/2010/07/21/throttling-function-calls
+function send_image_factory(delay) {
+  var previousCall = new Date().getTime();
+
+  return function(image) {
+    var time = new Date().getTime();
+
+    if ((time - previousCall) >= delay) {
+      previousCall = time;
+      console.log("sending image to server");
+      $.post('/api/draw', {image: image}, function (resp) {
+        console.log(resp);
+      });
+    } else {
+      console.log("throttled");
+    }
+  };
 }
