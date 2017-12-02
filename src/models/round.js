@@ -9,7 +9,8 @@ Round.getInfoById = function (id) {
   return db.one("SELECT * FROM rounds WHERE id = $1", id)
     .then(function (round) {
       return db.any('SELECT round_user.user_id, users.nickname, round_user.score' +
-        ' FROM round_user INNER JOIN users ON round_user.user_id=users.id WHERE round_user.round_id = $1', id)
+        ' FROM round_user INNER JOIN users ON round_user.user_id=users.id' +
+        ' WHERE round_user.round_id = $1 ORDER BY round_user.user_id', id)
         .then(function (data) {
           round.users = data;
           return round;
