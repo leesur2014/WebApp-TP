@@ -60,7 +60,10 @@
             <button type="button" id="eraser-btn" class="btn btn-default">Eraser</button>
           </div>
           &nbsp;&nbsp;&nbsp;&nbsp;
-          Color: <input id = "color-selector" class="jscolor" value="000000">
+          Color:
+            <input type="hidden" id = "color-selector" class="jscolor" value="000000">
+          <input type="hidden" id="color-selector" value="000000">
+                  <button class="jscolor {valueElement: 'color-selector'}">Pick a color</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
           <button type="button" class="btn btn-default" id="clear-btn">Clear</button>
         </div>
