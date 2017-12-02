@@ -433,7 +433,14 @@ function generate_user_row(user) {
 
   row.append($("<td>").text(user.nickname));
   row.append($("<td>").text(user.score_draw + user.score_guess));
-  row.append($("<td>").text(user.observer ? "Observer" : "Player"));
+  var observer_status = $('<td>');
+  if (user.observer) {
+    observer_status.html("Observer");
+  } else {
+    observer_status.html("Player");
+    row.addClass('success');
+  }
+  row.append(observer_status);
   row.append($("<td>").text(user.ready ? "Yes" : "No"));
 
   return row;
