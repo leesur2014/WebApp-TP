@@ -10,3 +10,4 @@ Feedbacks from users
 7. There should be some instructions to prompt users how to start game when users log in for the first time. (done)
 8. It will be more obvious for users to create or join game room by clicking buttons near instructions instead of clicking blocks in navigation bar. (done)
 9. When painter is painting, it's hard to notice where the guessing word is. Better to increase font size or change font to draw users attention. (done)
+10. Refresh canvas more frequently, some painters trend to draw continually, which leads to players wait for long time to see paintings.
