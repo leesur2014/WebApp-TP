@@ -376,6 +376,11 @@ $(function () {
     context.clearRect(0, 0, canvas.width, canvas.height);
     $("#guess-result").text("");
     $("#guesser-div").show();
+    $.getJSON('/api/user/' + round.painter_id, function (resp) {
+      if (resp.code == 0) {
+        $("#guesser-prompt").text(`${resp.data.nickname} is painting. Please guess an answer.`);
+      }
+    });
 
     if (round.image) {
       // in case the user refreshes the page during a round
@@ -392,7 +397,11 @@ $(function () {
     context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     $("#guess-form").hide();
-    $("#guesser-prompt").text(`The answer is ${round.answer}.`);
+    $.getJSON('/api/user/' + round.painter_id, function (resp) {
+      if (resp.code == 0) {
+        $("#guesser-prompt").text(`${resp.data.nickname} is painting. The answer is ${round.answer}.`);
+      }
+    });
     $("#guesser-div").show();
 
     if (round.image) {
