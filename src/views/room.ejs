@@ -3,6 +3,7 @@
 
   <head>
     <% include head %>
+    <script src="/static/js/jscolor.js"></script>
     <title>Game Room</title>
   </head>
 
@@ -58,13 +59,9 @@
             <button type="button" id="brush-btn" class="btn btn-default">Brush</button>
             <button type="button" id="eraser-btn" class="btn btn-default">Eraser</button>
           </div>
-          <div class="btn-group" role="group" id="color-div">
-            <button type="button" class="btn btn-default">Red</button>
-            <button type="button" class="btn btn-default">Yellow</button>
-            <button type="button" class="btn btn-default">Green</button>
-            <button type="button" class="btn btn-default">Blue</button>
-            <button type="button" class="btn btn-default active">Black</button>
-          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Color: <input id = "color-selector" class="jscolor" value="000000">
+            &nbsp;&nbsp;&nbsp;&nbsp;
           <button type="button" class="btn btn-default" id="clear-btn">Clear</button>
         </div>
 
