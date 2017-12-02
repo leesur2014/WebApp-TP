@@ -266,7 +266,13 @@ $(function () {
       color: 'black',
       width: 2,
       eraser: false
-    }
+    };
+
+    var send_image = throttle(function () {
+      $.post('/api/draw', {image: canvas.toDataURL()}, function (resp) {
+        console.log(resp);
+      });
+    }, 500);
 
     canvas.addEventListener('mousedown', onMouseDown, false);
     canvas.addEventListener('mouseup', onMouseUp, false);
@@ -301,9 +307,7 @@ $(function () {
       } else {
         drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
-      $.post('/api/draw', {image: canvas.toDataURL()}, function (resp) {
-        console.log(resp);
-      });
+      $.post('/api/draw', {image: canvas.toDataURL()});
     }
 
     function onMouseMove(e){
@@ -314,9 +318,9 @@ $(function () {
       } else {
         drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
-
       current.x = e.pageX - offset.left;
       current.y = e.pageY - offset.top;
+      send_image();
     }
 
     $("#pencil-btn").click(function (e) {
