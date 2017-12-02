@@ -343,10 +343,9 @@ $(function () {
       $(e.target).addClass("active");
     });
 
-    $("#color-div button").click(function (e) {
-      current.color = $(e.target).text();
-      $("#color-div button").removeClass("active");
-      $(e.target).addClass("active");
+    $('#color-selector').on('change', function(e) {
+        console.log('changed color: ' + $('#color-selector').val());
+        current.color = '#' + $('#color-selector').val();
     });
 
     $("#clear-btn").click(function () {
