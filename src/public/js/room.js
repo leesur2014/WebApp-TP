@@ -60,6 +60,13 @@ $(function () {
 
     });
 
+  window.addEventListener("beforeunload", function () {
+    if (socket) {
+      socket.off();
+      socket.close();
+      console.log("socket closed");
+    }
+  });
 
   $('#logout-btn').click(function() {
     if (round != null) {
@@ -67,10 +74,7 @@ $(function () {
       if (!r)  return;
     }
     if (socket) {
-      // close socket before quitting the room
       socket.off();
-      socket.close();
-      console.log("socket closed");
     }
     $.post("/api/exit", {force: (round != null)}, function(resp) {
       if (resp.code != 0)
@@ -206,6 +210,9 @@ $(function () {
           var user_id = resp.data.users[i].user_id;
           tbody.append(generate_result_row(users[user_id].nickname, resp.data.users[i].score));
         }
+
+        socket.off();
+        // remove all event listeners
 
         $('#round-result-modal').modal('show');
         $('#round-result-modal').on('hide.bs.modal', function () {
