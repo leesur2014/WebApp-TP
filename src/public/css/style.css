@@ -25,7 +25,8 @@ canvas {
     text-align: center;
 }
 
-.word {
+em {
   font-size: 2rem;
-  color: blue;
+  font-weight: bold;
+  font-style: italic;
 }
