@@ -442,9 +442,9 @@ function generate_user_row(user) {
   row.append($("<td>").text(user.score_draw + user.score_guess));
   var observer_status = $('<td>');
   if (user.observer) {
-    observer_status.html("Observer");
+    observer_status.text("Observer");
   } else {
-    observer_status.html("Player");
+    observer_status.text("Player");
     row.addClass('success');
   }
   row.append(observer_status);
@@ -483,4 +483,19 @@ function show_alert(msg) {
 
 function hide_alert() {
   $("#alert-div").hide();
+}
+
+// delay is in milliseconds
+// reference https://remysharp.com/2010/07/21/throttling-function-calls
+function throttle(callback, delay) {
+  var previousCall = new Date().getTime();
+
+  return function() {
+    var time = new Date().getTime();
+
+    if ((time - previousCall) >= delay) {
+      previousCall = time;
+      callback.apply(null, arguments);
+    }
+  };
 }
