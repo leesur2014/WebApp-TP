@@ -441,7 +441,16 @@ function generate_user_row(user) {
     row.addClass('success');
   }
   row.append(observer_status);
-  row.append($("<td>").html(user.ready ? 'Yes<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>' : "No"));
+
+  var is_ready = $('<span>');
+  if (user.ready) {
+    is_ready.addClass('glyphicon glyphicon-ok');
+  } else if (user.observer) {
+    is_ready.addClass('glyphicon glyphicon-minus');
+  } else {
+    is_ready.addClass('glyphicon glyphicon-remove');
+  }
+  row.append($("<td>").append(is_ready));
 
   return row;
 }
