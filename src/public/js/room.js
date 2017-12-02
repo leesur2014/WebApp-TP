@@ -378,7 +378,7 @@ $(function () {
     $("#guesser-div").show();
     $.getJSON('/api/user/' + round.painter_id, function (resp) {
       if (resp.code == 0) {
-        $("#guesser-prompt").text(`${resp.data.nickname} is painting. Please guess an answer.`);
+        $("#guesser-prompt").html(`<em>${resp.data.nickname}</em> is painting. Please guess an answer.`);
       }
     });
 
@@ -399,7 +399,7 @@ $(function () {
     $("#guess-form").hide();
     $.getJSON('/api/user/' + round.painter_id, function (resp) {
       if (resp.code == 0) {
-        $("#guesser-prompt").text(`${resp.data.nickname} is painting. The answer is ${round.answer}.`);
+        $("#guesser-prompt").html(`<em>${resp.data.nickname}</em> is painting. The answer is <em>${round.answer}</em>.`);
       }
     });
     $("#guesser-div").show();
