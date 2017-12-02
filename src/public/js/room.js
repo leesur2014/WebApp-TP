@@ -441,7 +441,7 @@ function generate_user_row(user) {
     row.addClass('success');
   }
   row.append(observer_status);
-  row.append($("<td>").text(user.ready ? "Yes" : "No"));
+  row.append($("<td>").html(user.ready ? 'Yes<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>' : "No"));
 
   return row;
 }
