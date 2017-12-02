@@ -268,8 +268,6 @@ $(function () {
       eraser: false
     }
 
-    var send_image = send_image_factory(500);
-
     canvas.addEventListener('mousedown', onMouseDown, false);
     canvas.addEventListener('mouseup', onMouseUp, false);
     canvas.addEventListener('mouseout', onMouseUp, false);
@@ -303,7 +301,9 @@ $(function () {
       } else {
         drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
-      send_image(canvas.toDataURL());
+      $.post('/api/draw', {image: canvas.toDataURL()}, function (resp) {
+        console.log(resp);
+      });
     }
 
     function onMouseMove(e){
@@ -314,9 +314,9 @@ $(function () {
       } else {
         drawLine(current.x, current.y, e.pageX - offset.left, e.pageY - offset.top, current.color, current.width);
       }
+
       current.x = e.pageX - offset.left;
       current.y = e.pageY - offset.top;
-      send_image(canvas.toDataURL());
     }
 
     $("#pencil-btn").click(function (e) {
@@ -487,20 +487,15 @@ function hide_alert() {
 
 // delay is in milliseconds
 // reference https://remysharp.com/2010/07/21/throttling-function-calls
-function send_image_factory(delay) {
+function throttle(callback, delay) {
   var previousCall = new Date().getTime();
 
-  return function(image) {
+  return function() {
     var time = new Date().getTime();
 
     if ((time - previousCall) >= delay) {
       previousCall = time;
-      console.log("sending image to server");
-      $.post('/api/draw', {image: image}, function (resp) {
-        console.log(resp);
-      });
-    } else {
-      console.log("throttled");
+      callback.apply(null, arguments);
     }
   };
 }
